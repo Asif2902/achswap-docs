@@ -1,8 +1,6 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
-import type * as Preset from '@docusaurus/preset-classic';
+// @ts-check
 
-const config: Config = {
+const config = {
   title: 'AchSwap & AchMarket Documentation',
   tagline: 'Decentralized Exchange & Prediction Markets on ARC',
   url: 'https://docs.achswap.com',
@@ -19,23 +17,20 @@ const config: Config = {
       'classic',
       {
         docs: {
-          sidebarPath: './sidebars.ts',
+          sidebarPath: require.resolve('./sidebars.cjs'),
           breadcrumbs: true,
           routeBasePath: '/',
-          // @ts-expect-error: typedoc options
           showLastUpdateTime: true,
-          showLastUpdateAuthor: true,
         },
         blog: false,
         theme: {
           customCss: './src/css/custom.css',
         },
-      } satisfies Preset.Options,
+      },
     ],
   ],
 
   themeConfig: {
-    // @ts-expect-error: navbar type
     navbar: {
       title: 'AchSwap & AchMarket',
       logo: {
@@ -77,10 +72,6 @@ const config: Config = {
       style: 'dark',
       copyright: `Copyright © ${new Date().getFullYear()} AchSwap. Built with Docusaurus.`,
     },
-    prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
-    },
     announcementBar: {
       id: 'announcement',
       content: 'Welcome to AchSwap & AchMarket Documentation',
@@ -88,7 +79,7 @@ const config: Config = {
       textColor: '#ffffff',
       isCloseable: true,
     },
-  } satisfies Preset.ThemeConfig,
+  },
 };
 
-export default config;
+module.exports = config;
