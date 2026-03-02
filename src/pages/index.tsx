@@ -1,7 +1,7 @@
+import React from 'react';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
-import Heading from '@theme/Heading';
 
 export default function Home(): JSX.Element {
   const {siteConfig} = useDocusaurusContext();
@@ -13,13 +13,13 @@ export default function Home(): JSX.Element {
       <main>
         <div className="hero">
           <div className="container">
-            <Heading as="h1" className="hero__title">
+            <h1 className="hero__title">
               {siteConfig.title}
-            </Heading>
+            </h1>
             <p className="hero__subtitle">
               {siteConfig.tagline}
             </p>
-            
+
             <div style={{display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap'}}>
               <Link className="button button--primary button--lg" to="/introduction">
                 Get Started
@@ -37,9 +37,9 @@ export default function Home(): JSX.Element {
         <div className="container" style={{padding: '3rem 0'}}>
           <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem'}}>
             <div className="card">
-              <Heading as="h3">AchSwap v3</Heading>
+              <h3>AchSwap v3</h3>
               <p>
-                A modern decentralized exchange supporting both Uniswap V2 and V3 style liquidity pools. 
+                A modern decentralized exchange supporting both Uniswap V2 and V3 style liquidity pools.
                 Trade tokens, add liquidity, and earn fees on ARC Testnet.
               </p>
               <ul style={{marginTop: '1rem', color: '#94a3b8'}}>
@@ -50,9 +50,9 @@ export default function Home(): JSX.Element {
             </div>
 
             <div className="card">
-              <Heading as="h3">AchMarket</Heading>
+              <h3>AchMarket</h3>
               <p>
-                Decentralized prediction markets powered by LMSR. 
+                Decentralized prediction markets powered by LMSR.
                 Create markets, trade on outcomes, and earn fees on resolved markets.
               </p>
               <ul style={{marginTop: '1rem', color: '#94a3b8'}}>
@@ -63,9 +63,9 @@ export default function Home(): JSX.Element {
             </div>
 
             <div className="card">
-              <Heading as="h3">ARC Testnet</Heading>
+              <h3>ARC Testnet</h3>
               <p>
-                Both applications run on ARC Testnet with USDC as the native gas token. 
+                Both applications run on ARC Testnet with USDC as the native gas token.
                 No ETH required - just USDC for all operations.
               </p>
               <ul style={{marginTop: '1rem', color: '#94a3b8'}}>
