@@ -17,7 +17,7 @@ const config = {
       'classic',
       {
         docs: {
-          sidebarPath: require.resolve('./sidebars.cjs'),
+          sidebarPath: require.resolve('./sidebars.js'),
           breadcrumbs: true,
           routeBasePath: '/',
           showLastUpdateTime: true,
