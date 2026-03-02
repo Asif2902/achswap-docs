@@ -3,11 +3,11 @@
 const config = {
   title: 'AchSwap & AchMarket Documentation',
   tagline: 'Decentralized Exchange & Prediction Markets on ARC',
-  url: 'https://docs.achswap.com',
+  url: 'https://achswapfi.xyz',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.png',
 
   organizationName: 'achswap',
   projectName: 'achswap-docs',
@@ -31,11 +31,16 @@ const config = {
   ],
 
   themeConfig: {
+    colorMode: {
+      defaultMode: 'dark',
+      disableSwitch: false,
+      respectPrefersColorScheme: false,
+    },
     navbar: {
       title: 'AchSwap & AchMarket',
       logo: {
         alt: 'AchSwap Logo',
-        src: 'img/logo.svg',
+        src: 'img/achswap-logo.png',
       },
       items: [
         {
@@ -57,13 +62,8 @@ const config = {
           position: 'left',
         },
         {
-          href: 'https://achswap.com',
+          href: 'https://achswapfi.xyz',
           label: 'Website',
-          position: 'right',
-        },
-        {
-          href: 'https://github.com/Asif2902',
-          label: 'GitHub',
           position: 'right',
         },
       ],

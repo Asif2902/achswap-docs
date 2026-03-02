@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
+/* ─── Light mode (default) ───────────────────────────────────────── */
 :root {
   --ifm-color-primary: #2563eb;
   --ifm-color-primary-dark: #1d4ed8;
@@ -9,28 +10,71 @@
   --ifm-color-primary-lighter: #60a5fa;
   --ifm-color-primary-lightest: #93c5fd;
   --ifm-code-font-size: 95%;
-  --ifm-navbar-background-color: #0f1219;
-  --ifm-navbar-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-  --ifm-footer-background-color: #0f1219;
   --ifm-font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Theme-aware custom variables */
+  --doc-navbar-bg: #ffffff;
+  --doc-footer-bg: #f1f5f9;
+  --doc-border-color: rgba(0, 0, 0, 0.1);
+  --doc-card-bg: #f8fafc;
+  --doc-card-border: rgba(0, 0, 0, 0.08);
+  --doc-text-muted: #475569;
+  --doc-text-body: #1e293b;
+  --doc-code-bg: rgba(37, 99, 235, 0.08);
+  --doc-code-color: #1e40af;
+  --doc-pre-bg: #f1f5f9;
+  --doc-pre-border: rgba(0, 0, 0, 0.08);
+  --doc-table-th-bg: rgba(37, 99, 235, 0.07);
+  --doc-table-th-border: rgba(37, 99, 235, 0.25);
+  --doc-table-td-border: rgba(0, 0, 0, 0.07);
+  --doc-table-hover: rgba(37, 99, 235, 0.04);
+  --doc-heading-border: rgba(0, 0, 0, 0.1);
+  --doc-menu-active-bg: rgba(37, 99, 235, 0.1);
+  --doc-menu-active-color: #1d4ed8;
+  --doc-toc-border: rgba(0, 0, 0, 0.1);
+  --doc-announcement-bg: #2563eb;
 }
 
+/* ─── Dark mode ──────────────────────────────────────────────────── */
 [data-theme='dark'] {
   --ifm-background-color: #0f1219;
   --ifm-background-surface-color: #1a1f2e;
+
+  --doc-navbar-bg: #0f1219;
+  --doc-footer-bg: #0f1219;
+  --doc-border-color: rgba(255, 255, 255, 0.08);
+  --doc-card-bg: rgba(255, 255, 255, 0.03);
+  --doc-card-border: rgba(255, 255, 255, 0.08);
+  --doc-text-muted: #94a3b8;
+  --doc-text-body: #cbd5e1;
+  --doc-code-bg: rgba(37, 99, 235, 0.15);
+  --doc-code-color: #93c5fd;
+  --doc-pre-bg: #1a1f2e;
+  --doc-pre-border: rgba(255, 255, 255, 0.08);
+  --doc-table-th-bg: rgba(37, 99, 235, 0.12);
+  --doc-table-th-border: rgba(37, 99, 235, 0.35);
+  --doc-table-td-border: rgba(255, 255, 255, 0.05);
+  --doc-table-hover: rgba(255, 255, 255, 0.03);
+  --doc-heading-border: rgba(255, 255, 255, 0.08);
+  --doc-menu-active-bg: rgba(37, 99, 235, 0.15);
+  --doc-menu-active-color: #60a5fa;
+  --doc-toc-border: rgba(255, 255, 255, 0.08);
   --ifm-menu-color: #94a3b8;
   --ifm-menu-color-active: #ffffff;
   --ifm-menu-color-background-active: rgba(37, 99, 235, 0.15);
   --ifm-toc-border-color: rgba(255, 255, 255, 0.08);
 }
 
+/* ─── Navbar ─────────────────────────────────────────────────────── */
 .navbar {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: var(--doc-navbar-bg);
+  border-bottom: 1px solid var(--doc-border-color);
+  box-shadow: none;
 }
 
 .navbar__title {
   font-weight: 700;
-  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -40,6 +84,13 @@
   font-weight: 500;
 }
 
+/* ─── Footer ─────────────────────────────────────────────────────── */
+.footer {
+  background-color: var(--doc-footer-bg);
+  border-top: 1px solid var(--doc-border-color);
+}
+
+/* ─── Hero (homepage) ────────────────────────────────────────────── */
 .hero {
   padding: 4rem 0;
   text-align: center;
@@ -48,7 +99,7 @@
 .hero__title {
   font-size: 3rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #60a5fa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -57,89 +108,123 @@
 
 .hero__subtitle {
   font-size: 1.25rem;
-  color: #94a3b8;
+  color: var(--doc-text-muted);
   max-width: 600px;
   margin: 0 auto 2rem;
 }
 
+/* ─── Buttons ────────────────────────────────────────────────────── */
 .button--primary {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   border: none;
+  color: #ffffff !important;
 }
 
 .button--primary:hover {
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff !important;
 }
 
+/* ─── Cards (homepage) ───────────────────────────────────────────── */
 .card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--doc-card-bg);
+  border: 1px solid var(--doc-card-border);
   border-radius: 12px;
   padding: 1.5rem;
   transition: all 0.3s ease;
 }
 
 .card:hover {
-  border-color: rgba(37, 99, 235, 0.3);
+  border-color: rgba(37, 99, 235, 0.35);
   transform: translateY(-4px);
-  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.12);
 }
 
+.card h3 {
+  color: var(--ifm-heading-color);
+}
+
+.card ul {
+  color: var(--doc-text-muted);
+}
+
+/* ─── Sidebar menu ───────────────────────────────────────────────── */
 .menu__link {
   border-radius: 8px;
   padding: 0.5rem 1rem;
 }
 
 .menu__link--active {
-  background: rgba(37, 99, 235, 0.15);
-  color: #60a5fa;
+  background: var(--doc-menu-active-bg);
+  color: var(--doc-menu-active-color);
 }
 
+/* ─── Admonitions ────────────────────────────────────────────────── */
 .admonition {
   border-radius: 8px;
 }
 
+/* ─── Markdown content ───────────────────────────────────────────── */
 .markdown h1 {
   font-weight: 800;
   margin-bottom: 1.5rem;
+  color: var(--ifm-heading-color);
 }
 
 .markdown h2 {
   font-weight: 700;
   margin-top: 2rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--doc-heading-border);
+  color: var(--ifm-heading-color);
 }
 
 .markdown h3 {
   font-weight: 600;
   margin-top: 1.5rem;
+  color: var(--ifm-heading-color);
 }
 
 .markdown p {
   line-height: 1.7;
-  color: #cbd5e1;
+  color: var(--doc-text-body);
 }
 
 .markdown ul,
 .markdown ol {
   line-height: 1.7;
-  color: #cbd5e1;
+  color: var(--doc-text-body);
+}
+
+.markdown li {
+  color: var(--doc-text-body);
+}
+
+.markdown strong {
+  color: var(--ifm-heading-color);
 }
 
 .markdown code {
-  background: rgba(37, 99, 235, 0.15);
+  background: var(--doc-code-bg);
+  color: var(--doc-code-color);
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
   font-size: 0.875em;
 }
 
 .markdown pre {
-  background: #1a1f2e;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--doc-pre-bg) !important;
+  border: 1px solid var(--doc-pre-border);
   border-radius: 8px;
 }
 
+.markdown pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+/* ─── Tables ─────────────────────────────────────────────────────── */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -147,18 +232,20 @@ table {
 }
 
 th {
-  background: rgba(37, 99, 235, 0.1);
+  background: var(--doc-table-th-bg);
   padding: 0.75rem 1rem;
   text-align: left;
   font-weight: 600;
-  border-bottom: 2px solid rgba(37, 99, 235, 0.3);
+  border-bottom: 2px solid var(--doc-table-th-border);
+  color: var(--ifm-heading-color);
 }
 
 td {
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--doc-table-td-border);
+  color: var(--doc-text-body);
 }
 
 tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--doc-table-hover);
 }
