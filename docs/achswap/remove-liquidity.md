@@ -117,3 +117,9 @@ Remove 100% of your position:
 ### Amount incorrect
 - Pool balances may have changed
 - Check block explorer for transaction history
+
+---
+
+## Related Links
+
+- [Open AchSwap →](https://app.achswapfi.xyz)

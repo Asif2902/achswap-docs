@@ -222,3 +222,10 @@ function redeem() external {
 
 - Uses Solidity 0.8+ overflow checks
 - No SafeMath needed
+
+---
+
+## Related Links
+
+- [Open AchSwap →](https://app.achswapfi.xyz)
+- [Open AchMarket →](https://market.achswapfi.xyz)

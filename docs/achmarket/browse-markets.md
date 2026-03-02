@@ -164,3 +164,9 @@ Mobile view shows:
 - Try different keywords
 - Check spelling
 - Markets may not exist yet
+
+---
+
+## Related Links
+
+- [Open AchMarket →](https://market.achswapfi.xyz)

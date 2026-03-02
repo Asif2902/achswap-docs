@@ -81,3 +81,10 @@ Since ARC Testnet uses USDC as the native gas token, you'll need some for tradin
 - Learn about [adding liquidity](/achswap/add-liquidity)
 - Explore [creating prediction markets](/achmarket/create-market)
 - Understand the [technical architecture](/technical/smart-contracts)
+
+---
+
+## Related Links
+
+- [Open AchSwap →](https://app.achswapfi.xyz)
+- [Open AchMarket →](https://market.achswapfi.xyz)

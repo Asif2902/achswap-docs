@@ -152,3 +152,10 @@ Price impact shows how your trade affects the pool price. Larger trades relative
 
 - Manually add ARC Testnet
 - Ensure using correct RPC URL
+
+---
+
+## Related Links
+
+- [Open AchSwap →](https://app.achswapfi.xyz)
+- [Open AchMarket →](https://market.achswapfi.xyz)

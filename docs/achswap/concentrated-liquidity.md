@@ -190,3 +190,9 @@ Concentrated liquidity is powerful but requires:
 - Willingness to adjust positions
 
 Start with conservative ranges and graduate to aggressive strategies as you learn.
+
+---
+
+## Related Links
+
+- [Open AchSwap →](https://app.achswapfi.xyz)

@@ -82,5 +82,11 @@ Both applications run on **ARC Testnet**:
 
 ## Support
 
-- GitHub: [github.com/Asif2902](https://github.com/Asif2902)
-- Documentation: [docs.achswap.com](https://docs.achswap.com)
+- Documentation: [docs.achswapfi.xyz](https://docs.achswapfi.xyz)
+
+---
+
+## Related Links
+
+- [Open AchSwap →](https://app.achswapfi.xyz)
+- [Open AchMarket →](https://market.achswapfi.xyz)

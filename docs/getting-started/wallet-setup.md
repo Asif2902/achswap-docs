@@ -97,3 +97,10 @@ If you have multiple accounts in your wallet:
 ### Network Switch Failed
 - Manually add ARC Testnet to your wallet
 - Ensure you have the latest wallet version
+
+---
+
+## Related Links
+
+- [Open AchSwap →](https://app.achswapfi.xyz)
+- [Open AchMarket →](https://market.achswapfi.xyz)

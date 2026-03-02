@@ -147,3 +147,9 @@ Bridging involves two types of fees:
 2. **Keep Records** - Save transaction hashes
 3. **Be Patient** - Attestation takes time during congestion
 4. **Use Fast Transfer** - When speed matters
+
+---
+
+## Related Links
+
+- [Open AchSwap →](https://app.achswapfi.xyz)

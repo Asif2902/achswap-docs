@@ -217,3 +217,9 @@ Router estimates gas for each route:
 2. **Check Price Impact** - Yellow/red warnings
 3. **Review Route** - See what's being used
 4. **Adjust Slippage** - If trades revert often
+
+---
+
+## Related Links
+
+- [Open AchSwap →](https://app.achswapfi.xyz)

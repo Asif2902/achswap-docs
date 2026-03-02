@@ -166,3 +166,10 @@ AchMarket has the lowest fee among major prediction markets.
 | AchMarket | 0.25% |
 
 Competitive with major DEXs.
+
+---
+
+## Related Links
+
+- [Open AchSwap →](https://app.achswapfi.xyz)
+- [Open AchMarket →](https://market.achswapfi.xyz)

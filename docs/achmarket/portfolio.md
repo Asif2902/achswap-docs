@@ -174,3 +174,9 @@ Portfolio requires wallet connection:
 - See "Connect Wallet" empty state
 - Must connect to view positions
 - Click "Connect Wallet" to proceed
+
+---
+
+## Related Links
+
+- [Open AchMarket →](https://market.achswapfi.xyz)

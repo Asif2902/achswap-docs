@@ -164,3 +164,9 @@ When you provide liquidity:
 ## Removing Liquidity
 
 See [Remove Liquidity](/achswap/remove-liquidity) for withdrawal instructions.
+
+---
+
+## Related Links
+
+- [Open AchSwap →](https://app.achswapfi.xyz)

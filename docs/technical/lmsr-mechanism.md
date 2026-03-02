@@ -191,3 +191,10 @@ LMSR provides:
 4. Mathematical fairness
 
 It's the gold standard for decentralized prediction markets.
+
+---
+
+## Related Links
+
+- [Open AchSwap →](https://app.achswapfi.xyz)
+- [Open AchMarket →](https://market.achswapfi.xyz)
