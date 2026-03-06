@@ -46,8 +46,11 @@ The Factory:
 ### Contract Address
 
 ```
-Factory: 0x7B7D71141B5b9b2F42E6D7Bf1657ad9c2B140272
+Factory: 0x249A649e138f46318AfC0aD128fe0fd432902e48
+Lens: 0xF9e1DFa4d020fbd70924200d27E82B520D178354
 ```
+
+Network: ARC Testnet (Chain ID: 5042002)
 
 ## Market Contract
 
@@ -62,9 +65,10 @@ Each market is its own contract:
 ### Key Features
 
 1. **LMSR Pricing** - Automated market making
-2. **ERC-1155 Style** - Shares as tokens
-3. **Resolution** - Winner selection
-4. **Redemption** - Payout distribution
+2. **Solady Math** - Fixed-point exp/ln calculations
+3. **ERC-1155 Style** - Shares as tokens
+4. **Resolution** - Winner selection
+5. **Redemption** - Payout distribution
 
 ## LMSR Mechanism
 

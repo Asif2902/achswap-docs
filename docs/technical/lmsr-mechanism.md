@@ -14,6 +14,14 @@ LMSR is an automated market making algorithm designed specifically for predictio
 - **Dynamic pricing** - Prices reflect market sentiment
 - **Incentive alignment** - Accurate prices = lower cost
 
+## Solady Math
+
+AchMarket uses **Solady's FixedPointMathLib** for high-precision exponential and logarithmic calculations. This ensures:
+
+- Safe arithmetic with overflow protection
+- Gas-efficient implementations
+- Battle-tested code from Solady library (by Remco Bloemen)
+
 ## The Core Formula
 
 ### Cost Function
