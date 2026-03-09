@@ -79,6 +79,7 @@ const sidebars = {
         'technical/smart-contracts',
         'technical/lmsr-mechanism',
         'technical/fee-structure',
+        'technical/mcp',
       ],
     },
     {
