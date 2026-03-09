@@ -160,4 +160,4 @@ Start with V2 to learn, then graduate to V3.
 
 ## Related Links
 
-- [Open AchSwap →](https://app.achswapfi.xyz)
+- [Open AchSwap →](https://trade.achswap.app)

@@ -151,4 +151,4 @@ Recent swaps are stored locally:
 
 ## Related Links
 
-- [Open AchSwap →](https://app.achswapfi.xyz)
+- [Open AchSwap →](https://trade.achswap.app)

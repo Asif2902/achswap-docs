@@ -163,4 +163,4 @@ Review all markets in dashboard:
 
 ## Related Links
 
-- [Open AchMarket →](https://market.achswapfi.xyz)
+- [Open AchMarket →](https://prediction.achswap.app)

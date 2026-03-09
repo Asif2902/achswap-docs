@@ -195,4 +195,4 @@ Start with conservative ranges and graduate to aggressive strategies as you lear
 
 ## Related Links
 
-- [Open AchSwap →](https://app.achswapfi.xyz)
+- [Open AchSwap →](https://trade.achswap.app)

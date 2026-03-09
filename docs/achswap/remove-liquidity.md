@@ -122,4 +122,4 @@ Remove 100% of your position:
 
 ## Related Links
 
-- [Open AchSwap →](https://app.achswapfi.xyz)
+- [Open AchSwap →](https://trade.achswap.app)

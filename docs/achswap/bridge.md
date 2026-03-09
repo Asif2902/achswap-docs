@@ -152,4 +152,4 @@ Bridging involves two types of fees:
 
 ## Related Links
 
-- [Open AchSwap →](https://app.achswapfi.xyz)
+- [Open AchSwap →](https://trade.achswap.app)

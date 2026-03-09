@@ -126,4 +126,4 @@ Pool data is cached for performance:
 
 ## Related Links
 
-- [Open AchSwap →](https://app.achswapfi.xyz)
+- [Open AchSwap →](https://trade.achswap.app)

@@ -222,4 +222,4 @@ Router estimates gas for each route:
 
 ## Related Links
 
-- [Open AchSwap →](https://app.achswapfi.xyz)
+- [Open AchSwap →](https://trade.achswap.app)

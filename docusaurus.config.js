@@ -3,7 +3,7 @@
 const config = {
   title: 'AchSwap & AchMarket Documentation',
   tagline: 'Decentralized Exchange & Prediction Markets on ARC',
-  url: 'https://achswapfi.xyz',
+  url: 'https://achswap.app',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -62,7 +62,7 @@ const config = {
           position: 'left',
         },
         {
-          href: 'https://achswapfi.xyz',
+          href: 'https://achswap.app',
           label: 'Website',
           position: 'right',
         },

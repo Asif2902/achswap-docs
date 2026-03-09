@@ -150,4 +150,4 @@ Track overall performance:
 
 ## Related Links
 
-- [Open AchMarket →](https://market.achswapfi.xyz)
+- [Open AchMarket →](https://prediction.achswap.app)
