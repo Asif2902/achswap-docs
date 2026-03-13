@@ -89,6 +89,31 @@ No fee is collected. All traders can claim full refunds based on their deposits.
 
 **0.25%** (only on resolved markets, never on cancelled).
 
+### What do the market stability tags mean?
+
+Markets are tagged based on their liquidity parameter (b):
+
+| Tag | b Value | What it means |
+|-----|---------|---------------|
+| Degen Market | 0-5,000 | High risk, large price swings |
+| Highly Unstable | 5,001-10,000 | Very volatile |
+| Unstable | 10,001-25,000 | Moderate volatility |
+| Stable | 25,001-50,000 | Lower volatility |
+| Highly Stable | 50,001-100,000 | Very stable prices |
+| Extremely Stable | 100,001-250,000 | Near-stable |
+| Whale Stable | 250,001+ | Designed for large trades |
+
+Lower b = more speculative, higher potential returns but also bigger losses.
+Higher b = more stable, better for larger positions without moving the price much.
+
+### Which stability level should I choose?
+
+- **Degen/Unstable**: For speculative short-term bets, smaller markets
+- **Stable**: For general use, balanced risk/reward
+- **Highly Stable+**: For markets expecting high volume, or large positions
+
+The b parameter is set at market creation and cannot be changed later.
+
 ---
 
 ## Wallets & Network

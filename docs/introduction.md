@@ -39,6 +39,7 @@ Welcome to the AchSwap and AchMarket documentation. This guide covers everything
 | Market Creation | Create prediction markets |
 | Trading | Buy/sell outcome shares |
 | LMSR Pricing | Dynamic pricing based on volume |
+| Market Stability Tags | Degen, Stable, Highly Stable - see price sensitivity before trading |
 | Resolution | Resolve with proof, claim winnings |
 
 ## Network Information
@@ -52,6 +53,8 @@ Both applications run on **ARC Testnet**:
 | RPC URL | https://arc-testnet.drpc.org/ |
 | Explorer | https://testnet.arcscan.app |
 | Native Token | USDC |
+| Factory Contract | 0xd7b122B12caCB299249f89be7F241a47f762f283 |
+| Lens Contract | 0x8241ACa87D4Dee4CA167b1e172Ed955522599e70 |
 
 ## Getting Started
 
