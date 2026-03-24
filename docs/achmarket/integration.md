@@ -53,35 +53,72 @@ const LENS_ADDRESS = '0x...';    // Replace with actual lens address
 const ABI_FACTORY = [
   'function totalMarkets() view returns (uint256)',
   'function getMarkets(uint256 offset, uint256 limit) view returns (address[])',
-  'function isMarket(address) view returns (bool)'
+  'function isMarket(address) view returns (bool)',
+  'function markets(uint256) view returns (address)',
+  'function getMarketCount() view returns (uint256)'
 ];
 
 const ABI_LENS = [
-  'function getMarketSummaries(uint256 offset, uint256 limit) view returns (tuple(...))',
-  'function getMarketDetail(address market) view returns (tuple(...))',
-  'function getUserPortfolio(address user) view returns (tuple(...)[])',
-  'function getGlobalStats() view returns (tuple(...))'
+  'function getMarketSummaries(uint256 offset, uint256 limit) view returns (tuple(address market, uint256 marketId, string title, string category, string imageUri, string[] outcomeLabels, int256[] impliedProbabilitiesWad, uint8 stage, uint256 winningOutcome, uint256 marketDeadline, uint256 totalVolumeWei, uint256 participants, int256 bWad)[])',
+  'function getMarketDetail(address market) view returns (tuple(address market, string title, string description, string category, string imageUri, string proofUri, string[] outcomeLabels, int256[] totalSharesWad, int256[] impliedProbabilitiesWad, uint8 stage, uint256 winningOutcome, uint256 createdAt, uint256 marketDeadline, int256 bWad, uint256 totalVolumeWei, uint256 participants, uint256 resolvedPoolWei, uint256 resolutionDeadline, string cancelReason, string cancelProofUri))',
+  'function getUserPortfolio(address user) view returns (tuple(address market, string title, string category, string[] outcomeLabels, uint256[] sharesPerOutcome, uint256 netDepositedWei, bool canRedeem, bool canRefund, bool hasRedeemed, bool hasRefunded, uint8 stage)[])',
+  'function getGlobalStats() view returns (uint256 totalMarkets, uint256 totalVolumeWei, uint256 totalParticipants, uint256 activeMarkets, uint256 resolvedMarkets, uint256 cancelledOrExpiredMarkets)',
+  'function factory() view returns (address)'
 ];
 
 const ABI_MARKET = [
+  // Write functions
   'function buy(uint256 outcomeIdx, uint256 sharesWad, uint256 maxCostWei) external payable',
   'function sell(uint256 outcomeIdx, uint256 sharesWad, uint256 minReceiveWei) external',
   'function redeem() external',
   'function refund() external',
-  'function getMarketInfo() view returns (...)',
-  'function getImpliedProbabilities() view returns (int256[])',
-  'function getUserInfo(address user) view returns (...)',
-  'function previewBuy(uint256 outcomeIdx, uint256 sharesWad) view returns (uint256)',
-  'function previewSell(uint256 outcomeIdx, uint256 sharesWad) view returns (uint256)',
-  'function stage() view returns (uint8)',
-  'function marketDeadline() view returns (uint256)',
+  
+  // View functions - Metadata
+  'function title() view returns (string)',
+  'function description() view returns (string)',
+  'function category() view returns (string)',
+  'function imageUri() view returns (string)',
+  'function createdAt() view returns (uint256)',
+  'function admin() view returns (address)',
+  
+  // View functions - Outcomes
   'function outcomeLabels(uint256) view returns (string)',
   'function outcomeCount() view returns (uint256)',
+  
+  // View functions - LMSR
+  'function b() view returns (int256)',
+  'function totalSharesWad(uint256) view returns (int256)',
+  'function getShares() view returns (int256[])',
+  'function getImpliedProbabilities() view returns (int256[])',
+  
+  // View functions - User positions
   'function sharesOf(address, uint256) view returns (uint256)',
   'function netDepositedWei(address) view returns (uint256)',
   'function hasRedeemed(address) view returns (bool)',
   'function hasRefunded(address) view returns (bool)',
-  'function winningOutcome() view returns (uint256)'
+  'function getUserInfo(address user) view returns (uint256[] memory _shares, uint256 _netDeposited, bool _redeemed, bool _refunded, bool _canRedeem, bool _canRefund)',
+  
+  // View functions - Market state
+  'function stage() view returns (uint8)',
+  'function winningOutcome() view returns (uint256)',
+  'function marketDeadline() view returns (uint256)',
+  'function proofUri() view returns (string)',
+  'function cancelReason() view returns (string)',
+  'function cancelProofUri() view returns (string)',
+  'function resolvedPoolWei() view returns (uint256)',
+  'function resolutionDeadline() view returns (uint256)',
+  
+  // View functions - Analytics
+  'function totalVolumeWei() view returns (uint256)',
+  'function participantCount() view returns (uint256)',
+  'function totalNetDepositedWei() view returns (uint256)',
+  
+  // View functions - Previews
+  'function previewBuy(uint256 outcomeIdx, uint256 sharesWad) view returns (uint256 costWei)',
+  'function previewSell(uint256 outcomeIdx, uint256 sharesWad) view returns (uint256 proceedsWei)',
+  
+  // View functions - Full info
+  'function getMarketInfo() view returns (string memory _title, string memory _description, string memory _category, string memory _imageUri, string memory _proofUri, string[] memory _outcomeLabels, uint8 _stage, uint256 _winningOutcome, uint256 _createdAt, uint256 _marketDeadline, uint256 _totalVolumeWei, uint256 _participantCount, string memory _cancelReason, string memory _cancelProofUri)'
 ];
 
 export function getContracts(provider) {
