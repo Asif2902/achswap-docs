@@ -68,6 +68,14 @@ const sidebars = {
         'achmarket/fee-management',
       ],
     },
+    {
+      type: 'category',
+      label: 'Integration',
+      collapsed: false,
+      items: [
+        'achmarket/integration',
+      ],
+    },
   ],
 
   technicalSidebar: [
