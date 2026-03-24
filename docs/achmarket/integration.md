@@ -4,7 +4,7 @@ sidebar_position: 8
 
 # Integration Guide
 
-This guide provides everything you need to integrate with the AchMarket prediction market system. It covers the contract architecture, data retrieval, and user-facing functions.
+This guide shows how to integrate AchMarket into a React frontend. It covers contract setup, fetching market data, and rendering markets with images and probabilities.
 
 ---
 
@@ -18,417 +18,873 @@ AchMarket uses a three-contract architecture:
 | **PredictionMarket** | Individual market with LMSR pricing, trading, and redemption |
 | **PredictionMarketLens** | Read-only analytics and data aggregation |
 
-### Market Lifecycle
+### Market Stages
 
-1. **Active** - Trading is open, users can buy/sell shares
-2. **Suspended** - Trading paused (admin-controlled)
-3. **Resolved** - Market decided, winners can redeem
-4. **Cancelled** - Admin cancelled, users can refund
-5. **Expired** - Grace period passed without resolution, users can refund
-
----
-
-## Contract Addresses
-
-> **Note:** Replace `FACTORY_ADDRESS` with the actual deployed factory address on your target network.
-
-```solidity
-PredictionMarketFactory factory = PredictionMarketFactory(FACTORY_ADDRESS);
-PredictionMarketLens lens = PredictionMarketLens(LENS_ADDRESS);
-```
+| Stage | Value | Description |
+|-------|-------|-------------|
+| Active | 0 | Trading is open |
+| Suspended | 1 | Trading paused |
+| Resolved | 2 | Winners can redeem |
+| Cancelled | 3 | Full refund available |
+| Expired | 4 | Full refund available |
 
 ---
 
-## Getting Market Data
+## Prerequisites
 
-### 1. List All Markets
+Install required packages:
 
-```solidity
-// Get total market count
-uint256 totalMarkets = factory.totalMarkets();
-
-// Get market addresses (paginated)
-address[] memory markets = factory.getMarkets(offset, limit);
-```
-
-### 2. Get Market Summaries
-
-```solidity
-MarketSummary[] memory summaries = lens.getMarketSummaries(offset, limit);
-
-// MarketSummary contains:
-// - market: address
-// - marketId: uint256
-// - title: string
-// - category: string
-// - imageUri: string
-// - outcomeLabels: string[]
-// - impliedProbabilitiesWad: int256[] (0 to 1e18)
-// - stage: Stage (0=Active, 1=Suspended, 2=Resolved, 3=Cancelled, 4=Expired)
-// - winningOutcome: uint256
-// - marketDeadline: uint256 (timestamp)
-// - totalVolumeWei: uint256
-// - participants: uint256
-// - bWad: int256 (LMSR liquidity parameter)
-```
-
-### 3. Get Full Market Details
-
-```solidity
-MarketDetail memory detail = lens.getMarketDetail(marketAddress);
-
-// MarketDetail contains all MarketSummary fields plus:
-// - description: string
-// - proofUri: string (resolution proof)
-// - totalSharesWad: int256[]
-// - resolvedPoolWei: uint256
-// - resolutionDeadline: uint256
-// - cancelReason: string
-// - cancelProofUri: string
-```
-
-### 4. Get Implied Probabilities
-
-```solidity
-int256[] memory probs = market.getImpliedProbabilities();
-
-// Returns probability for each outcome as WAD (1e18 = 100%)
-// Sums to approximately 1e18
-```
-
-### 5. Get User Positions
-
-```solidity
-UserPosition[] memory positions = lens.getUserPortfolio(userAddress);
-
-// UserPosition contains:
-// - market: address
-// - title: string
-// - category: string
-// - outcomeLabels: string[]
-// - sharesPerOutcome: uint256[] (WAD)
-// - netDepositedWei: uint256
-// - canRedeem: bool
-// - canRefund: bool
-// - hasRedeemed: bool
-// - hasRefunded: bool
-// - stage: Stage
-```
-
-### 6. Get Individual User Info
-
-```solidity
-(
-    uint256[] memory shares,
-    uint256 netDeposited,
-    bool redeemed,
-    bool refunded,
-    bool canRedeem,
-    bool canRefund
-) = market.getUserInfo(userAddress);
+```bash
+npm install ethers viem @tanstack/react-query
 ```
 
 ---
 
-## User Trading Functions
+## Contract Setup
+
+### Using Ethers.js
+
+```javascript
+import { ethers } from 'ethers';
+
+const FACTORY_ADDRESS = '0x...'; // Replace with actual factory address
+const LENS_ADDRESS = '0x...';    // Replace with actual lens address
+
+const ABI_FACTORY = [
+  'function totalMarkets() view returns (uint256)',
+  'function getMarkets(uint256 offset, uint256 limit) view returns (address[])',
+  'function isMarket(address) view returns (bool)'
+];
+
+const ABI_LENS = [
+  'function getMarketSummaries(uint256 offset, uint256 limit) view returns (tuple(...))',
+  'function getMarketDetail(address market) view returns (tuple(...))',
+  'function getUserPortfolio(address user) view returns (tuple(...)[])',
+  'function getGlobalStats() view returns (tuple(...))'
+];
+
+const ABI_MARKET = [
+  'function buy(uint256 outcomeIdx, uint256 sharesWad, uint256 maxCostWei) external payable',
+  'function sell(uint256 outcomeIdx, uint256 sharesWad, uint256 minReceiveWei) external',
+  'function redeem() external',
+  'function refund() external',
+  'function getMarketInfo() view returns (...)',
+  'function getImpliedProbabilities() view returns (int256[])',
+  'function getUserInfo(address user) view returns (...)',
+  'function previewBuy(uint256 outcomeIdx, uint256 sharesWad) view returns (uint256)',
+  'function previewSell(uint256 outcomeIdx, uint256 sharesWad) view returns (uint256)',
+  'function stage() view returns (uint8)',
+  'function marketDeadline() view returns (uint256)',
+  'function outcomeLabels(uint256) view returns (string)',
+  'function outcomeCount() view returns (uint256)',
+  'function sharesOf(address, uint256) view returns (uint256)',
+  'function netDepositedWei(address) view returns (uint256)',
+  'function hasRedeemed(address) view returns (bool)',
+  'function hasRefunded(address) view returns (bool)',
+  'function winningOutcome() view returns (uint256)'
+];
+
+export function getContracts(provider) {
+  const factory = new ethers.Contract(FACTORY_ADDRESS, ABI_FACTORY, provider);
+  const lens = new ethers.Contract(LENS_ADDRESS, ABI_LENS, provider);
+  return { factory, lens };
+}
+
+export function getMarketContract(marketAddress, signer) {
+  return new ethers.Contract(marketAddress, ABI_MARKET, signer);
+}
+```
+
+### Using Viem
+
+```javascript
+import { createPublicClient, createWalletClient, http } from 'viem';
+import { privateKeyToAccount } from 'viem/accounts';
+
+const client = createPublicClient({
+  chain: yourChain,
+  transport: http()
+});
+
+const walletClient = createWalletClient({
+  chain: yourChain,
+  transport: http(),
+  account: yourAccount
+});
+```
+
+---
+
+## Fetching Market Data
+
+### Get All Markets
+
+```javascript
+async function fetchMarkets(provider, offset = 0, limit = 10) {
+  const { lens } = getContracts(provider);
+  
+  const summaries = await lens.getMarketSummaries(offset, limit);
+  
+  return summaries.map((s, i) => ({
+    address: s.market,
+    id: s.marketId,
+    title: s.title,
+    category: s.category,
+    imageUri: s.imageUri,
+    outcomes: s.outcomeLabels,
+    probabilities: s.impliedProbabilitiesWad.map(p => Number(p) / 1e18),
+    stage: Number(s.stage),
+    winningOutcome: Number(s.winningOutcome),
+    deadline: Number(s.marketDeadline),
+    volume: Number(s.totalVolumeWei) / 1e18,
+    participants: Number(s.participants)
+  }));
+}
+```
+
+### Get Single Market Detail
+
+```javascript
+async function fetchMarketDetail(provider, marketAddress) {
+  const { lens } = getContracts(provider);
+  
+  const detail = await lens.getMarketDetail(marketAddress);
+  
+  return {
+    address: detail.market,
+    title: detail.title,
+    description: detail.description,
+    category: detail.category,
+    imageUri: detail.imageUri,
+    proofUri: detail.proofUri,
+    outcomes: detail.outcomeLabels,
+    probabilities: detail.impliedProbabilitiesWad.map(p => Number(p) / 1e18),
+    totalShares: detail.totalSharesWad.map(s => Number(s) / 1e18),
+    stage: Number(detail.stage),
+    winningOutcome: Number(detail.winningOutcome),
+    createdAt: Number(detail.createdAt),
+    deadline: Number(detail.marketDeadline),
+    volume: Number(detail.totalVolumeWei) / 1e18,
+    participants: Number(detail.participants),
+    resolvedPoolWei: Number(detail.resolvedPoolWei),
+    resolutionDeadline: Number(detail.resolutionDeadline),
+    cancelReason: detail.cancelReason,
+    cancelProofUri: detail.cancelProofUri
+  };
+}
+```
+
+---
+
+## Rendering Market Cards
+
+### Basic Market Card Component
+
+```jsx
+import React from 'react';
+
+function MarketCard({ market, onClick }) {
+  const formatProbability = (prob) => {
+    return `${(prob * 100).toFixed(1)}%`;
+  };
+  
+  const formatDeadline = (timestamp) => {
+    const date = new Date(timestamp * 1000);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+  
+  const formatVolume = (volume) => {
+    if (volume >= 1e6) return `${(volume / 1e6).toFixed(2)}M`;
+    if (volume >= 1e3) return `${(volume / 1e3).toFixed(2)}K`;
+    return volume.toFixed(2);
+  };
+  
+  const getStageLabel = (stage) => {
+    const labels = ['Active', 'Suspended', 'Resolved', 'Cancelled', 'Expired'];
+    return labels[stage] || 'Unknown';
+  };
+  
+  return (
+    <div 
+      className="market-card" 
+      onClick={() => onClick(market.address)}
+      style={{
+        border: '1px solid #e0e0e0',
+        borderRadius: '12px',
+        padding: '16px',
+        cursor: 'pointer',
+        transition: 'box-shadow 0.2s'
+      }}
+    >
+      {/* Image */}
+      {market.imageUri && (
+        <img 
+          src={market.imageUri} 
+          alt={market.title}
+          style={{
+            width: '100%',
+            height: '150px',
+            objectFit: 'cover',
+            borderRadius: '8px',
+            marginBottom: '12px'
+          }}
+        />
+      )}
+      
+      {/* Title & Category */}
+      <h3 style={{ margin: '0 0 8px 0' }}>{market.title}</h3>
+      <span 
+        style={{
+          display: 'inline-block',
+          padding: '4px 8px',
+          background: '#f0f0f0',
+          borderRadius: '4px',
+          fontSize: '12px'
+        }}
+      >
+        {market.category}
+      </span>
+      
+      {/* Probabilities */}
+      <div style={{ marginTop: '12px' }}>
+        {market.outcomes.map((outcome, idx) => (
+          <div 
+            key={idx}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              padding: '4px 0'
+            }}
+          >
+            <span>{outcome}</span>
+            <span style={{ fontWeight: 'bold' }}>
+              {formatProbability(market.probabilities[idx])}
+            </span>
+          </div>
+        ))}
+      </div>
+      
+      {/* Footer Info */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        marginTop: '12px',
+        paddingTop: '12px',
+        borderTop: '1px solid #e0e0e0',
+        fontSize: '12px',
+        color: '#666'
+      }}>
+        <span>{getStageLabel(market.stage)}</span>
+        <span>Vol: {formatVolume(market.volume)} ETH</span>
+        <span>Ends: {formatDeadline(market.deadline)}</span>
+      </div>
+    </div>
+  );
+}
+
+export default MarketCard;
+```
+
+### Market Grid
+
+```jsx
+function MarketGrid({ markets, onMarketClick }) {
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+      gap: '20px',
+      padding: '20px'
+    }}>
+      {markets.map(market => (
+        <MarketCard 
+          key={market.address}
+          market={market}
+          onClick={onMarketClick}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+---
+
+## Rendering Market Detail Page
+
+### Full Market Detail Component
+
+```jsx
+function MarketDetailPage({ market, userAddress, onBuy, onSell, onRedeem, onRefund }) {
+  const formatProbability = (prob) => `${(prob * 100).toFixed(1)}%`;
+  const formatEth = (wei) => `${(Number(wei) / 1e18).toFixed(4)} ETH`;
+  
+  const isResolved = market.stage === 2;
+  const isCancelled = market.stage === 3;
+  const isExpired = market.stage === 4;
+  const isActive = market.stage === 0;
+  const canTrade = isActive && Date.now() / 1000 < market.deadline;
+  
+  return (
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
+      {/* Header with Image */}
+      {market.imageUri && (
+        <img 
+          src={market.imageUri}
+          alt={market.title}
+          style={{
+            width: '100%',
+            height: '300px',
+            objectFit: 'cover',
+            borderRadius: '12px',
+            marginBottom: '20px'
+          }}
+        />
+      )}
+      
+      {/* Title & Description */}
+      <h1>{market.title}</h1>
+      <p style={{ color: '#666', fontSize: '16px' }}>{market.description}</p>
+      
+      {/* Category Tag */}
+      <span style={{
+        display: 'inline-block',
+        padding: '6px 12px',
+        background: '#e3f2fd',
+        borderRadius: '20px',
+        fontSize: '14px'
+      }}>
+        {market.category}
+      </span>
+      
+      {/* Market Stats */}
+      <div style={{
+        display: 'flex',
+        gap: '20px',
+        margin: '20px 0',
+        padding: '16px',
+        background: '#f5f5f5',
+        borderRadius: '8px'
+      }}>
+        <div>
+          <div style={{ fontSize: '12px', color: '#666' }}>Volume</div>
+          <div style={{ fontSize: '18px', fontWeight: 'bold' }}>
+            {market.volume.toFixed(2)} ETH
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize: '12px', color: '#666' }}>Participants</div>
+          <div style={{ fontSize: '18px', fontWeight: 'bold' }}>
+            {market.participants}
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize: '12px', color: '#666' }}>Deadline</div>
+          <div style={{ fontSize: '18px', fontWeight: 'bold' }}>
+            {new Date(market.deadline * 1000).toLocaleDateString()}
+          </div>
+        </div>
+      </div>
+      
+      {/* Outcomes & Probabilities */}
+      <h2>Outcomes</h2>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {market.outcomes.map((outcome, idx) => (
+          <div 
+            key={idx}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '16px',
+              background: isResolved && market.winningOutcome === idx ? '#e8f5e9' : '#fff',
+              border: isResolved && market.winningOutcome === idx ? '2px solid #4caf50' : '1px solid #ddd',
+              borderRadius: '8px'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              {isResolved && market.winningOutcome === idx && (
+                <span style={{ color: '#4caf50', fontWeight: 'bold' }}>✓ Winner</span>
+              )}
+              <span style={{ fontSize: '18px', fontWeight: '500' }}>{outcome}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <span style={{ fontSize: '20px', fontWeight: 'bold' }}>
+                {formatProbability(market.probabilities[idx])}
+              </span>
+              {canTrade && (
+                <button
+                  onClick={() => onBuy(idx)}
+                  style={{
+                    padding: '8px 16px',
+                    background: '#2196f3',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Buy
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {/* Resolution Info */}
+      {(isResolved || isCancelled || isExpired) && (
+        <div style={{
+          marginTop: '20px',
+          padding: '16px',
+          background: isResolved ? '#e8f5e9' : isCancelled ? '#ffebee' : '#fff3e0',
+          borderRadius: '8px'
+        }}>
+          <h3>
+            {isResolved ? 'Market Resolved' : isCancelled ? 'Market Cancelled' : 'Market Expired'}
+          </h3>
+          {market.proofUri && (
+            <p>Proof: <a href={market.proofUri}>{market.proofUri}</a></p>
+          )}
+          {market.cancelReason && (
+            <p>Reason: {market.cancelReason}</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+---
+
+## Trading Interface
+
+### Buy Component
+
+```jsx
+function BuyPanel({ market, outcomeIdx, outcomeLabel, onConfirm }) {
+  const [amount, setAmount] = useState('');
+  const [estimatedCost, setEstimatedCost] = useState(null);
+  
+  useEffect(() => {
+    if (amount && market) {
+      // Call previewBuy to get estimated cost
+      // estimateCost(market.address, outcomeIdx, parseFloat(amount) * 1e18)
+      //   .then(setEstimatedCost);
+    }
+  }, [amount, market, outcomeIdx]);
+  
+  const handleBuy = () => {
+    const sharesWad = ethers.parseEther(amount);
+    const maxCost = estimatedCost ? estimatedCost.mul(105).div(100) : ethers.parseEther(amount); // 5% slippage
+    onConfirm(outcomeIdx, sharesWad, maxCost);
+  };
+  
+  return (
+    <div style={{ padding: '16px', border: '1px solid #ddd', borderRadius: '8px' }}>
+      <h4>Buy {outcomeLabel}</h4>
+      <input
+        type="number"
+        placeholder="Amount (ETH)"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        style={{
+          width: '100%',
+          padding: '8px',
+          marginBottom: '12px',
+          borderRadius: '4px',
+          border: '1px solid #ddd'
+        }}
+      />
+      {estimatedCost && (
+        <p>Estimated cost: {ethers.formatEther(estimatedCost)} ETH</p>
+      )}
+      <button
+        onClick={handleBuy}
+        disabled={!amount}
+        style={{
+          width: '100%',
+          padding: '12px',
+          background: '#4caf50',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '6px',
+          cursor: 'pointer'
+        }}
+      >
+        Buy Shares
+      </button>
+    </div>
+  );
+}
+```
+
+### Sell Component
+
+```jsx
+function SellPanel({ market, outcomeIdx, outcomeLabel, userShares, onConfirm }) {
+  const [amount, setAmount] = useState('');
+  const [estimatedProceeds, setEstimatedProceeds] = useState(null);
+  
+  const handleSell = () => {
+    const sharesWad = ethers.parseEther(amount);
+    const minReceive = estimatedProceeds ? estimatedProceeds.mul(95).div(100) : 0; // 5% slippage
+    onConfirm(outcomeIdx, sharesWad, minReceive);
+  };
+  
+  return (
+    <div style={{ padding: '16px', border: '1px solid #ddd', borderRadius: '8px' }}>
+      <h4>Sell {outcomeLabel}</h4>
+      <p>Your shares: {userShares ? ethers.formatEther(userShares) : 0}</p>
+      <input
+        type="number"
+        placeholder="Amount to sell"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        style={{
+          width: '100%',
+          padding: '8px',
+          marginBottom: '12px'
+        }}
+      />
+      <button
+        onClick={handleSell}
+        disabled={!amount || !userShares}
+        style={{
+          width: '100%',
+          padding: '12px',
+          background: '#ff9800',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '6px'
+        }}
+      >
+        Sell Shares
+      </button>
+    </div>
+  );
+}
+```
+
+---
+
+## User Portfolio
+
+### Portfolio Component
+
+```jsx
+function Portfolio({ positions, onRedeem, onRefund }) {
+  const formatEth = (wei) => ethers.formatEther(wei);
+  
+  return (
+    <div style={{ padding: '20px' }}>
+      <h2>Your Portfolio</h2>
+      {positions.length === 0 ? (
+        <p>No positions yet</p>
+      ) : (
+        positions.map((pos) => (
+          <div 
+            key={pos.market}
+            style={{
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              padding: '16px',
+              marginBottom: '16px'
+            }}
+          >
+            <h3>{pos.title}</h3>
+            <p>Category: {pos.category}</p>
+            
+            {/* Shares */}
+            <div style={{ margin: '12px 0' }}>
+              <strong>Your Shares:</strong>
+              {pos.outcomeLabels.map((label, idx) => (
+                <div key={idx}>
+                  {label}: {pos.sharesPerOutcome[idx] ? formatEth(pos.sharesPerOutcome[idx]) : 0}
+                </div>
+              ))}
+            </div>
+            
+            {/* Net Deposited */}
+            <p>Net Deposited: {formatEth(pos.netDeposited)} ETH</p>
+            
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', gap: '12px' }}>
+              {pos.canRedeem && (
+                <button
+                  onClick={() => onRedeem(pos.market)}
+                  style={{
+                    padding: '10px 20px',
+                    background: '#4caf50',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px'
+                  }}
+                >
+                  Redeem Winnings
+                </button>
+              )}
+              {pos.canRefund && (
+                <button
+                  onClick={() => onRefund(pos.market)}
+                  style={{
+                    padding: '10px 20px',
+                    background: '#f44336',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px'
+                  }}
+                >
+                  Get Refund
+                </button>
+              )}
+              {pos.hasRedeemed && (
+                <span style={{ color: '#4caf50' }}>✓ Redeemed</span>
+              )}
+              {pos.hasRefunded && (
+                <span style={{ color: '#f44336' }}>✓ Refunded</span>
+              )}
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+```
+
+---
+
+## Executing Transactions
 
 ### Buy Shares
 
-```solidity
-function buy(
-    uint256 outcomeIdx,    // Index of the outcome (0, 1, 2, ...)
-    uint256 sharesWad,     // Amount of shares in WAD (1e18 = 1 share)
-    uint256 maxCostWei    // Maximum acceptable cost (slippage protection)
-) external payable;
+```javascript
+async function buyShares(marketAddress, outcomeIdx, sharesWad, maxCostWei, signer) {
+  const market = getMarketContract(marketAddress, signer);
+  
+  const tx = await market.buy(outcomeIdx, sharesWad, maxCostWei, {
+    value: maxCostWei
+  });
+  
+  const receipt = await tx.wait();
+  return receipt;
+}
 ```
-
-**Parameters:**
-- `outcomeIdx`: Index of the outcome to buy (0-based, matches outcomeLabels array)
-- `sharesWad`: Amount of shares in wei-adjusted format (1e18 = 1 full share)
-- `maxCostWei`: Maximum ETH willing to pay (prevents slippage)
-
-**Example:**
-```solidity
-// Buy 10 shares of outcome 0, accepting up to 0.1 ETH
-market.buy{value: 0.1 ether}(0, 10e18, 0.1 ether);
-```
-
-**Return:** Any excess ETH is refunded to the caller.
 
 ### Sell Shares
 
-```solidity
-function sell(
-    uint256 outcomeIdx,     // Index of the outcome to sell
-    uint256 sharesWad,      // Amount of shares to sell in WAD
-    uint256 minReceiveWei  // Minimum acceptable proceeds (slippage protection)
-) external;
-```
-
-**Parameters:**
-- `outcomeIdx`: Index of the outcome to sell
-- `sharesWad`: Amount of shares to sell in WAD
-- `minReceiveWei`: Minimum ETH acceptable (prevents slippage)
-
-**Example:**
-```solidity
-// Sell 5 shares of outcome 0, accepting at least 0.05 ETH
-market.sell(0, 5e18, 0.05 ether);
-```
-
-**Return:** ETH proceeds are sent to the caller.
-
-### Preview Buy Cost
-
-```solidity
-uint256 cost = market.previewBuy(outcomeIdx, sharesWad);
-// Returns cost in wei
-```
-
-### Preview Sell Proceeds
-
-```solidity
-uint256 proceeds = market.previewSell(outcomeIdx, sharesWad);
-// Returns proceeds in wei
-```
-
----
-
-## Redemption & Refunds
-
-### Redeem Winnings (Resolved Markets)
-
-When a market is resolved, winners can redeem their shares for ETH.
-
-```solidity
-function redeem() external;
-```
-
-**Requirements:**
-- Market stage must be `Resolved`
-- User must hold shares in the winning outcome
-- User must not have already redeemed
-
-**Example:**
-```solidity
-// After market resolves with outcome index 0 as winner
-if (market.canRedeem(user)) {
-    market.redeem();
+```javascript
+async function sellShares(marketAddress, outcomeIdx, sharesWad, minReceiveWei, signer) {
+  const market = getMarketContract(marketAddress, signer);
+  
+  const tx = await market.sell(outcomeIdx, sharesWad, minReceiveWei);
+  const receipt = await tx.wait();
+  
+  return receipt;
 }
 ```
 
-### Get Redemption Status
+### Redeem Winnings
 
-```solidity
-(
-    ,
-    ,
-    bool hasRedeemed,
-    bool hasRefunded,
-    bool canRedeem,
-    bool canRefund
-) = market.getUserInfo(userAddress);
-```
-
-### Refund (Cancelled/Expired Markets)
-
-When a market is cancelled or expires, users get pro-rata refunds.
-
-```solidity
-function refund() external;
-```
-
-**Requirements:**
-- Market stage must be `Cancelled` or `Expired`
-- User must have net deposits
-- User must not have already refunded
-
-**Example:**
-```solidity
-// Check if user can refund
- (, , , , , bool canRefund) = market.getUserInfo(userAddress);
- if (canRefund) {
-     market.refund();
- }
-```
-
----
-
-## Key Data Types
-
-### Stage Enum
-
-```solidity
-enum Stage {
-    Active,     // 0 - Trading open
-    Suspended,  // 1 - Trading paused
-    Resolved,   // 2 - Winners can redeem
-    Cancelled,  // 3 - Full refund available
-    Expired     // 4 - Full refund available
+```javascript
+async function redeem(marketAddress, signer) {
+  const market = getMarketContract(marketAddress, signer);
+  
+  const tx = await market.redeem();
+  const receipt = await tx.wait();
+  
+  return receipt;
 }
 ```
 
-### Probability Format
+### Get Refund
 
-All probabilities are returned as WAD (fixed-point 18 decimals):
-- `1e18` = 100%
-- `5e17` = 50%
-- `1e17` = 10%
-
----
-
-## Smart Contract Integration Example
-
-### Basic Integration Contract
-
-```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
-
-import {PredictionMarket} from "./PredictionMarket.sol";
-import {PredictionMarketFactory} from "./PredictionMarketFactory.sol";
-import {PredictionMarketLens} from "./PredictionMarketLens.sol";
-
-contract MarketIntegrator {
-    PredictionMarketFactory public factory;
-    PredictionMarketLens public lens;
-
-    constructor(address _factory, address _lens) {
-        factory = PredictionMarketFactory(_factory);
-        lens = PredictionMarketLens(_lens);
-    }
-
-    struct MarketInfo {
-        address marketAddress;
-        string title;
-        string description;
-        string category;
-        string[] outcomes;
-        uint256 deadline;
-        uint256 stage;
-        uint256 volume;
-        int256[] probabilities;
-    }
-
-    function getMarketInfo(address market) external view returns (MarketInfo memory info) {
-        PredictionMarketLens.MarketDetail memory detail = lens.getMarketDetail(market);
-        
-        info.marketAddress = market;
-        info.title = detail.title;
-        info.description = detail.description;
-        info.category = detail.category;
-        info.outcomes = detail.outcomeLabels;
-        info.deadline = detail.marketDeadline;
-        info.stage = uint256(detail.stage);
-        info.volume = detail.totalVolumeWei;
-        info.probabilities = detail.impliedProbabilitiesWad;
-    }
-
-    function getUserPositions(address user) external view returns (
-        address[] memory markets,
-        uint256[][] memory allShares,
-        uint256[] memory netDeposited
-    ) {
-        PredictionMarketLens.UserPosition[] memory positions = lens.getUserPortfolio(user);
-        
-        markets = new address[](positions.length);
-        allShares = new uint256[][](positions.length);
-        netDeposited = new uint256[](positions.length);
-        
-        for (uint i = 0; i < positions.length; i++) {
-            markets[i] = positions[i].market;
-            allShares[i] = positions[i].sharesPerOutcome;
-            netDeposited[i] = positions[i].netDepositedWei;
-        }
-    }
-
-    function buyOutcome(address market, uint256 outcomeIdx, uint256 shares, uint256 maxCost) external payable {
-        PredictionMarket(market).buy{value: msg.value}(outcomeIdx, shares, maxCost);
-    }
-
-    function sellOutcome(address market, uint256 outcomeIdx, uint256 shares, uint256 minReceive) external {
-        PredictionMarket(market).sell(outcomeIdx, shares, minReceive);
-    }
-
-    function redeemWinnings(address market) external {
-        PredictionMarket(market).redeem();
-    }
-
-    function getRefund(address market) external {
-        PredictionMarket(market).refund();
-    }
+```javascript
+async function refund(marketAddress, signer) {
+  const market = getMarketContract(marketAddress, signer);
+  
+  const tx = await market.refund();
+  const receipt = await tx.wait();
+  
+  return receipt;
 }
 ```
 
-### What Data Should Your Smart Contract Forward?
-
-When integrating with AchMarket, your smart contract should forward:
-
-1. **Market Address** - The specific PredictionMarket contract
-2. **User Address** - The wallet interacting (typically `msg.sender`)
-3. **Outcome Index** - Which outcome they're trading (0, 1, 2...)
-4. **Amount** - Share quantity in WAD
-5. **Value** - ETH value for purchases
-
 ---
 
-## Error Codes
+## Handling Images
 
-| Error | Description |
-|-------|-------------|
-| `PM: not admin` | Function restricted to admin |
-| `PM: market not active` | Market not in Active stage |
-| `PM: trading period ended` | Past market deadline |
-| `PM: invalid outcome` | Outcome index out of bounds |
-| `PM: zero shares` | Zero amount specified |
-| `PM: slippage exceeded` | Price moved beyond maxCostWei/minReceiveWei |
-| `PM: insufficient ETH` | Not enough ETH sent |
-| `PM: insufficient shares` | Not enough shares to sell |
-| `PM: not resolved` | Market not in Resolved stage |
-| `PM: already redeemed` | Already claimed winnings |
-| `PM: refunds not open` | Market not Cancelled/Expired |
-| `PM: already refunded` | Already claimed refund |
-| `PM: nothing to refund` | No deposits to refund |
+### Image Component with Fallback
 
----
+```jsx
+function MarketImage({ src, alt, style }) {
+  const [error, setError] = useState(false);
+  
+  return (
+    <img
+      src={error ? '/placeholder-market.png' : src}
+      alt={alt}
+      onError={() => setError(true)}
+      style={style}
+    />
+  );
+}
+```
 
-## Events to Monitor
+### Using IPFS Images
 
-```solidity
-// Trading
-event SharesBought(address indexed trader, uint256 indexed outcomeIndex, uint256 sharesWad, uint256 costWei);
-event SharesSold(address indexed trader, uint256 indexed outcomeIndex, uint256 sharesWad, uint256 proceedsWei);
+```javascript
+// If your imageUri is an IPFS link like ipfs://Qmxxx
+function getImageUrl(ipfsUri) {
+  if (!ipfsUri) return null;
+  
+  if (ipfsUri.startsWith('ipfs://')) {
+    const ipfsHash = ipfsUri.replace('ipfs://', '');
+    return `https://ipfs.io/ipfs/${ipfsHash}`;
+  }
+  
+  return ipfsUri;
+}
 
-// Resolution
-event MarketResolved(uint256 winningOutcome, string proofUri);
-event MarketCancelled(string reason, string proofUri);
-
-// Claims
-event Redeemed(address indexed user, uint256 amountWei);
-event Refunded(address indexed user, uint256 amountWei);
+// Usage in component
+<img src={getImageUrl(market.imageUri)} alt={market.title} />
 ```
 
 ---
 
-## Gas Considerations
+## Utility Functions
 
-- **Buying**: Moderate gas (state updates + fee calculation)
-- **Selling**: Higher gas (requires liquidity check)
-- **Redeem**: Low gas (single transfer)
-- **Refund**: Low gas (single transfer)
-- **View calls**: Free (no gas)
+### Format WAD to ETH
+
+```javascript
+function formatWadToEth(wad) {
+  return (Number(wad) / 1e18).toFixed(4);
+}
+
+function parseEthToWad(eth) {
+  return (parseFloat(eth) * 1e18).toString();
+}
+```
+
+### Format Probability
+
+```javascript
+function formatProbability(probabilityWad) {
+  return `${(Number(probabilityWad) / 1e18 * 100).toFixed(1)}%`;
+}
+```
+
+### Time Formatting
+
+```javascript
+function formatTimestamp(timestamp) {
+  return new Date(timestamp * 1000).toLocaleString();
+}
+
+function formatTimeRemaining(deadline) {
+  const now = Math.floor(Date.now() / 1000);
+  const remaining = deadline - now;
+  
+  if (remaining <= 0) return 'Ended';
+  
+  const days = Math.floor(remaining / 86400);
+  const hours = Math.floor((remaining % 86400) / 3600);
+  const minutes = Math.floor((remaining % 3600) / 60);
+  
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
+}
+```
+
+---
+
+## Complete Integration Example
+
+```jsx
+import React, { useState, useEffect } from 'react';
+import { ethers } from 'ethers';
+
+function App() {
+  const [markets, setMarkets] = useState([]);
+  const [selectedMarket, setSelectedMarket] = useState(null);
+  const [userAddress, setUserAddress] = useState(null);
+  const [provider, setProvider] = useState(null);
+  
+  // Initialize provider
+  useEffect(() => {
+    if (window.ethereum) {
+      const p = new ethers.BrowserProvider(window.ethereum);
+      setProvider(p);
+    }
+  }, []);
+  
+  // Connect wallet
+  const connectWallet = async () => {
+    if (!provider) return;
+    const signer = await provider.getSigner();
+    setUserAddress(await signer.getAddress());
+  };
+  
+  // Fetch markets
+  useEffect(() => {
+    if (!provider) return;
+    // fetchMarkets(provider).then(setMarkets);
+  }, [provider]);
+  
+  return (
+    <div>
+      {/* Header */}
+      <header style={{ padding: '16px', borderBottom: '1px solid #ddd' }}>
+        <h1>AchMarket</h1>
+        {userAddress ? (
+          <span>{userAddress.slice(0, 6)}...{userAddress.slice(-4)}</span>
+        ) : (
+          <button onClick={connectWallet}>Connect Wallet</button>
+        )}
+      </header>
+      
+      {/* Main Content */}
+      {selectedMarket ? (
+        <MarketDetailPage 
+          market={selectedMarket}
+          userAddress={userAddress}
+          onBuy={(idx, shares, maxCost) => /* handle buy */}
+          onRedeem={(addr) => /* handle redeem */}
+          onRefund={(addr) => /* handle refund */}
+        />
+      ) : (
+        <MarketGrid 
+          markets={markets}
+          onMarketClick={(addr) => /* fetch and show detail */}
+        />
+      )}
+    </div>
+  );
+}
+```
 
 ---
 
 ## Testing Checklist
 
+- [ ] Connect wallet and get user address
 - [ ] Fetch and display market list
-- [ ] Show market details with probabilities
+- [ ] Render market images correctly
+- [ ] Display market probabilities as percentages
+- [ ] Show market deadline with proper formatting
+- [ ] Handle different market stages (Active, Resolved, etc.)
 - [ ] Implement buy with slippage protection
 - [ ] Implement sell with slippage protection
-- [ ] Handle resolution and show redeem button
-- [ ] Handle cancellation/show refund button
-- [ ] Show user portfolio with all positions
-- [ ] Handle stage transitions correctly
-- [ ] Format WAD numbers properly (divide by 1e18)
-- [ ] Handle ETHwei (18 decimals)
+- [ ] Show redeem button when market is resolved
+- [ ] Show refund button when market is cancelled/expired
+- [ ] Fetch and display user portfolio
+- [ ] Handle transaction errors gracefully
+- [ ] Add loading states for async operations
