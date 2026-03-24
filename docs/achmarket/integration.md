@@ -12,11 +12,20 @@ This guide explains how to integrate with AchMarket prediction markets from any 
 
 AchMarket uses a three-contract architecture:
 
-| Contract | Purpose | Address |
-|----------|---------|---------|
-| **PredictionMarketFactory** | Creates and registers new markets | `FACTORY_ADDRESS` |
-| **PredictionMarketLens** | Read-only analytics and data aggregation | `LENS_ADDRESS` |
+| Contract | Purpose | Address (ARC Testnet) |
+|----------|---------|----------------------|
+| **PredictionMarketFactory** | Creates and registers new markets | `0xd7b122B12caCB299249f89be7F241a47f762f283` |
+| **PredictionMarketLens** | Read-only analytics and data aggregation | `0x8241ACa87D4Dee4CA167b1e172Ed955522599e70` |
 | **PredictionMarket** | Individual market - one per prediction market | Unique per market |
+
+### Network Configuration
+
+| Parameter | Value |
+|-----------|-------|
+| Chain ID | 5042002 (0x4CEC52) |
+| RPC URL | https://arc-testnet.drpc.org/ |
+| Block Explorer | https://testnet.arcscan.app |
+| Native Currency | USDC (18 decimals) |
 
 ### Market Lifecycle
 
@@ -32,154 +41,150 @@ A market goes through these stages:
 
 ---
 
-## Native Currency
-
-- **Currency**: USDC (native gas token)
-- **Decimals**: 18 (same as ETH)
-- All amounts in contracts are in wei (1 USDC = 10¹⁸ wei)
-
----
-
 ## Contract ABIs
+
+These ABIs are verified from the frontend implementation - 100% accurate.
 
 ### PredictionMarketFactory ABI
 
-Use this ABI to interact with the factory that creates and tracks all markets.
-
 ```javascript
-const ABI_FACTORY = [
-  // Write Functions
-  'function createMarket(string _title, string _description, string _category, string _imageUri, string[] _outcomeLabels, int256 _bWad, uint256 _durationSeconds) external returns (address)',
-  'function editMarket(address market, string _title, string _description, string _category) external',
-  'function setMinBWad(int256 _min) external',
-  'function setMaxBWad(int256 _max) external',
-  'function setDurationBounds(uint256 _min, uint256 _max) external',
-  
-  // View Functions - Registry
-  'function totalMarkets() view returns (uint256)',
-  'function markets(uint256) view returns (address)',
-  'function getMarketCount() view returns (uint256)',
-  'function getMarkets(uint256 offset, uint256 limit) view returns (address[])',
-  'function isMarket(address) view returns (bool)',
-  'function marketIndex(address) view returns (uint256)',
-  
-  // View Functions - Configuration
-  'function minBWad() view returns (int256)',
-  'function maxBWad() view returns (int256)',
-  'function minDuration() view returns (uint256)',
-  'function maxDuration() view returns (uint256)',
-  
+export const FACTORY_ABI = [
+  // Read functions
+  "function owner() view returns (address)",
+  "function totalMarkets() view returns (uint256)",
+  "function markets(uint256) view returns (address)",
+  "function isMarket(address) view returns (bool)",
+  "function minBWad() view returns (int256)",
+  "function maxBWad() view returns (int256)",
+  "function minDuration() view returns (uint256)",
+  "function maxDuration() view returns (uint256)",
+  "function getMarkets(uint256 offset, uint256 limit) view returns (address[])",
+  "function getMarketCount() view returns (uint256)",
+
+  // Write functions (Admin only - not needed for basic user integration)
+  "function createMarket(string _title, string _description, string _category, string _imageUri, string[] _outcomeLabels, int256 _bWad, uint256 _durationSeconds) returns (address market)",
+  "function setMinBWad(int256 _min)",
+  "function setMaxBWad(int256 _max)",
+  "function setDurationBounds(uint256 _min, uint256 _max)",
+  "function editMarket(address market, string _title, string _description, string _category)",
+
   // Events
-  'event MarketCreated(address indexed market, uint256 indexed marketId, address indexed creator, string title, string category, uint256 outcomeCount, uint256 deadline)'
+  "event MarketCreated(address indexed market, uint256 indexed marketId, address indexed creator, string title, string category, uint256 outcomeCount, uint256 deadline)",
 ];
 ```
 
 ### PredictionMarketLens ABI
 
-Use this ABI to fetch aggregated data, market summaries, and user portfolios.
-
 ```javascript
-const ABI_LENS = [
-  // Global Analytics
-  'function getGlobalStats() view returns (uint256 totalMarkets, uint256 totalVolumeWei, uint256 totalParticipants, uint256 activeMarkets, uint256 resolvedMarkets, uint256 cancelledOrExpiredMarkets)',
-  
-  // Market List (Paginated)
-  'function getMarketSummaries(uint256 offset, uint256 limit) view returns (tuple(address market, uint256 marketId, string title, string category, string imageUri, string[] outcomeLabels, int256[] impliedProbabilitiesWad, uint8 stage, uint256 winningOutcome, uint256 marketDeadline, uint256 totalVolumeWei, uint256 participants, int256 bWad)[])',
-  
-  // Single Market Detail
-  'function getMarketDetail(address market) view returns (tuple(address market, string title, string description, string category, string imageUri, string proofUri, string[] outcomeLabels, int256[] totalSharesWad, int256[] impliedProbabilitiesWad, uint8 stage, uint256 winningOutcome, uint256 createdAt, uint256 marketDeadline, int256 bWad, uint256 totalVolumeWei, uint256 participants, uint256 resolvedPoolWei, uint256 resolutionDeadline, string cancelReason, string cancelProofUri))',
-  
-  // User Portfolio
-  'function getUserPortfolio(address user) view returns (tuple(address market, string title, string category, string[] outcomeLabels, uint256[] sharesPerOutcome, uint256 netDepositedWei, bool canRedeem, bool canRefund, bool hasRedeemed, bool hasRefunded, uint8 stage)[])',
-  
-  // Utility
-  'function factory() view returns (address)'
+export const LENS_ABI = [
+  // Global stats - aggregate data across all markets
+  "function getGlobalStats() view returns (tuple(uint256 totalMarkets, uint256 totalVolumeWei, uint256 totalParticipants, uint256 activeMarkets, uint256 resolvedMarkets, uint256 cancelledOrExpiredMarkets))",
+
+  // Paginated market list - for displaying market cards
+  "function getMarketSummaries(uint256 offset, uint256 limit) view returns (tuple(address market, uint256 marketId, string title, string category, string imageUri, string[] outcomeLabels, int256[] impliedProbabilitiesWad, uint8 stage, uint256 winningOutcome, uint256 marketDeadline, uint256 totalVolumeWei, uint256 participants, int256 bWad)[])",
+
+  // Single market detail - full information about one market
+  "function getMarketDetail(address market) view returns (tuple(address market, string title, string description, string category, string imageUri, string proofUri, string[] outcomeLabels, int256[] totalSharesWad, int256[] impliedProbabilitiesWad, uint8 stage, uint256 winningOutcome, uint256 createdAt, uint256 marketDeadline, int256 bWad, uint256 totalVolumeWei, uint256 participants, uint256 resolvedPoolWei, uint256 resolutionDeadline, string cancelReason, string cancelProofUri))",
+
+  // User portfolio - all positions across all markets
+  "function getUserPortfolio(address user) view returns (tuple(address market, string title, string category, string[] outcomeLabels, uint256[] sharesPerOutcome, uint256 netDepositedWei, bool canRedeem, bool canRefund, bool hasRedeemed, bool hasRefunded, uint8 stage)[])",
 ];
 ```
 
 ### PredictionMarket ABI (Per Market)
 
-Use this ABI to interact with a specific market contract. Replace `MARKET_ADDRESS` with the specific market's address.
+Use this ABI to interact with a specific market. Replace `MARKET_ADDRESS` with the market's address.
 
 ```javascript
-const ABI_MARKET = [
-  // === WRITE FUNCTIONS (USER ACTIONS) ===
-  
+export const MARKET_ABI = [
+  // === READ FUNCTIONS (View) ===
+
+  // Market Metadata
+  "function title() view returns (string)",
+  "function description() view returns (string)",
+  "function category() view returns (string)",
+  "function imageUri() view returns (string)",
+  "function proofUri() view returns (string)",
+  "function cancelReason() view returns (string)",
+  "function cancelProofUri() view returns (string)",
+  "function admin() view returns (address)",
+  "function createdAt() view returns (uint256)",
+
+  // Market State
+  "function stage() view returns (uint8)",
+  "function winningOutcome() view returns (uint256)",
+  "function marketDeadline() view returns (uint256)",
+
+  // LMSR Pricing
+  "function b() view returns (int256)",
+  "function outcomeCount() view returns (uint256)",
+  "function getShares() view returns (int256[])",
+  "function getImpliedProbabilities() view returns (int256[])",
+
+  // Analytics
+  "function totalVolumeWei() view returns (uint256)",
+  "function totalNetDepositedWei() view returns (uint256)",
+  "function participantCount() view returns (uint256)",
+  "function resolvedPoolWei() view returns (uint256)",
+  "function resolutionDeadline() view returns (uint256)",
+
+  // Constants
+  "function PLATFORM_FEE_BPS() view returns (uint256)",
+  "function RESOLUTION_GRACE_PERIOD() view returns (uint256)",
+
+  // User Positions
+  "function sharesOf(address, uint256) view returns (uint256)",
+  "function netDepositedWei(address) view returns (uint256)",
+  "function hasRedeemed(address) view returns (bool)",
+  "function hasRefunded(address) view returns (bool)",
+
+  // Complex View Functions
+  "function getMarketInfo() view returns (string _title, string _description, string _category, string _imageUri, string _proofUri, string[] _outcomeLabels, uint8 _stage, uint256 _winningOutcome, uint256 _createdAt, uint256 _marketDeadline, uint256 _totalVolumeWei, uint256 _participantCount, string _cancelReason, string _cancelProofUri)",
+  "function previewBuy(uint256 outcomeIdx, uint256 sharesWad) view returns (uint256 costWei)",
+  "function previewSell(uint256 outcomeIdx, uint256 sharesWad) view returns (uint256 proceedsWei)",
+  "function getUserInfo(address user) view returns (uint256[] _shares, uint256 _netDeposited, bool _redeemed, bool _refunded, bool _canRedeem, bool _canRefund)",
+
+  // === WRITE FUNCTIONS (User Actions) ===
+
   // Buy shares of an outcome
   // outcomeIdx: Which outcome to buy (0 = first outcome, 1 = second, etc.)
   // sharesWad: Amount of shares (in wei, 1e18 = 1 full share)
   // maxCostWei: Maximum USDC willing to pay (slippage protection)
-  // Returns: Any excess USDC is refunded to caller
-  'function buy(uint256 outcomeIdx, uint256 sharesWad, uint256 maxCostWei) external payable',
-  
+  // Note: Must send USDC value equal to maxCostWei
+  "function buy(uint256 outcomeIdx, uint256 sharesWad, uint256 maxCostWei) payable",
+
   // Sell shares back to market
   // outcomeIdx: Which outcome to sell
   // sharesWad: Amount of shares to sell (in wei)
   // minReceiveWei: Minimum USDC expected (slippage protection)
-  // Returns: Proceeds in USDC sent to caller
-  'function sell(uint256 outcomeIdx, uint256 sharesWad, uint256 minReceiveWei) external',
-  
+  "function sell(uint256 outcomeIdx, uint256 sharesWad, uint256 minReceiveWei)",
+
   // Redeem winnings (only for resolved markets)
   // Call when market stage is Resolved and you hold winning outcome shares
-  // Returns: Your share of the resolved pool in USDC
-  'function redeem() external',
-  
+  "function redeem()",
+
   // Get refund (only for cancelled/expired markets)
   // Call when market stage is Cancelled or Expired
-  // Returns: Pro-rata share of remaining pool based on net deposits
-  'function refund() external',
-  
-  // === VIEW FUNCTIONS (DATA) ===
-  
-  // Market Metadata
-  'function title() view returns (string)',
-  'function description() view returns (string)',
-  'function category() view returns (string)',
-  'function imageUri() view returns (string)',
-  'function createdAt() view returns (uint256)',
-  'function admin() view returns (address)',
-  
-  // Outcomes
-  'function outcomeLabels(uint256) view returns (string)',
-  'function outcomeCount() view returns (uint256)',
-  
-  // LMSR Pricing
-  'function b() view returns (int256)',
-  'function getShares() view returns (int256[])',
-  'function getImpliedProbabilities() view returns (int256[])',
-  
-  // User Positions
-  'function sharesOf(address user, uint256 outcomeIdx) view returns (uint256)',
-  'function netDepositedWei(address user) view returns (uint256)',
-  'function hasRedeemed(address user) view returns (bool)',
-  'function hasRefunded(address user) view returns (bool)',
-  'function getUserInfo(address user) view returns (uint256[] memory _shares, uint256 _netDeposited, bool _redeemed, bool _refunded, bool _canRedeem, bool _canRefund)',
-  
-  // Market State
-  'function stage() view returns (uint8)',
-  'function winningOutcome() view returns (uint256)',
-  'function marketDeadline() view returns (uint256)',
-  'function proofUri() view returns (string)',
-  'function cancelReason() view returns (string)',
-  'function cancelProofUri() view returns (string)',
-  'function resolvedPoolWei() view returns (uint256)',
-  'function resolutionDeadline() view returns (uint256)',
-  
-  // Analytics
-  'function totalVolumeWei() view returns (uint256)',
-  'function participantCount() view returns (uint256)',
-  'function totalNetDepositedWei() view returns (uint256)',
-  
-  // Price Previews
-  'function previewBuy(uint256 outcomeIdx, uint256 sharesWad) view returns (uint256 costWei)',
-  'function previewSell(uint256 outcomeIdx, uint256 sharesWad) view returns (uint256 proceedsWei)',
-  
-  // Complete Market Info
-  'function getMarketInfo() view returns (string memory _title, string memory _description, string memory _category, string memory _imageUri, string memory _proofUri, string[] memory _outcomeLabels, uint8 _stage, uint256 _winningOutcome, uint256 _createdAt, uint256 _marketDeadline, uint256 _totalVolumeWei, uint256 _participantCount, string memory _cancelReason, string memory _cancelProofUri)',
-  
-  // Admin/Utility
-  'function triggerExpiry() external',
-  'function resolutionDeadline() view returns (uint256)'
+  "function refund()",
+
+  // === ADMIN FUNCTIONS (Not needed for basic user integration) ===
+  "function resolve(uint256 _winningOutcome, string _proofUri)",
+  "function cancel(string reason, string _proofUri)",
+  "function editMarket(string _title, string _description, string _category)",
+  "function suspend()",
+  "function resume()",
+  "function editDeadline(uint256 newDeadline)",
+  "function triggerExpiry()",
+
+  // === EVENTS ===
+  "event SharesBought(address indexed trader, uint256 indexed outcomeIndex, uint256 sharesWad, uint256 costWei)",
+  "event SharesSold(address indexed trader, uint256 indexed outcomeIndex, uint256 sharesWad, uint256 proceedsWei)",
+  "event MarketResolved(uint256 winningOutcome, string proofUri)",
+  "event MarketCancelled(string reason, string proofUri)",
+  "event MarketEdited(string newTitle, string newDescription)",
+  "event Redeemed(address indexed user, uint256 amountWei)",
+  "event Refunded(address indexed user, uint256 amountWei)",
+  "event FeeCollected(address indexed recipient, uint256 amountWei)",
 ];
 ```
 
@@ -212,7 +217,7 @@ const ABI_MARKET = [
 
 ### Step 1: Initialize Provider
 
-Connect to the blockchain using your preferred framework:
+Connect to the blockchain:
 
 ```javascript
 // Ethers.js
@@ -222,12 +227,28 @@ const provider = new ethers.BrowserProvider(window.ethereum);
 // Viem
 import { createPublicClient, http } from 'viem';
 const client = createPublicClient({
-  chain: arcTestnet,
+  chain: {
+    id: 5042002,
+    name: 'ARC Testnet',
+    nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 18 },
+    rpcUrls: { default: { http: ['https://arc-testnet.drpc.org/'] } },
+  },
   transport: http()
 });
 ```
 
-### Step 2: Get Market List
+### Step 2: Connect to Contracts
+
+```javascript
+const FACTORY_ADDRESS = '0xd7b122B12caCB299249f89be7F241a47f762f283';
+const LENS_ADDRESS = '0x8241ACa87D4Dee4CA167b1e172Ed955522599e70';
+
+// Using Ethers.js
+const factory = new ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, provider);
+const lens = new ethers.Contract(LENS_ADDRESS, LENS_ABI, provider);
+```
+
+### Step 3: Get Market List
 
 ```javascript
 // Get total number of markets
@@ -238,38 +259,44 @@ const marketAddresses = await factory.getMarkets(0, 10);
 
 // Get market summaries with probabilities
 const summaries = await lens.getMarketSummaries(0, 10);
+// Returns: [{ market, marketId, title, category, imageUri, outcomeLabels, impliedProbabilitiesWad, stage, winningOutcome, marketDeadline, totalVolumeWei, participants, bWad }, ...]
 ```
 
-### Step 3: Get Market Details
+### Step 4: Get Market Details
 
 ```javascript
 // Full details for a single market
 const detail = await lens.getMarketDetail(marketAddress);
+// Returns: { market, title, description, category, imageUri, proofUri, outcomeLabels, totalSharesWad, impliedProbabilitiesWad, stage, winningOutcome, createdAt, marketDeadline, bWad, totalVolumeWei, participants, resolvedPoolWei, resolutionDeadline, cancelReason, cancelProofUri }
 
 // Access fields:
 // detail.title - Market name
-// detail.description - Full description
+// detail.description - Full description  
 // detail.imageUri - Image URL for market
 // detail.outcomeLabels - Array of outcome names (e.g., ["Yes", "No"])
 // detail.impliedProbabilitiesWad - Array of probabilities (divide by 1e18)
 // detail.stage - Current stage (0-4)
 // detail.marketDeadline - Unix timestamp when trading ends
-// detail.totalVolumeWei - Total trading volume
+// detail.totalVolumeWei - Total trading volume in USDC wei
 ```
 
-### Step 4: Execute Transactions
+### Step 5: Execute Transactions
 
 **Buying Shares:**
 
 ```javascript
 // 1. Preview cost first
+const market = new ethers.Contract(marketAddress, MARKET_ABI, signer);
 const costWei = await market.previewBuy(outcomeIdx, sharesWad);
 
 // 2. Execute buy with slippage protection
-// Set maxCostWei = costWei * 1.05 (5% slippage)
-const maxCostWei = costWei * 105 / 100;
+// Set maxCostWei = costWei * 1.05 (5% slippage buffer)
+const maxCostWei = (costWei * 105n) / 100n;
 
-await market.buy(outcomeIdx, sharesWad, maxCostWei, { value: maxCostWei });
+const tx = await market.buy(outcomeIdx, sharesWad, maxCostWei, {
+  value: maxCostWei  // Send USDC equal to maxCostWei
+});
+await tx.wait();
 ```
 
 **Selling Shares:**
@@ -279,39 +306,40 @@ await market.buy(outcomeIdx, sharesWad, maxCostWei, { value: maxCostWei });
 const proceedsWei = await market.previewSell(outcomeIdx, sharesWad);
 
 // 2. Execute sell with slippage protection
-// Set minReceiveWei = proceedsWei * 0.95 (5% slippage)
-const minReceiveWei = proceedsWei * 95 / 100;
+// Set minReceiveWei = proceedsWei * 0.95 (5% slippage buffer)
+const minReceiveWei = (proceedsWei * 95n) / 100n;
 
-await market.sell(outcomeIdx, sharesWad, minReceiveWei);
+const tx = await market.sell(outcomeIdx, sharesWad, minReceiveWei);
+await tx.wait();
 ```
 
 **Redeeming Winnings:**
 
 ```javascript
-// Check if user can redeem
+// Get user info to check if can redeem
 const [, , , , canRedeem] = await market.getUserInfo(userAddress);
 
 if (canRedeem) {
-  await market.redeem();
+  const tx = await market.redeem();
+  await tx.wait();
 }
 ```
 
 **Getting Refund:**
 
 ```javascript
-// Check if user can refund
+// Get user info to check if can refund
 const [, , , , , canRefund] = await market.getUserInfo(userAddress);
 
 if (canRefund) {
-  await market.refund();
+  const tx = await market.refund();
+  await tx.wait();
 }
 ```
 
 ---
 
-## Key Functions Explained
-
-### Understanding LMSR Pricing
+## Understanding LMSR Pricing
 
 The market uses Logarithmic Market Scoring Rule (LMSR) for dynamic pricing:
 
@@ -320,26 +348,40 @@ The market uses Logarithmic Market Scoring Rule (LMSR) for dynamic pricing:
 - **Implied probability** reflects the current market sentiment
 - Use `previewBuy()` and `previewSell()` to get exact prices before trading
 
-### Slippage Protection
+**Key concept**: The `b` parameter (liquidity parameter) controls how prices respond to trading. Higher `b` means slower price movement (more stable probabilities).
+
+---
+
+## Slippage Protection
 
 Always use slippage protection when trading:
 
-- **Buy**: Set `maxCostWei` higher than expected cost
-- **Sell**: Set `minReceiveWei` lower than expected proceeds
-- Recommended: 1-5% buffer depending on market liquidity
+- **Buy**: Set `maxCostWei` higher than expected cost (recommend 1-5%)
+- **Sell**: Set `minReceiveWei` lower than expected proceeds (recommend 1-5%)
 
-### User Position Tracking
+Example:
+```javascript
+// 5% slippage protection
+const SLIPPAGE_PERCENT = 5;
+const slippageMultiplier = 100 + SLIPPAGE_PERCENT;
+const maxCostWei = (costWei * BigInt(slippageMultiplier)) / 100n;
+```
+
+---
+
+## User Position Tracking
 
 To get a user's complete portfolio:
 
 ```javascript
 const positions = await lens.getUserPortfolio(userAddress);
+// Returns: [{ market, title, category, outcomeLabels, sharesPerOutcome, netDepositedWei, canRedeem, canRefund, hasRedeemed, hasRefunded, stage }, ...]
 
 // Each position contains:
 // - market: Market contract address
 // - title: Market name
 // - outcomeLabels: ["Yes", "No", etc.]
-// - sharesPerOutcome: Array of share amounts (WAD)
+// - sharesPerOutcome: Array of share amounts in wei
 // - netDepositedWei: Total USDC deposited minus withdrawn
 // - canRedeem: Boolean - can claim winnings?
 // - canRefund: Boolean - can get refund?
@@ -391,17 +433,19 @@ event Refunded(address indexed user, uint256 amountWei);
 ## Complete Integration Checklist
 
 - [ ] Initialize provider (Ethers.js, Viem, Web3.py, etc.)
-- [ ] Connect factory and lens contracts
+- [ ] Connect to factory (`0xd7b122B12caCB299249f89be7F241a47f762f283`)
+- [ ] Connect to lens (`0x8241ACa87D4Dee4CA167b1e172Ed955522599e70`)
 - [ ] Fetch market list with pagination
-- [ ] Display market cards with images
+- [ ] Display market cards with images (imageUri)
 - [ ] Show implied probabilities (divide WAD by 1e18)
 - [ ] Display market deadline with countdown
 - [ ] Implement buy with slippage protection
 - [ ] Implement sell with slippage protection
-- [ ] Show buy/sell only when market is Active and before deadline
+- [ ] Show buy/sell only when market is Active (stage 0) and before deadline
 - [ ] Display resolved market with winner highlighted
-- [ ] Show redeem button when user can redeem
-- [ ] Show refund button when user can refund
+- [ ] Show redeem button when user can redeem (canRedeem = true)
+- [ ] Show refund button when user can refund (canRefund = true)
 - [ ] Fetch and display user portfolio
 - [ ] Handle all error cases gracefully
 - [ ] Format amounts correctly (wei / 1e18 for display)
+- [ ] Use USDC as currency symbol (not ETH)
