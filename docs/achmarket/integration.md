@@ -43,8 +43,6 @@ A market goes through these stages:
 
 ## Contract ABIs
 
-These ABIs are verified from the frontend implementation - 100% accurate.
-
 ### PredictionMarketFactory ABI
 
 ```javascript
