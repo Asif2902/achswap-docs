@@ -317,7 +317,7 @@ function MarketCard({ market, onClick }) {
         color: '#666'
       }}>
         <span>{getStageLabel(market.stage)}</span>
-        <span>Vol: {formatVolume(market.volume)} ETH</span>
+        <span>Vol: {formatVolume(market.volume)} USDC</span>
         <span>Ends: {formatDeadline(market.deadline)}</span>
       </div>
     </div>
@@ -359,7 +359,7 @@ function MarketGrid({ markets, onMarketClick }) {
 ```jsx
 function MarketDetailPage({ market, userAddress, onBuy, onSell, onRedeem, onRefund }) {
   const formatProbability = (prob) => `${(prob * 100).toFixed(1)}%`;
-  const formatEth = (wei) => `${(Number(wei) / 1e18).toFixed(4)} ETH`;
+  const formatEth = (wei) => `${(Number(wei) / 1e18).toFixed(4)} USDC`;
   
   const isResolved = market.stage === 2;
   const isCancelled = market.stage === 3;
@@ -411,7 +411,7 @@ function MarketDetailPage({ market, userAddress, onBuy, onSell, onRedeem, onRefu
         <div>
           <div style={{ fontSize: '12px', color: '#666' }}>Volume</div>
           <div style={{ fontSize: '18px', fontWeight: 'bold' }}>
-            {market.volume.toFixed(2)} ETH
+            {market.volume.toFixed(2)} USDC
           </div>
         </div>
         <div>
@@ -528,7 +528,7 @@ function BuyPanel({ market, outcomeIdx, outcomeLabel, onConfirm }) {
       <h4>Buy {outcomeLabel}</h4>
       <input
         type="number"
-        placeholder="Amount (ETH)"
+        placeholder="Amount (USDC)"
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
         style={{
@@ -540,7 +540,7 @@ function BuyPanel({ market, outcomeIdx, outcomeLabel, onConfirm }) {
         }}
       />
       {estimatedCost && (
-        <p>Estimated cost: {ethers.formatEther(estimatedCost)} ETH</p>
+        <p>Estimated cost: {ethers.formatEther(estimatedCost)} USDC</p>
       )}
       <button
         onClick={handleBuy}
@@ -649,7 +649,7 @@ function Portfolio({ positions, onRedeem, onRefund }) {
             </div>
             
             {/* Net Deposited */}
-            <p>Net Deposited: {formatEth(pos.netDeposited)} ETH</p>
+            <p>Net Deposited: {formatEth(pos.netDeposited)} USDC</p>
             
             {/* Action Buttons */}
             <div style={{ display: 'flex', gap: '12px' }}>
@@ -798,7 +798,7 @@ function getImageUrl(ipfsUri) {
 
 ## Utility Functions
 
-### Format WAD to ETH
+### Format WAD to USDC
 
 ```javascript
 function formatWadToEth(wad) {
