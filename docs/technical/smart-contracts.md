@@ -214,7 +214,7 @@ function buy(
     
     // Slippage protection
     require(costWei <= maxCostWei, "Slippage exceeded");
-    require(msg.value >= costWei, "Insufficient ETH");
+    require(msg.value >= costWei, "Insufficient USDC");
     
     // Update state
     totalSharesWad[outcomeIdx] += int256(sharesWad);
@@ -224,7 +224,7 @@ function buy(
     totalNetDepositedWei += costWei;
     _trackParticipant(msg.sender);
     
-    // Refund excess ETH
+    // Refund excess USDC
     uint256 excess = msg.value - costWei;
     if (excess > 0) {
         (bool ok,) = msg.sender.call{value: excess}("");
