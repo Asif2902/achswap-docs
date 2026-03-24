@@ -61,13 +61,6 @@ export const FACTORY_ABI = [
   "function getMarkets(uint256 offset, uint256 limit) view returns (address[])",
   "function getMarketCount() view returns (uint256)",
 
-  // Write functions (Admin only - not needed for basic user integration)
-  "function createMarket(string _title, string _description, string _category, string _imageUri, string[] _outcomeLabels, int256 _bWad, uint256 _durationSeconds) returns (address market)",
-  "function setMinBWad(int256 _min)",
-  "function setMaxBWad(int256 _max)",
-  "function setDurationBounds(uint256 _min, uint256 _max)",
-  "function editMarket(address market, string _title, string _description, string _category)",
-
   // Events
   "event MarketCreated(address indexed market, uint256 indexed marketId, address indexed creator, string title, string category, uint256 outcomeCount, uint256 deadline)",
 ];
@@ -167,21 +160,11 @@ export const MARKET_ABI = [
   // Call when market stage is Cancelled or Expired
   "function refund()",
 
-  // === ADMIN FUNCTIONS (Not needed for basic user integration) ===
-  "function resolve(uint256 _winningOutcome, string _proofUri)",
-  "function cancel(string reason, string _proofUri)",
-  "function editMarket(string _title, string _description, string _category)",
-  "function suspend()",
-  "function resume()",
-  "function editDeadline(uint256 newDeadline)",
-  "function triggerExpiry()",
-
   // === EVENTS ===
   "event SharesBought(address indexed trader, uint256 indexed outcomeIndex, uint256 sharesWad, uint256 costWei)",
   "event SharesSold(address indexed trader, uint256 indexed outcomeIndex, uint256 sharesWad, uint256 proceedsWei)",
   "event MarketResolved(uint256 winningOutcome, string proofUri)",
   "event MarketCancelled(string reason, string proofUri)",
-  "event MarketEdited(string newTitle, string newDescription)",
   "event Redeemed(address indexed user, uint256 amountWei)",
   "event Refunded(address indexed user, uint256 amountWei)",
   "event FeeCollected(address indexed recipient, uint256 amountWei)",
