@@ -459,7 +459,266 @@ aggregator.registerAdapter(0xF82c88FbF46E109a3865647E5c4d4834b31f8AFB);
 
 ---
 
-## Public Functions
+## AchSwap API
+
+A REST API is available for applications that prefer HTTP calls over direct on-chain interaction. The API handles quoting, route decoding, and transaction building server-side.
+
+**Base URL:**
+
+```
+https://swap-api.achswap.app
+```
+
+### Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/health` | Check API status and chain info |
+| `GET` | `/quote?tokenIn=&tokenOut=&amountIn=&slippageBps=` | Get swap quote with expected output and route data |
+| `GET` | `/decode?routeData=` | Decode route data into readable segments |
+| `POST` | `/swap-tx` | Build unsigned transaction calldata |
+
+**Parameters — `/quote`:**
+
+| Param | Required | Description |
+|---|---|---|
+| `tokenIn` | Yes | Token address, or `USDC` / `native` for native USDC |
+| `tokenOut` | Yes | Token address, or `USDC` / `native` for native USDC |
+| `amountIn` | Yes | Amount in human-readable format (e.g. `1`, `0.5`, `100`) |
+| `slippageBps` | No | Slippage in basis points. Default: `50` (0.5%) |
+
+**Parameters — `/decode`:**
+
+| Param | Required | Description |
+|---|---|---|
+| `routeData` | Yes | Hex-encoded route data from `/quote` response |
+
+**Request body — `/swap-tx`:**
+
+| Field | Required | Description |
+|---|---|---|
+| `tokenIn` | Yes | Input token address |
+| `tokenOut` | Yes | Output token address |
+| `amountIn` | Yes | Input amount in wei |
+| `amountOutMin` | Yes | Minimum output in wei (from quote response) |
+| `recipient` | Yes | Wallet address receiving output |
+| `routeData` | Yes | Route data from `/quote` response |
+
+### Example — HTML (Vanilla JS)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AchSwap Quote</title>
+</head>
+<body>
+  <h1>AchSwap Quote</h1>
+  <input id="amount" type="text" placeholder="Amount (e.g. 1)" value="1" />
+  <button id="quoteBtn">Get Quote</button>
+  <pre id="output"></pre>
+
+  <script>
+    const API = 'https://swap-api.achswap.app'
+
+    const USDC = 'native'
+    const TOKEN = '0x45Bb5425f293bdd209c894364C462421FF5FfA48'
+
+    document.getElementById('quoteBtn').addEventListener('click', async () => {
+      const amount = document.getElementById('amount').value
+      const url = `${API}/quote?tokenIn=${USDC}&tokenOut=${TOKEN}&amountIn=${amount}&slippageBps=50`
+
+      const res = await fetch(url)
+      const data = await res.json()
+
+      document.getElementById('output').textContent = JSON.stringify(data, null, 2)
+    })
+  </script>
+</body>
+</html>
+```
+
+### Example — JavaScript / TypeScript
+
+```typescript
+const API = 'https://swap-api.achswap.app'
+
+interface QuoteResponse {
+  tokenIn: string
+  tokenOut: string
+  amountIn: string
+  expectedOut: string
+  minOut: string
+  slippageBps: number
+  routeData: string
+  adapter: string
+}
+
+interface Segment {
+  isV3: boolean
+  path: string[]
+  fees: number[]
+  bps: number
+}
+
+// 1. Get a quote
+async function getQuote(
+  tokenIn: string,
+  tokenOut: string,
+  amountIn: string,
+  slippageBps = 50
+): Promise<QuoteResponse> {
+  const params = new URLSearchParams({ tokenIn, tokenOut, amountIn, slippageBps: String(slippageBps) })
+  const res = await fetch(`${API}/quote?${params}`)
+  return res.json()
+}
+
+// 2. Decode the route
+async function decodeRoute(routeData: string): Promise<{ segments: Segment[] }> {
+  const res = await fetch(`${API}/decode?routeData=${routeData}`)
+  return res.json()
+}
+
+// 3. Build swap transaction
+async function buildSwapTx(params: {
+  tokenIn: string
+  tokenOut: string
+  amountIn: string
+  amountOutMin: string
+  recipient: string
+  routeData: string
+}) {
+  const res = await fetch(`${API}/swap-tx`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  })
+  return res.json()
+}
+
+// Usage
+async function main() {
+  const quote = await getQuote('USDC', '0x45Bb5425f293bdd209c894364C462421FF5FfA48', '1')
+  console.log('Expected:', quote.expectedOut)
+  console.log('Min out:', quote.minOut)
+
+  const decoded = await decodeRoute(quote.routeData)
+  console.log('Route:', decoded.segments)
+
+  const tx = await buildSwapTx({
+    tokenIn: quote.tokenIn,
+    tokenOut: quote.tokenOut,
+    amountIn: quote.amountIn,
+    amountOutMin: quote.minOut,
+    recipient: '0xYourWalletAddress',
+    routeData: quote.routeData,
+  })
+  console.log('Tx data:', tx)
+  // Send tx with ethers.js / viem / wagmi
+}
+```
+
+### Example — React / TSX
+
+```tsx
+import { useState, useCallback } from 'react'
+import { useAccount, useWriteContract } from 'wagmi'
+
+const API = 'https://swap-api.achswap.app'
+const ADAPTER = '0xF82c88FbF46E109a3865647E5c4d4834b31f8AFB'
+
+const ADAPTER_ABI = [
+  {
+    type: 'function',
+    name: 'swap',
+    stateMutability: 'payable',
+    inputs: [
+      { name: 'tokenIn', type: 'address' },
+      { name: 'tokenOut', type: 'address' },
+      { name: 'amountIn', type: 'uint256' },
+      { name: 'amountOutMin', type: 'uint256' },
+      { name: 'recipient', type: 'address' },
+      { name: 'routeData', type: 'bytes' },
+    ],
+    outputs: [{ name: 'totalOut', type: 'uint256' }],
+  },
+]
+
+export function SwapButton() {
+  const { address } = useAccount()
+  const { writeContractAsync } = useWriteContract()
+  const [loading, setLoading] = useState(false)
+
+  const swap = useCallback(async () => {
+    if (!address) return
+    setLoading(true)
+
+    try {
+      // 1. Quote
+      const quoteRes = await fetch(
+        `${API}/quote?tokenIn=USDC&tokenOut=0x45Bb5425f293bdd209c894364C462421FF5FfA48&amountIn=1`
+      )
+      const quote = await quoteRes.json()
+
+      // 2. Decode route (optional — for display)
+      const decodeRes = await fetch(`${API}/decode?routeData=${quote.routeData}`)
+      const decoded = await decodeRes.json()
+      console.log('Route:', decoded.segments)
+
+      // 3. Execute swap via wallet
+      await writeContractAsync({
+        address: ADAPTER,
+        abi: ADAPTER_ABI,
+        functionName: 'swap',
+        args: [
+          quote.tokenIn,
+          quote.tokenOut,
+          BigInt(quote.amountIn),
+          BigInt(quote.minOut),
+          address,
+          quote.routeData,
+        ],
+        value: BigInt(quote.amountIn),
+      })
+    } finally {
+      setLoading(false)
+    }
+  }, [address, writeContractAsync])
+
+  return (
+    <button onClick={swap} disabled={!address || loading}>
+      {loading ? 'Swapping...' : 'Swap 1 USDC'}
+    </button>
+  )
+}
+```
+
+### Flow
+
+```
+Frontend                         API                          Blockchain
+────────                         ───                          ──────────
+GET /quote?tokenIn=&tokenOut=&amountIn=
+                  ─────────────►
+                                 quote() via eth_call
+                                 ← expectedOut, routeData
+         ◄────────────────────
+GET /decode?routeData=
+                  ─────────────►
+                                 decodeRoute() via eth_call
+                                 ← segments
+         ◄────────────────────
+
+POST /swap-tx { amountIn, amountOutMin, recipient, routeData }
+                  ─────────────►
+                                 buildSwapCalldata()
+                                 ← { to, data, value }
+         ◄────────────────────
+
+sendTransaction({ to, data, value })
+                  ─────────────────────────────────────────────►
+```
 
 ```solidity
 // Off-chain only — call via eth_call / staticCall
