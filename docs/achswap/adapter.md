@@ -11,7 +11,6 @@ The AchSwap Adapter is the routing and execution layer of the AchSwap protocol. 
 The adapter was designed with one principle: the caller provides a token pair and an amount, and receives back everything they need to execute an optimal swap in a single transaction.
 
 **Deployed on Arc Testnet**
-
 ```
 AchSwapAdapter: 0xF82c88FbF46E109a3865647E5c4d4834b31f8AFB
 Chain ID:       5042002
@@ -97,6 +96,366 @@ For every V3 segment, the adapter probes all four Uniswap V3 fee tiers using the
 | High | 1% | Exotic or low-liquidity pairs |
 
 For two-hop V3 routes, fee tiers are selected independently per segment and the full packed path is quoted end-to-end using `quoteExactInput` so that cross-pool price impact is accurately captured.
+
+---
+
+## Public Functions
+
+```solidity
+// Off-chain only — call via eth_call / staticCall
+function quote(
+    address tokenIn,
+    address tokenOut,
+    uint256 amountIn
+) external returns (uint256 expectedOut, bytes memory routeData)
+
+// On-chain execution
+function swap(
+    address tokenIn,
+    address tokenOut,
+    uint256 amountIn,
+    uint256 amountOutMin,
+    address recipient,
+    bytes calldata routeData
+) external payable returns (uint256 totalOut)
+
+// Pure helper — compute minimum output from quoted amount and slippage
+// slippageBps: 1000 = 10%, 500 = 5%, 50 = 0.5%
+function minOut(uint256 quotedOut, uint16 slippageBps) external pure returns (uint256)
+
+// Decode routeData for display or inspection
+function decodeRoute(bytes calldata routeData) external pure returns (Segment[] memory)
+```
+
+**Native USDC (address(0)).** Pass `address(0)` for `tokenIn` to use native USDC as input — `msg.value` must equal `amountIn`. Pass `address(0)` for `tokenOut` to receive native USDC — the adapter unwraps automatically before delivery.
+
+**Approvals.** For ERC-20 input tokens, the caller approves the adapter for `amountIn` before calling `swap`. Internal router approvals are reset to zero after each segment executes.
+
+---
+
+## Integration — JavaScript / TypeScript
+
+The standard integration flow for any frontend or backend service.
+
+```typescript
+import { ethers } from 'ethers'
+
+const ADAPTER_ADDRESS = '0xF82c88FbF46E109a3865647E5c4d4834b31f8AFB'
+
+const ADAPTER_ABI = [
+  'function quote(address,address,uint256) returns (uint256,bytes)',
+  'function swap(address,address,uint256,uint256,address,bytes) payable returns (uint256)',
+  'function minOut(uint256,uint16) pure returns (uint256)',
+  'function decodeRoute(bytes) pure returns (tuple(bool isV3,address[] path,uint24[] fees,uint16 bps)[])',
+]
+
+const ERC20_ABI = [
+  'function approve(address,uint256) returns (bool)',
+  'function allowance(address,address) view returns (uint256)',
+]
+
+/**
+ * Execute a swap through the AchSwap Adapter.
+ *
+ * tokenIn / tokenOut: token addresses. Pass address(0) for native USDC.
+ * amountIn:          input amount in wei (18 decimals for native USDC).
+ * slippageBps:       slippage in basis points. 500 = 5%, 1000 = 10%.
+ */
+async function achSwap(
+  signer: ethers.Signer,
+  tokenIn: string,
+  tokenOut: string,
+  amountIn: bigint,
+  slippageBps: number = 500
+): Promise<ethers.TransactionReceipt> {
+
+  const adapter   = new ethers.Contract(ADAPTER_ADDRESS, ADAPTER_ABI, signer)
+  const recipient = await signer.getAddress()
+
+  // 1. Quote — free, no transaction, no gas
+  const [expectedOut, routeData] = await adapter.quote.staticCall(
+    tokenIn, tokenOut, amountIn
+  )
+  console.log('Expected output:', ethers.formatUnits(expectedOut, 18))
+
+  // 2. Apply slippage
+  const amountOutMin = await adapter.minOut(expectedOut, slippageBps)
+
+  // 3. Approve ERC-20 input (skip for native USDC)
+  const isNativeIn = tokenIn === ethers.ZeroAddress
+  if (!isNativeIn) {
+    const erc20     = new ethers.Contract(tokenIn, ERC20_ABI, signer)
+    const allowance = await erc20.allowance(recipient, ADAPTER_ADDRESS)
+    if (allowance < amountIn) {
+      const approveTx = await erc20.approve(ADAPTER_ADDRESS, amountIn)
+      await approveTx.wait()
+    }
+  }
+
+  // 4. Execute swap
+  const tx = await adapter.swap(
+    tokenIn,
+    tokenOut,
+    amountIn,
+    amountOutMin,
+    recipient,
+    routeData,
+    isNativeIn ? { value: amountIn } : {}
+  )
+
+  return tx.wait()
+}
+```
+
+**Inspecting the route before executing:**
+
+```typescript
+const segments = await adapter.decodeRoute(routeData)
+
+for (const seg of segments) {
+  const type  = seg.isV3 ? 'V3' : 'V2'
+  const share = (Number(seg.bps) / 100).toFixed(0) + '%'
+  const path  = seg.path.join(' → ')
+  const fees  = seg.isV3
+    ? seg.fees.map(f => (Number(f) / 10000 * 100).toFixed(2) + '%').join(', ')
+    : 'N/A'
+  console.log(`${type} | ${share} | ${path} | fees: ${fees}`)
+}
+
+// Example output:
+// V3  | 60% | 0xTokenIn → 0xTokenOut | fees: 0.30%
+// V2  | 40% | 0xTokenIn → 0xTokenOut | fees: N/A
+```
+
+---
+
+## Integration — Solidity
+
+For protocols that call the adapter from a smart contract. `quote` must be obtained off-chain and passed as calldata — it cannot be called inside a transaction.
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+interface IAchSwapAdapter {
+    function swap(
+        address tokenIn,
+        address tokenOut,
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address recipient,
+        bytes calldata routeData
+    ) external payable returns (uint256 totalOut);
+}
+
+interface IERC20 {
+    function approve(address spender, uint256 amount) external returns (bool);
+    function transferFrom(address from, address to, uint256 amount) external returns (bool);
+}
+
+/**
+ * Example: a protocol that routes user swaps through AchSwap.
+ *
+ * The caller obtains routeData and amountOutMin off-chain via:
+ *   const [expectedOut, routeData] = await adapter.quote.staticCall(...)
+ *   const amountOutMin = expectedOut * (10000 - slippageBps) / 10000
+ *
+ * Then passes them here.
+ */
+contract MyProtocol {
+
+    address public constant ACHSWAP_ADAPTER = 0xF82c88FbF46E109a3865647E5c4d4834b31f8AFB;
+
+    function swapViaAchSwap(
+        address tokenIn,
+        address tokenOut,
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address recipient,
+        bytes calldata routeData
+    ) external returns (uint256 amountOut) {
+
+        // Pull from caller
+        IERC20(tokenIn).transferFrom(msg.sender, address(this), amountIn);
+
+        // Approve adapter
+        IERC20(tokenIn).approve(ACHSWAP_ADAPTER, amountIn);
+
+        // Execute
+        amountOut = IAchSwapAdapter(ACHSWAP_ADAPTER).swap(
+            tokenIn, tokenOut, amountIn, amountOutMin, recipient, routeData
+        );
+    }
+}
+```
+
+---
+
+## Building a DEX UI on AchSwap Liquidity
+
+Any frontend can source AchSwap liquidity without deploying any contracts — point directly at the adapter address and implement the four-step flow. The adapter handles all routing decisions internally.
+
+**Recommended flow:**
+
+```
+1. User selects tokenIn, tokenOut, amountIn
+         ↓
+2. quote.staticCall() → show expectedOut, route breakdown
+         ↓
+3. User confirms slippage → compute amountOutMin
+         ↓
+4. Approve tokenIn to 0xF82c88FbF46E109a3865647E5c4d4834b31f8AFB
+         ↓
+5. swap() → done
+```
+
+The `decodeRoute` function gives you everything needed to show users what is happening under the hood: which router (V2 or V3), the exact token path including any intermediate hops, fee tiers, and the split breakdown if the swap is divided between multiple pools.
+
+---
+
+## Building an Aggregator with AchSwap as a Source
+
+The AchSwap Adapter is designed to be registered in any aggregator that follows the `quote` + `swap` pattern. The aggregator calls `quote` on each registered adapter off-chain, picks the one with the highest `expectedOut`, and routes the swap to it.
+
+**Off-chain aggregation (TypeScript):**
+
+```typescript
+const ADAPTERS = [
+  '0xF82c88FbF46E109a3865647E5c4d4834b31f8AFB',  // AchSwap
+  '0x...AnotherDEX',
+]
+
+async function getBestAdapter(tokenIn: string, tokenOut: string, amountIn: bigint) {
+  const results = await Promise.allSettled(
+    ADAPTERS.map(async (addr) => {
+      const adapter = new ethers.Contract(addr, ADAPTER_ABI, provider)
+      const [expectedOut, routeData] = await adapter.quote.staticCall(
+        tokenIn, tokenOut, amountIn
+      )
+      return { addr, expectedOut, routeData }
+    })
+  )
+
+  return results
+    .filter(r => r.status === 'fulfilled')
+    .map(r => (r as PromiseFulfilledResult<any>).value)
+    .sort((a, b) => (b.expectedOut > a.expectedOut ? 1 : -1))[0]
+}
+
+async function aggregatedSwap(
+  signer: ethers.Signer,
+  tokenIn: string,
+  tokenOut: string,
+  amountIn: bigint,
+  slippageBps: number
+) {
+  const best    = await getBestAdapter(tokenIn, tokenOut, amountIn)
+  const adapter = new ethers.Contract(best.addr, ADAPTER_ABI, signer)
+  const minOut  = await adapter.minOut(best.expectedOut, slippageBps)
+
+  const erc20 = new ethers.Contract(tokenIn, ERC20_ABI, signer)
+  await (await erc20.approve(best.addr, amountIn)).wait()
+
+  return adapter.swap(
+    tokenIn, tokenOut, amountIn, minOut,
+    await signer.getAddress(), best.routeData
+  )
+}
+```
+
+**On-chain aggregator (Solidity):**
+
+`quote` cannot be called inside a transaction. The correct pattern is to select the winning adapter and compute `routeData` off-chain, then pass both as calldata into the aggregator's execute function.
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+interface IAchSwapAdapter {
+    function swap(
+        address tokenIn, address tokenOut,
+        uint256 amountIn, uint256 amountOutMin,
+        address recipient, bytes calldata routeData
+    ) external payable returns (uint256);
+}
+
+interface IERC20 {
+    function approve(address, uint256) external returns (bool);
+    function transferFrom(address, address, uint256) external returns (bool);
+}
+
+contract MyAggregator {
+
+    mapping(address => bool) public registeredAdapters;
+    address public owner;
+
+    modifier onlyOwner() { require(msg.sender == owner, "not owner"); _; }
+
+    constructor() { owner = msg.sender; }
+
+    function registerAdapter(address adapter) external onlyOwner {
+        registeredAdapters[adapter] = true;
+    }
+
+    /**
+     * @notice Execute a swap via a pre-selected adapter.
+     * @dev    Select the best adapter and routeData off-chain via quote().
+     *         Pass the winning adapter address and routeData here.
+     *
+     * @param adapter      Adapter address (must be registered).
+     * @param tokenIn      Input token. address(0) = native USDC.
+     * @param tokenOut     Output token. address(0) = native USDC.
+     * @param amountIn     Exact input amount.
+     * @param amountOutMin Minimum output. Revert if not met.
+     * @param recipient    Receives output.
+     * @param routeData    Encoded route from adapter.quote().
+     */
+    function execute(
+        address adapter,
+        address tokenIn,
+        address tokenOut,
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address recipient,
+        bytes calldata routeData
+    ) external returns (uint256 amountOut) {
+        require(registeredAdapters[adapter], "unknown adapter");
+
+        IERC20(tokenIn).transferFrom(msg.sender, address(this), amountIn);
+        IERC20(tokenIn).approve(adapter, amountIn);
+
+        amountOut = IAchSwapAdapter(adapter).swap(
+            tokenIn, tokenOut, amountIn, amountOutMin, recipient, routeData
+        );
+    }
+}
+```
+
+To register AchSwap on deployment:
+
+```solidity
+aggregator.registerAdapter(0xF82c88FbF46E109a3865647E5c4d4834b31f8AFB);
+```
+
+---
+
+## Contract Reference
+
+| Function | Type | Description |
+|---|---|---|
+| `quote(tokenIn, tokenOut, amountIn)` | `external` — eth_call only | Returns best output and encoded route |
+| `swap(tokenIn, tokenOut, amountIn, amountOutMin, recipient, routeData)` | `external payable` | Executes swap from routeData |
+| `minOut(quotedOut, slippageBps)` | `pure` | Applies slippage tolerance to quoted output |
+| `decodeRoute(routeData)` | `pure` | Decodes routeData into Segment array for inspection |
+
+| Parameter | Value | Notes |
+|---|---|---|
+| Adapter address | `0xF82c88FbF46E109a3865647E5c4d4834b31f8AFB` | Arc Testnet |
+| Chain ID | `5042002` | Arc Testnet |
+| Native token | USDC | 18 decimals — use `address(0)` to reference |
+| V3 fee tiers probed | 100, 500, 3000, 10000 | Basis points |
+| Split ratios probed | 5000, 7000, 3000 | bps for leg A |
+| Max segments per route | 2 | Single-leg or split |
 
 ---
 
