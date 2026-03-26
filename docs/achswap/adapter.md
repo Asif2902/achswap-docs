@@ -478,6 +478,8 @@ https://swap-api.achswap.app
 | `GET` | `/decode?routeData=` | Decode route data into readable segments |
 | `POST` | `/swap-tx` | Build unsigned transaction calldata |
 
+> **All amounts are in wei.** The API does not convert decimals. Pass `amountIn` in the token's smallest unit (e.g. `1000000000000000000` for 1 token with 18 decimals, `1000000` for 1 token with 6 decimals). Response fields `amountIn`, `expectedOut`, `minOut` are also in wei. It is the caller's responsibility to convert using the token's `decimals()`.
+
 **Parameters — `/quote`:**
 
 | Param | Required | Description |
