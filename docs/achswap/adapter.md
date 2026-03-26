@@ -484,7 +484,7 @@ https://swap-api.achswap.app
 |---|---|---|
 | `tokenIn` | Yes | Token address, or `USDC` / `native` for native USDC |
 | `tokenOut` | Yes | Token address, or `USDC` / `native` for native USDC |
-| `amountIn` | Yes | Amount in human-readable format (e.g. `1`, `0.5`, `100`) |
+| `amountIn` | Yes | Amount in wei (e.g. `1000000000000000000` for 1 token with 18 decimals) |
 | `slippageBps` | No | Slippage in basis points. Default: `50` (0.5%) |
 
 **Parameters — `/decode`:**
@@ -515,7 +515,7 @@ https://swap-api.achswap.app
 </head>
 <body>
   <h1>AchSwap Quote</h1>
-  <input id="amount" type="text" placeholder="Amount (e.g. 1)" value="1" />
+  <input id="amount" type="text" placeholder="Amount in wei (e.g. 1000000000000000000)" value="1000000000000000000" />
   <button id="quoteBtn">Get Quote</button>
   <pre id="output"></pre>
 
@@ -599,7 +599,7 @@ async function buildSwapTx(params: {
 
 // Usage
 async function main() {
-  const quote = await getQuote('USDC', '0x45Bb5425f293bdd209c894364C462421FF5FfA48', '1')
+  const quote = await getQuote('USDC', '0x45Bb5425f293bdd209c894364C462421FF5FfA48', '1000000000000000000')
   console.log('Expected:', quote.expectedOut)
   console.log('Min out:', quote.minOut)
 
@@ -657,7 +657,7 @@ export function SwapButton() {
     try {
       // 1. Quote
       const quoteRes = await fetch(
-        `${API}/quote?tokenIn=USDC&tokenOut=0x45Bb5425f293bdd209c894364C462421FF5FfA48&amountIn=1`
+        `${API}/quote?tokenIn=USDC&tokenOut=0x45Bb5425f293bdd209c894364C462421FF5FfA48&amountIn=1000000000000000000`
       )
       const quote = await quoteRes.json()
 
