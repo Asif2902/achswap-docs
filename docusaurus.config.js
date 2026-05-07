@@ -3,7 +3,7 @@
 const config = {
   title: 'AchSwap & AchMarket Documentation',
   tagline: 'Decentralized Exchange & Prediction Markets on ARC',
-  url: 'https://achswap.app',
+  url: 'https://docs.achswap.app',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
