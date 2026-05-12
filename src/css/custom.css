@@ -122,9 +122,17 @@ a {
   background: var(--site-surface);
   bottom: 0;
   box-shadow: 22px 0 55px rgba(15, 23, 42, 0.22);
+  height: 100vh;
+  height: 100dvh;
+  left: 0;
+  max-height: 100vh;
+  max-height: 100dvh;
   max-width: min(88vw, 340px);
+  overflow-y: auto;
+  position: fixed;
   top: 0;
   width: min(88vw, 340px);
+  z-index: calc(var(--ifm-z-index-fixed, 200) + 2);
 }
 
 .navbar-sidebar__items {
@@ -559,12 +567,21 @@ tr:nth-child(even) td {
     white-space: nowrap;
   }
 
+  .navbar-sidebar.navbar-sidebar--show,
   .navbar-sidebar--show .navbar-sidebar {
+    opacity: 1;
     transform: translate3d(0, 0, 0);
+    visibility: visible;
   }
 
   .navbar-sidebar__backdrop {
     background: rgba(3, 7, 18, 0.58);
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: calc(var(--ifm-z-index-fixed, 200) + 1);
   }
 
   .homeHero {
