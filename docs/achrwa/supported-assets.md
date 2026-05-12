@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # Supported Assets
 
-AchRWA currently supports 5 synthetic tokens tracking real-world asset prices. All tokens are ERC-20 with 18 decimals and backed 1:1 by USDC reserves in the vault.
+AchRWA currently supports 10 synthetic tokens tracking real-world asset prices. All tokens are ERC-20 with 18 decimals and backed 1:1 by USDC reserves in the vault.
 
 ## Stocks
 
@@ -12,6 +12,9 @@ AchRWA currently supports 5 synthetic tokens tracking real-world asset prices. A
 |-------|-----------|--------|---------|-----------------|
 | Synth Apple Inc. | Apple Inc. (AAPL) | sAAPL | 1 | ~60 seconds |
 | Synth Alphabet Inc. | Alphabet Inc. (GOOGL) | sGOOGL | 2 | ~60 seconds |
+| Synth Microsoft Corp. | Microsoft Corp. (MSFT) | sMSFT | 6 | ~60 seconds |
+| Synth Tesla Inc. | Tesla Inc. (TSLA) | sTSLA | 8 | ~60 seconds |
+| Synth Nvidia Corp. | Nvidia Corp. (NVDA) | sNVDA | 9 | ~60 seconds |
 
 ## Commodities
 
@@ -20,6 +23,13 @@ AchRWA currently supports 5 synthetic tokens tracking real-world asset prices. A
 | Synth Crude Oil WTI | WTI Crude Oil Futures | sWTI | 3 | ~60 seconds |
 | Synth Gold | Gold Futures (GC=F) | sGOLD | 4 | ~60 seconds |
 | Synth Silver | Silver Futures (SI=F) | sSILVER | 5 | ~60 seconds |
+| Synth Natural Gas | Natural Gas Futures (NG=F) | sNATGAS | 7 | ~60 seconds |
+
+## Forex
+
+| Token | Underlying | Symbol | Pair ID | Oracle Frequency |
+|-------|-----------|--------|---------|-----------------|
+| Synth GBP/USD | British Pound / US Dollar | sGBPUSD | 10 | ~60 seconds |
 
 ## Token Details
 
@@ -44,9 +54,14 @@ Each asset has:
 |-------|-------------|-------------|
 | sAAPL | 120 seconds | 50% |
 | sGOOGL | 120 seconds | 50% |
+| sMSFT | 120 seconds | 50% |
+| sTSLA | 120 seconds | 50% |
+| sNVDA | 120 seconds | 50% |
 | sWTI | 180 seconds | 50% |
 | sGOLD | 180 seconds | 50% |
 | sSILVER | 180 seconds | 50% |
+| sNATGAS | 180 seconds | 50% |
+| sGBPUSD | 120 seconds | 50% |
 
 ## Trading Limits
 

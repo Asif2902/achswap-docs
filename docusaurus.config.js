@@ -44,22 +44,28 @@ const config = {
       },
       items: [
         {
-          type: 'docSidebar',
-          sidebarId: 'achswapSidebar',
+          to: '/achswap/swap',
           label: 'AchSwap v3',
           position: 'left',
+          activeBasePath: 'achswap',
         },
         {
-          type: 'docSidebar',
-          sidebarId: 'achmarketSidebar',
+          to: '/achmarket/browse-markets',
           label: 'AchMarket',
           position: 'left',
+          activeBasePath: 'achmarket',
         },
         {
-          type: 'docSidebar',
-          sidebarId: 'technicalSidebar',
+          to: '/achrwa/overview',
+          label: 'AchRWA',
+          position: 'left',
+          activeBasePath: 'achrwa',
+        },
+        {
+          to: '/technical/smart-contracts',
           label: 'Technical',
           position: 'left',
+          activeBasePath: 'technical',
         },
         {
           href: 'https://achswap.app',

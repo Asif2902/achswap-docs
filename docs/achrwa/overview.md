@@ -2,9 +2,9 @@
 sidebar_position: 1
 ---
 
-# AchRWA — Real World Assets on Arc
+# AchRWA - Real World Assets on Arc
 
-AchRWA brings **real-world asset prices** on-chain through a vault-backed synthetic token system. Users can buy and redeem synthetic tokens representing stocks, commodities, and forex — all settled in USDC on Arc.
+AchRWA brings **real-world asset prices** on-chain through a vault-backed synthetic token system. Users can buy and redeem synthetic tokens representing stocks, commodities, and forex, all settled in USDC on Arc.
 
 ## How It Works
 
@@ -31,9 +31,14 @@ AchRWA brings **real-world asset prices** on-chain through a vault-backed synthe
 |--------|-------|----------|-------------|
 | sAAPL | Apple Inc. | Stock | Yahoo Finance |
 | sGOOGL | Alphabet Inc. | Stock | Yahoo Finance |
+| sMSFT | Microsoft Corp. | Stock | Yahoo Finance |
+| sTSLA | Tesla Inc. | Stock | Yahoo Finance |
+| sNVDA | Nvidia Corp. | Stock | Yahoo Finance |
 | sWTI | Crude Oil WTI | Commodity | Yahoo Finance |
 | sGOLD | Gold Futures | Commodity | Yahoo Finance |
 | sSILVER | Silver Futures | Commodity | Yahoo Finance |
+| sNATGAS | Natural Gas Futures | Commodity | Yahoo Finance |
+| sGBPUSD | GBP/USD | Forex | Yahoo Finance |
 
 All synth tokens are **ERC-20** with 18 decimals, matching Arc's native USDC.
 

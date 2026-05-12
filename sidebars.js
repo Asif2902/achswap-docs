@@ -25,16 +25,6 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'AchRWA',
-      collapsed: false,
-      items: [
-        'achrwa/overview',
-        'achrwa/supported-assets',
-        'achrwa/security',
-      ],
-    },
-    {
-      type: 'category',
       label: 'Advanced',
       collapsed: true,
       items: [
@@ -89,6 +79,19 @@ const sidebars = {
     },
   ],
 
+  achrwaSidebar: [
+    {
+      type: 'category',
+      label: 'AchRWA',
+      collapsed: false,
+      items: [
+        'achrwa/overview',
+        'achrwa/supported-assets',
+        'achrwa/security',
+      ],
+    },
+  ],
+
   technicalSidebar: [
     {
       type: 'category',
@@ -99,16 +102,6 @@ const sidebars = {
         'technical/lmsr-mechanism',
         'technical/fee-structure',
         'technical/mcp',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'AchRWA',
-      collapsed: false,
-      items: [
-        'achrwa/overview',
-        'achrwa/supported-assets',
-        'achrwa/security',
       ],
     },
     {

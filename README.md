@@ -4,7 +4,7 @@ Welcome to the official documentation for AchSwap v3 and AchMarket.
 
 ## Prerequisites
 
-- **Node.js >= 20.0**
+- **Node.js 20.x**
 - **npm >= 9.0** (or yarn/pnpm)
 
 ## Installation
@@ -26,19 +26,20 @@ npm run preview
 ## Project Structure
 
 ```
-whitepaper/
+achswap-docs/
 ├── docs/                    # Documentation files
 │   ├── introduction.md       # Main introduction
 │   ├── getting-started/     # Getting started guides
 │   ├── achswap/            # AchSwap v3 documentation
+│   ├── achrwa/             # AchRWA documentation
 │   ├── achmarket/          # AchMarket documentation
 │   └── technical/         # Technical documentation
 ├── src/
 │   ├── css/custom.css      # Custom styles
 │   └── pages/             # Custom pages
 ├── static/                 # Static assets
-├── docusaurus.config.ts   # Docusaurus configuration
-└── sidebars.ts            # Sidebar configuration
+├── docusaurus.config.js   # Docusaurus configuration
+└── sidebars.js            # Sidebar configuration
 ```
 
 ## Writing Documentation
@@ -57,7 +58,7 @@ sidebar_position: 1
 
 ### Sidebar Configuration
 
-Edit `sidebars.ts` to add/remove pages from the sidebar.
+Edit `sidebars.js` to add/remove pages from the sidebar.
 
 ## Deployment
 
@@ -65,6 +66,7 @@ Edit `sidebars.ts` to add/remove pages from the sidebar.
 
 1. Connect repository to Vercel
 2. Configure build settings:
+   - Install Command: `npm install --legacy-peer-deps`
    - Build Command: `npm run build`
    - Output Directory: `build`
 3. Deploy
@@ -87,7 +89,7 @@ Edit `src/css/custom.css` to customize:
 
 ### Configuration
 
-Edit `docusaurus.config.ts` for:
+Edit `docusaurus.config.js` for:
 - Site title and metadata
 - Navigation
 - Footer
