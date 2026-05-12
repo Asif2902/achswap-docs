@@ -4,8 +4,8 @@ Welcome to the official documentation for AchSwap v3 and AchMarket.
 
 ## Prerequisites
 
-- **Node.js 20.x**
-- **npm >= 9.0** (or yarn/pnpm)
+- **Node.js 20.x, 22.x, or 24.x**
+- **npm >= 10.0** (or yarn/pnpm)
 
 ## Installation
 
@@ -66,7 +66,8 @@ Edit `sidebars.js` to add/remove pages from the sidebar.
 
 1. Connect repository to Vercel
 2. Configure build settings:
-   - Install Command: `npm install --legacy-peer-deps`
+   - Framework Preset: `Docusaurus`
+   - Install Command: `npm install`
    - Build Command: `npm run build`
    - Output Directory: `build`
 3. Deploy
@@ -97,8 +98,8 @@ Edit `docusaurus.config.js` for:
 
 ## Technology Stack
 
-- [Docusaurus](https://docusaurus.io/) - Documentation framework
-- [React](https://reactjs.org/) - UI library
+- [Docusaurus 3](https://docusaurus.io/) - Documentation framework
+- [React 18](https://reactjs.org/) - UI library
 - [TypeScript](https://www.typescriptlang.org/) - Type safety
 
 ## Contributing
