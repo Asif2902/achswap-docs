@@ -186,6 +186,13 @@ It returns whichever gives the highest output. The `quote_adapter` tool uses a s
 |----------|---------|
 | V2 Factory | `0x7cC023C7184810B84657D55c1943eBfF8603B72B` |
 | V2 Router | `0xB92428D440c335546b69138F7fAF689F5ba8D436` |
+| V3 Factory | `0x65fa500712D451b521bA114a4D3962565969F06a` |
+| V3 Swap Router | `0x8ceD4213F72dEB449a9e2D9855bDF4b9e2e913B6` |
+| V3 Nonfungible Position Manager | `0x6Fe6e80B655fDa474981e16EE43b12131C987d46` |
+| V3 Quoter V2 | `0xcC3d26f4811B6861cD8fD2BC547629D6701c6F5F` |
+| V3 Migrator | `0x859d886319C75eD6Ec3d9f31e8d68802Fdb04D1B` |
+| V3 Position Descriptor | `0xB84c064010144a83d2D044A00395B7aDEd1101a3` |
+| V3 Tick Lens | `0x3ac9B673114477CEf52bfc8E3f9a7dcb767C8c3a` |
 | AchSwap Adapter | `0xF82c88FbF46E109a3865647E5c4d4834b31f8AFB` |
 
 ## Security

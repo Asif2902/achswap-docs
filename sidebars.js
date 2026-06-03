@@ -101,6 +101,7 @@ const sidebars = {
         'technical/smart-contracts',
         'technical/lmsr-mechanism',
         'technical/fee-structure',
+        'technical/contract-addresses',
         'technical/mcp',
       ],
     },
