@@ -8,9 +8,12 @@ Welcome to the AchSwap and AchMarket documentation. This guide covers everything
 
 ## What is AchSwap?
 
-**AchSwap** is a modern decentralized exchange (DEX) that combines the best of Uniswap V2 and V3 mechanics. Built on ARC Testnet, it provides:
+**AchSwap** is a modern decentralized exchange (DEX) that combines the best of Uniswap V2, V3, and V4 mechanics. Built on ARC Testnet, it provides:
 
-- **Smart Routing**: Automatically finds the best swap rates across V2 and V3 pools
+- **Smart Routing**: Automatically finds the best swap rates across V2, V3, and V4 pools
+- **Aggregator**: Splits trades across multiple protocols for optimal execution
+- **V4 Hook-Enabled Pools**: Singleton pools with custom logic hooks
+- **Gasless Swaps**: Sign a transaction, relayer pays the gas
 - **Concentrated Liquidity**: Earn more fees with targeted liquidity positions
 - **Cross-Chain Bridging**: Move USDC between chains via Circle's CCTP
 
@@ -31,6 +34,9 @@ Welcome to the AchSwap and AchMarket documentation. This guide covers everything
 | Token Swap | Exchange tokens with smart routing |
 | V2 Pools | Classic AMM liquidity pools |
 | V3 Pools | Concentrated liquidity positions |
+| V4 Pools | Hook-enabled singleton pools |
+| Aggregator | Split routing across all protocols |
+| Gasless Swap | Sign and swap without gas |
 | Cross-Chain | Bridge USDC via CCTP |
 
 ### For AchMarket
@@ -72,12 +78,12 @@ Both applications run on **ARC Testnet**:
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  ┌─────────────────────┐    ┌─────────────────────────────┐│
-│  │    AchSwap v3      │    │       AchMarket             ││
+│  │      AchSwap       │    │       AchMarket             ││
 │  │                    │    │                             ││
 │  │ • Swap Router      │    │ • PredictionMarketFactory  ││
-│  │ • V2 Factory       │    │ • PredictionMarket         ││
-│  │ • V3 Factory       │    │ • LMSR Math                ││
-│  │ • Position Manager │    │                             ││
+│  │ • V2 / V3 / V4     │    │ • PredictionMarket         ││
+│  │ • Aggregator       │    │ • LMSR Math                ││
+│  │ • Gasless Relayer  │    │                             ││
 │  └─────────────────────┘    └─────────────────────────────┘│
 │                                                             │
 └─────────────────────────────────────────────────────────────┘

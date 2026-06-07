@@ -5,11 +5,11 @@ import Layout from '@theme/Layout';
 
 const products = [
   {
-    title: 'AchSwap v3',
+    title: 'AchSwap',
     description:
-      'Swap tokens with smart routing across V2 and V3 style liquidity, manage pools, and bridge USDC on Arc.',
+      'Swap tokens with smart routing across V2, V3, and V4 pools, use gasless swaps, and bridge USDC on Arc.',
     href: '/achswap/swap',
-    items: ['Token swaps', 'Concentrated liquidity', 'Cross-chain USDC bridge'],
+    items: ['Token swaps', 'V4 hook-enabled pools', 'Gasless swaps', 'Cross-chain USDC bridge'],
   },
   {
     title: 'AchRWA',
@@ -46,7 +46,7 @@ export default function Home(): JSX.Element {
                 Start reading
               </Link>
               <Link className="button button--secondary button--lg" to="/achswap/swap">
-                AchSwap v3
+                AchSwap
               </Link>
               <Link className="button button--secondary button--lg" to="/achrwa/overview">
                 AchRWA

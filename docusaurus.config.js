@@ -45,7 +45,7 @@ const config = {
       items: [
         {
           to: '/achswap/swap',
-          label: 'AchSwap v3',
+          label: 'AchSwap',
           position: 'left',
           activeBasePath: 'achswap',
         },

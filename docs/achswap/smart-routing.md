@@ -1,222 +1,165 @@
 ---
-sidebar_position: 8
+sidebar_position: 9
 ---
 
-# Smart Routing
+# Smart Routing & Aggregator
 
-AchSwap's smart routing automatically finds the best swap path across V2 and V3 pools.
+AchSwap's smart routing system automatically finds the best swap rate across V2, V3, and V4 pools. The aggregator takes this further by splitting trades across multiple protocols for optimal execution.
 
 ## How Smart Routing Works
 
-### The Problem
+### Multi-Protocol Quotes
 
-When swapping Token A for Token B, there may be multiple paths:
+When you request a swap, the system queries all enabled protocols in parallel:
 
-```
-Option 1: Direct
-A ──────────────────────────────────────────────── B
+1. **V2 Pools** — Direct pair and hop-through-wrapped routes
+2. **V3 Pools** — All 5 fee tiers (single-hop) plus 25 multi-hop combinations
+3. **V4 Pools** — All registered V4 pools with hooks
+4. **Aggregator** — Optimal split across V2, V3, and V4 adapters
 
-Option 2: V2 via C
-A ──────────── C ────────────────────────────────── B
+The best quote is selected by output amount, and you can manually override to use any available route.
 
-Option 3: V3 via C  
-A ──────────── C ────────────────────────────────── B
-```
-
-### The Solution
-
-Smart routing:
-1. Queries quotes from all pools
-2. Compares prices
-3. Selects best route
-4. Executes optimal swap
-
-## Routing Interface
-
-### Route Display
-
-When you input a swap, you see the route:
+### Route Selection
 
 ```
-USDC → wUSDC → ACHS
- │         │
- └─ V3     └─ V2
+USDC → ACHS
+
+V2:    2,480 ACHS (direct)
+V3:    2,495 ACHS (0.05% fee tier)  ← Selected (best)
+V4:    2,490 ACHS (0.30% pool)
+Agg:   2,501 ACHS (60% V3 + 40% V4)
 ```
 
-This shows:
-- Token path
-- Pool type per hop
+## The Aggregator
 
-### Multi-Hop Routing
+The AchSwap aggregator splits your trade across multiple protocols to minimize price impact and maximize output.
 
-For complex swaps:
+### How Aggregator Splitting Works
+
+1. **Probe each adapter** — Get quotes from V2, V3, and V4 adapters for the full amount
+2. **Coarse search** — Test 10% increment splits across adapter pairs
+3. **Fine search** — Refine the top candidates with 1% increments
+4. **Select best** — Choose the split with highest net output
+
+### Example Split
 
 ```
-Token A → Token B → Token C → Token D
+Trade: 10,000 USDC → ACHS
+
+Single V3 route:     24,800 ACHS
+Aggregator split:
+  ├─ 60% via V3:     14,940 ACHS
+  └─ 40% via V4:      10,020 ACHS
+  Total:             24,960 ACHS (+0.6% better)
 ```
 
-Up to 4 hops supported.
+### Source Mask
 
-## Quote Calculation
+The aggregator uses a bitmask to select which protocols to include:
 
-### Process
+| Protocol | Bit Value |
+|----------|-----------|
+| V2 | 1 |
+| V3 | 2 |
+| V4 | 4 |
 
-1. **Query Pools**
-   - Check all V2 pools
-   - Check all V3 pools
-   - Account for fees
+For example, source mask `7` (1+2+4) enables all three protocols.
 
-2. **Calculate Output**
-   ```
-   Output = Input × (1 - Fee) × Rate
-   ```
+### Aggregator Fee
 
-3. **Compare Routes**
-   - Rank by output amount
-   - Consider gas costs
+The aggregator charges a **0.1% fee** (10 basis points) on the gross output. This is deducted before displaying the net output.
 
-4. **Select Best**
-   - Choose highest output
-   - Execute route
+## Protocol-Specific Routing
 
-### Fee Deduction
+### V2 Routing
 
-Fees are deducted per hop:
+- Queries direct path and hop-through-wrapped path
+- Uses `getAmountsOut` on the V2 Router
+- Best for: Simple pairs, stablecoins
 
-| Pool Type | Fee |
-|-----------|-----|
-| V2 | 0.3% |
-| V3 | Fee tier (0.01% - 10%) |
+### V3 Routing
 
-## V2 vs V3 Routing
+- Tests all 5 fee tiers in parallel
+- Multi-hop through wrapped token (25 fee-tier combinations)
+- Uses `QuoterV2` for accurate quotes with gas estimates
+- Best for: Concentrated liquidity, volatile pairs
 
-### V2 Pools
+### V4 Routing
 
-- Single fee tier (0.3%)
-- Distributed liquidity
-- Simpler pricing
-
-### V3 Pools
-
-- Multiple fee tiers
-- Concentrated liquidity
-- More complex pricing
-
-### Best Route Selection
-
-The router considers:
-- Output amount after fees
-- Number of hops
-- Gas cost estimation
-- Price impact
-
-## Price Impact and Routing
-
-### Single Pool vs Multi-Hop
-
-| Scenario | Price Impact |
-|----------|--------------|
-| Large direct pool | Low |
-| Small direct pool | High |
-| Multi-hop (deeper pools) | Lower |
-
-Smart routing automatically:
-1. Checks direct route first
-2. Finds alternatives if impact high
-3. Selects optimal path
-
-### Impact Thresholds
-
-| Impact | Warning |
-|--------|---------|
-| < 1% | None |
-| 1-5% | Yellow warning |
-| > 15% | Strong warning |
+- Queries all registered V4 pools
+- Supports hook-enabled pools
+- Uses the V4 Router's `quoteExactInputSingle`
+- Best for: Custom hook logic, new pool types
 
 ## Configuration
 
-### Enable/Disable Protocols
+### Protocol Toggles
 
-In settings, you can toggle:
+In swap settings, you can enable/disable each protocol:
 
-- Enable V2
-- Enable V3
+- **V2** — Classic constant product AMM
+- **V3** — Concentrated liquidity pools
+- **V4** — Hook-enabled singleton pools
+- **Aggregator** — Split routing across all protocols
 
-If a protocol is disabled, routing won't use those pools.
+### Aggregator Sub-Source Toggles
+
+When the aggregator is enabled, you can also toggle which sub-sources it uses:
+
+- **Aggregator V2** — Route splits through V2 adapter
+- **Aggregator V3** — Route splits through V3 adapter
+- **Aggregator V4** — Route splits through V4 adapter
 
 ### Default Settings
 
-Both V2 and V3 enabled by default for maximum efficiency.
+All protocols and aggregator sources are enabled by default for maximum rate optimization.
 
-## Examples
+## Price Impact
 
-### Direct Swap (Best Case)
+### Impact Calculation
 
-```
-Swap: 1000 USDC → ACHS
-
-Route: USDC → ACHS (V3)
-Pool TVL: $1,000,000
-Price Impact: 0.02%
-Output: 2,498 ACHS
-```
-
-### Multi-Hop (Better Rate)
+Price impact is measured by comparing the spot price to the execution price:
 
 ```
-Swap: 1000 USDC → ACHS
-
-Direct: USDC → ACHS (V2)
-Price Impact: 2.5%
-Output: 2,430 ACHS
-
-Multi-hop: USDC → wUSDC → ACHS (V3)
-Price Impact: 0.1%
-Output: 2,485 ACHS ✓
-
-Router selects: Multi-hop
+Impact = (Spot Output - Actual Output) / Spot Output × 100
 ```
 
-### Fallback
+### Impact Thresholds
 
-If best route fails:
-- Router falls back to second best
-- Ensures swap completes
+| Impact | UI Warning |
+|--------|------------|
+| < 1% | None |
+| 1% - 5% | Yellow warning |
+| > 15% | Red warning + confirmation required |
 
-## Advanced
+### Multi-Protocol Impact
 
-### Custom Routes
-
-Advanced users can:
-- Manually select routes
-- Force specific paths
-- Optimize for specific conditions
-
-### Gas Estimation
-
-Router estimates gas for each route:
-- Considers hop count
-- Account for V3 vs V2
-- Adds to total cost
+The aggregator reduces price impact by splitting large trades across deeper pools.
 
 ## Troubleshooting
 
 ### "No route found"
-- Token pair may not have pools
-- Enable disabled protocols
-- Try smaller amount
+- No pools exist for this token pair
+- Try enabling more protocols in settings
+- For V4, ensure the pool is registered on-chain
 
-### "Route failed"
-- Try again (transient)
-- Increase slippage
-- Try alternative token pair
+### "Aggregator has no route"
+- The V4 adapter may not be registered in the aggregator
+- Enable V2 or V3 as fallback sources
+- Try a smaller amount
+
+### Quote takes a while
+- V3 queries 5+25 fee-tier combinations in parallel
+- Aggregator probes multiple adapters and split combinations
+- Large amounts trigger coarse + fine split search
+- Results are cached for 5 seconds
 
 ## Best Practices
 
-1. **Trust the Router** - Usually finds best path
-2. **Check Price Impact** - Yellow/red warnings
-3. **Review Route** - See what's being used
-4. **Adjust Slippage** - If trades revert often
+1. **Trust smart routing** — It finds the best path automatically
+2. **Check the route** — Review which protocol/split was selected
+3. **Use aggregator for large trades** — Splits reduce price impact
+4. **Enable all protocols** — More options = better rates
 
 ---
 

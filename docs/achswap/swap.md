@@ -4,15 +4,26 @@ sidebar_position: 1
 
 # Token Swap
 
-The Swap page is your gateway to exchanging tokens on AchSwap v3. Our smart routing system finds the best rates across both V2 and V3 liquidity pools.
+The Swap page is your gateway to exchanging tokens on AchSwap. Our smart routing system finds the best rates across V2, V3, V4, and aggregator pools.
 
 ## Overview
 
 The swap interface provides:
-- **Smart Routing** - Automatically finds the best path
-- **V2 & V3 Support** - Leverages both pool types
+- **Smart Routing** - Automatically finds the best path across all protocols
+- **V2, V3 & V4 Support** - Leverages all pool types
+- **Aggregator** - Splits trades across multiple protocols for optimal execution
+- **Gasless Swaps** - Sign a transaction, relayer pays the gas
 - **Price Protection** - Configurable slippage tolerance
 - **Real-time Quotes** - Live price updates
+
+## Supported Pool Types
+
+| Pool | Type | Best For |
+|------|------|----------|
+| V2 | Classic AMM | Stable pairs, simple swaps |
+| V3 | Concentrated liquidity | Volatile pairs, capital efficiency |
+| V4 | Hook-enabled singleton | Custom logic, new pool types |
+| Aggregator | Split across all | Best rate, large trades |
 
 ## How It Works
 
@@ -30,12 +41,34 @@ The swap interface provides:
    - Exchange rate
    - Price impact
    - Minimum received (after slippage)
-   - Route visualization
+   - Route visualization (which protocol/split was selected)
 
 4. **Execute Swap**
    - Click Swap
    - Approve in your wallet
    - Wait for confirmation
+
+### Gasless Swap Flow
+
+1. Click the **Zap** icon to enable gasless mode
+2. If Permit2 is not approved, click **Enable Permit2 for Gasless** (one-time per token)
+3. Enter swap details
+4. Sign the permit message in your wallet
+5. The relayer submits the transaction and pays the gas
+6. Swap confirmed
+
+See [Gasless Swap](/achswap/gasless-swap) for full details.
+
+### Aggregator Routing
+
+The aggregator automatically splits your trade across multiple protocols to minimize price impact:
+
+1. Probes each adapter (V2, V3, V4) for the full amount
+2. Tests split ratios (coarse 10% increments, then fine 1% increments)
+3. Selects the split with highest net output
+4. Applies a 0.1% fee on gross output
+
+See [Smart Routing](/achswap/smart-routing) for full details.
 
 ## Interface Guide
 
@@ -70,6 +103,13 @@ Click the gear icon to access swap settings:
 | Slippage Tolerance | Maximum price change accepted | 0.5% |
 | Transaction Deadline | Time before trade expires | 20 min |
 | Recipient | Address receiving tokens | Your wallet |
+| V2 | Enable/disable V2 pools | On |
+| V3 | Enable/disable V3 pools | On |
+| V4 | Enable/disable V4 pools | On |
+| Aggregator | Enable/disable aggregator | On |
+| Aggregator V2 | Use V2 adapter in aggregator splits | On |
+| Aggregator V3 | Use V3 adapter in aggregator splits | On |
+| Aggregator V4 | Use V4 adapter in aggregator splits | On |
 
 ### Slippage Tolerance
 
@@ -97,10 +137,16 @@ A yellow warning appears when price impact exceeds 15%.
 The swap interface shows your trade route:
 
 ```
-USDC → wUSDC → ACHS
+USDC → wUSDC → ACHS (V3, 0.3%)
 ```
 
-This shows the path your tokens take. Multi-hop routes may provide better rates when direct pools are small.
+Or for aggregator splits:
+
+```
+60% via V3 (0.3%) + 40% via V4 (0.30%)
+```
+
+This shows the path your tokens take and which protocol was selected.
 
 ## Supported Tokens
 
@@ -133,6 +179,10 @@ Recent swaps are stored locally:
 - Click to see transaction details
 - Clear history option available
 
+### RWA Swaps
+
+The swap interface also supports RWA (Real World Asset) token swaps through a dedicated RWA tab. See the [AchRWA documentation](/achrwa/overview) for details.
+
 ## Troubleshooting
 
 ### "Insufficient liquidity"
@@ -146,6 +196,10 @@ Recent swaps are stored locally:
 ### Transaction reverted
 - Price moved beyond slippage tolerance
 - Increase slippage or try again later
+
+### "No route found"
+- Enable more protocols in settings
+- For V4, ensure the pool is registered on-chain
 
 ---
 

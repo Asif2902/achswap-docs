@@ -4,7 +4,7 @@ sidebar_position: 7
 
 # Concentrated Liquidity
 
-A deep dive into V3 concentrated liquidity mechanics and strategies.
+A deep dive into V3 and V4 concentrated liquidity mechanics and strategies.
 
 ## Concept Overview
 
@@ -190,6 +190,12 @@ Concentrated liquidity is powerful but requires:
 - Willingness to adjust positions
 
 Start with conservative ranges and graduate to aggressive strategies as you learn.
+
+## V4 and Concentrated Liquidity
+
+V4 pools also use concentrated liquidity mechanics, similar to V3. The key difference is that V4 pools support **hooks** — smart contracts that can execute custom logic before/after swaps or liquidity changes. Some hooks may automatically rebalance positions, collect additional rewards, or adjust fees dynamically.
+
+When providing V4 liquidity, always review the hook contract to understand its behavior.
 
 ---
 

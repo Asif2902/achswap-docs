@@ -1,15 +1,16 @@
 # MCP Server
 
-Model Context Protocol (MCP) server for Achswap DEX on ARC Testnet. Connect any AI agent to Achswap for V2+V3 smart-routed swaps, liquidity management, token deployment, and on-chain analytics.
+Model Context Protocol (MCP) server for Achswap DEX on ARC Testnet. Connect any AI agent to Achswap for V2+V3+V4 smart-routed swaps, aggregator split routing, liquidity management, token deployment, and on-chain analytics.
 
 ## Overview
 
-The Achswap MCP server allows AI agents to interact with the Achswap DEX through natural language. Swaps are automatically routed across V2 and V3 pools via the AchSwapAdapter to find the best price. AI agents can also deploy custom tokens, burn tokens, check transaction history, and analyze token holder distribution.
+The Achswap MCP server allows AI agents to interact with the Achswap DEX through natural language. Swaps are automatically routed across V2, V3, and V4 pools via the AchSwapAdapter and Aggregator to find the best price. AI agents can also deploy custom tokens, burn tokens, check transaction history, and analyze token holder distribution.
 
-## What's New (v3.0)
+## What's New (v3.1)
 
-- **V2+V3 Smart Routing** — Swaps route through AchSwapAdapter, automatically finding the best price across V2 and V3 pools with split routing (50/50, 70/30, 30/70 V2+V3)
-- **Quote Inspector** — `quote_adapter` shows exactly which router (V2 or V3) and fee tier is used, via staticCall (no transaction)
+- **V2+V3+V4 Smart Routing** — Swaps route through AchSwapAdapter, automatically finding the best price across V2, V3, and V4 pools with split routing
+- **Aggregator Support** — `quote_adapter` shows splits across V2, V3, and V4 adapters
+- **Quote Inspector** — `quote_adapter` shows exactly which router (V2, V3, or V4) and fee tier is used, via staticCall (no transaction)
 - **Token Deploy** — Deploy pre-compiled ERC20Burnable tokens with name, symbol, and total supply
 - **Token Burn** — Permanently destroy tokens from your balance
 - **Transaction History** — Recent transactions with decoded method calls, token transfers, and gas fees
@@ -25,7 +26,7 @@ The Achswap MCP server allows AI agents to interact with the Achswap DEX through
 | Auth | 1 | Generate wallet |
 | Wallet | 12 | Balance, transfer, wrap/unwrap, approvals, token info |
 | Pool | 5 | V2 reserves, quotes, pair lookup |
-| Swap | 5 | V2+V3 best-route via AchSwapAdapter |
+| Swap | 5 | V2+V3+V4 best-route via AchSwapAdapter |
 | Liquidity | 6 | Add/remove V2 liquidity |
 | Token | 2 | Deploy ERC20Burnable, burn tokens |
 | Analytics | 2 | Transaction history, token holders |
@@ -129,19 +130,19 @@ curl -X POST https://api.achswapfi.xyz/mcp/message \
 | `get_swap_quote` | V2-only quote (output amount for input) | No |
 | `get_swap_quote_reverse` | V2-only reverse quote (input needed for output) | No |
 
-### Swaps via AchSwapAdapter (V2+V3)
+### Swaps via AchSwapAdapter (V2+V3+V4)
 
 | Tool | Description | Auth Required |
 |------|-------------|---------------|
 | `approve_token` | Approve the adapter to spend a token | Yes |
-| `quote_adapter` | StaticCall quote across V2+V3. Shows decoded route (which router/fee tier is used). No transaction. | No |
-| `swap_via_adapter` | Swap any→any. Auto-routes V2+V3, auto-approves adapter. | Yes |
+| `quote_adapter` | StaticCall quote across V2+V3+V4. Shows decoded route (which router/fee tier is used). No transaction. | No |
+| `swap_via_adapter` | Swap any→any. Auto-routes V2+V3+V4, auto-approves adapter. | Yes |
 | `swap_native_via_adapter` | Swap native USDC → ERC20 token (shortcut) | Yes |
 | `swap_to_native_via_adapter` | Swap ERC20 token → native USDC (shortcut) | Yes |
 
 :::info How the Adapter Works
-The AchSwapAdapter (`0xF82c...8AFB`) evaluates all possible routes in a single `quote()` call:
-- V2 direct | V3 direct (best fee tier) | V2 two-hop (via WETH) | V3 two-hop
+The AchSwapAdapter evaluates all possible routes in a single `quote()` call:
+- V2 direct | V3 direct (best fee tier) | V4 direct | V2 two-hop (via wUSDC) | V3 two-hop
 - 50/50, 70/30, 30/70 V2+V3 split routing
 
 It returns whichever gives the highest output. The `quote_adapter` tool uses a staticCall (10M gas, no transaction) so you can inspect the route before swapping.
@@ -193,7 +194,15 @@ It returns whichever gives the highest output. The `quote_adapter` tool uses a s
 | V3 Migrator | `0x859d886319C75eD6Ec3d9f31e8d68802Fdb04D1B` |
 | V3 Position Descriptor | `0xB84c064010144a83d2D044A00395B7aDEd1101a3` |
 | V3 Tick Lens | `0x3ac9B673114477CEf52bfc8E3f9a7dcb767C8c3a` |
-| AchSwap Adapter | `0xF82c88FbF46E109a3865647E5c4d4834b31f8AFB` |
+| V4 Pool Manager | `0x016E91490d58dbea85ff91f4b941A9f39057bebb` |
+| V4 Router | `0x5813890f6aFc1f2dAc3C753442E3F2D49e9cE4d2` |
+| Aggregator Vault | `0x0DcbA75EB4c9d7d50f6732ae205b8F872D611E24` |
+| Aggregator V2 Adapter | `0x790959a8C0e3aDd93E7fE56E01335a2Cb24da412` |
+| Aggregator V3 Adapter | `0xA6f691814566aDe0C4F6f84B2BBbeD9747F625a3` |
+| Aggregator V4 Adapter | `0xf51f6168520234f14F9f494F975e5641017faF4f` |
+| Aggregator Quote Engine | `0xA4882662842A1D5a98423A63427B9496d5B6ac82` |
+| Aggregator Execution Router | `0xD20Ad9486f178073ef89585d18eCA1b2694B0e8B` |
+| AchSwap Adapter (Legacy) | `0xF82c88FbF46E109a3865647E5c4d4834b31f8AFB` |
 
 ## Security
 
@@ -215,7 +224,7 @@ It returns whichever gives the highest output. The `quote_adapter` tool uses a s
 
 ```
 1. quote_adapter(token_in="USDC", token_out="ACHS", amount_in="1000000000000000000")
-   → Shows: expected output, route (V2 or V3), fee tiers used
+   → Shows: expected output, route (V2, V3, or V4), fee tiers used, split if any
 
 2. swap_via_adapter(amount_in="1000000000000000000", token_in="USDC", token_out="ACHS")
    → Returns: tx hash, actual output, route used

@@ -10,7 +10,7 @@ Common questions about AchSwap and AchMarket.
 
 ### What is AchSwap?
 
-AchSwap is a decentralized exchange (DEX) built on ARC Testnet, supporting both V2 and V3 liquidity pools with smart routing and cross-chain bridging.
+AchSwap is a decentralized exchange (DEX) built on ARC Testnet, supporting V2, V3, and V4 liquidity pools with smart routing, aggregator split routing, gasless swaps, and cross-chain bridging.
 
 ### What is AchMarket?
 
@@ -31,24 +31,38 @@ Both run on **ARC Testnet** (Chain ID: 5042002).
 ### How do I add liquidity?
 
 1. Go to **Add Liquidity**
-2. Choose V2 or V3
+2. Choose V2, V3, or V4
 3. Select token pair
 4. Enter amounts
 5. Confirm transaction
 
-### What's the difference between V2 and V3?
+### What's the difference between V2, V3, and V4?
 
-- **V2**: Classic AMM, full range liquidity
-- **V3**: Concentrated liquidity, higher potential returns
+- **V2**: Classic AMM, full range liquidity, single 0.3% fee tier
+- **V3**: Concentrated liquidity, higher potential returns, multiple fee tiers (0.01%-10%)
+- **V4**: Hook-enabled singleton pools, configurable fees, custom logic hooks
 
 ### How are fees earned?
 
 V2: Earn a share of trading fees proportional to your pool share.
 V3: Earn fees when price stays within your selected range.
+V4: Similar to V3, plus potential additional rewards from hook contracts.
 
 ### What is smart routing?
 
-Smart routing automatically finds the best swap path across both V2 and V3 pools to get you the best rate.
+Smart routing automatically finds the best swap path across V2, V3, and V4 pools to get you the best rate.
+
+### What is the aggregator?
+
+The aggregator splits your trade across multiple protocols (V2, V3, V4) to minimize price impact and maximize output. It charges a 0.1% fee on the gross output.
+
+### What are gasless swaps?
+
+Gasless swaps let you sign a swap transaction and have the relayer submit it on your behalf, so you don't need native USDC for gas. See [Gasless Swap](/achswap/gasless-swap) for details.
+
+### What are RWA pairs?
+
+RWA (Real World Asset) pairs allow trading tokenized traditional assets like stocks, commodities, and forex. See the [AchRWA documentation](/achrwa/overview) for details.
 
 ### How do I use the bridge?
 

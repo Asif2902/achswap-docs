@@ -4,7 +4,7 @@ sidebar_position: 5
 
 # Cross-Chain Bridge
 
-The Bridge page allows you to transfer USDC between different blockchain networks using Circle's CCTP (Cross-Chain Transfer Protocol).
+The Bridge page allows you to transfer USDC between different blockchain networks using Circle's CCTP V2 (Cross-Chain Transfer Protocol).
 
 ## What is CCTP?
 

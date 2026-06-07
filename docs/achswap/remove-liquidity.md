@@ -4,7 +4,7 @@ sidebar_position: 3
 
 # Remove Liquidity
 
-Remove your liquidity from V2 pools or V3 positions to retrieve your tokens plus earned fees.
+Remove your liquidity from V2 pools, V3 positions, or V4 pools to retrieve your tokens plus earned fees.
 
 ## Removing V2 Liquidity
 
@@ -14,7 +14,7 @@ Remove your liquidity from V2 pools or V3 positions to retrieve your tokens plus
 2. Select **V2** mode
 3. Choose the pool (e.g., USDC/ACHS)
 4. Select your LP position
-5. Enter amount to remove ( useor percentage slider)
+5. Enter amount to remove (use percentage slider)
 6. Review tokens received
 7. Click **Remove Liquidity**
 8. Confirm in your wallet
@@ -74,6 +74,31 @@ Principal:
 - ACHS: 400.00
 ```
 
+## Removing V4 Liquidity
+
+V4 liquidity removal works similarly to V2 — you burn LP tokens and receive the underlying tokens plus fees.
+
+### Process
+
+1. Navigate to **Remove Liquidity**
+2. Select **V4** mode
+3. Choose the pool position to remove
+4. Select amount to remove (partial or full using the percentage slider)
+5. Review tokens received
+6. Click **Remove Liquidity**
+7. Confirm in your wallet
+
+### Fee Collection
+
+V4 fees are auto-collected when you remove liquidity, similar to V2.
+
+### V4 Pool Discovery
+
+V4 pools are discovered from on-chain state and cached locally. If a V4 pool doesn't appear:
+- The pool may not be initialized yet
+- Try refreshing the page
+- You can initialize a new pool from the Add Liquidity page
+
 ## Understanding Returns
 
 ### What You Receive
@@ -117,6 +142,11 @@ Remove 100% of your position:
 ### Amount incorrect
 - Pool balances may have changed
 - Check block explorer for transaction history
+
+### V4 pool not showing
+- Pool may not be initialized
+- Try refreshing the page
+- Initialize from Add Liquidity page
 
 ---
 

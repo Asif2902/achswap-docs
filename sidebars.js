@@ -28,6 +28,8 @@ const sidebars = {
       label: 'Advanced',
       collapsed: true,
       items: [
+        'achswap/v4-pools',
+        'achswap/gasless-swap',
         'achswap/v2-vs-v3',
         'achswap/concentrated-liquidity',
         'achswap/smart-routing',
