@@ -48,6 +48,35 @@ The swap interface provides:
    - Approve in your wallet
    - Wait for confirmation
 
+### Exact Output Mode
+
+By default you enter the token you want to **send** (exact input). You can also enter the token you want to **receive** (exact output):
+
+1. Type the amount you want to receive in the **To** field
+2. The interface estimates the required input in the **From** field
+3. The transaction is guaranteed to deliver at least the amount you typed, or it reverts
+
+#### How the input amount is calculated
+
+Exact output is a convenience feature. Behind the scenes the app searches for the input required to produce your desired output:
+
+- **V2 and V3** use native reverse-quote functions.
+- **V4 and Aggregator** use forward-quote search because they do not expose native reverse quotes.
+
+The **From** amount shown is the estimated required input. The transaction sends a slightly larger input — the estimate plus your slippage tolerance — to guarantee you receive the exact output you asked for.
+
+#### Important behavior
+
+- **Slippage is added to the input side.** If you set 0.5% slippage, the transaction may send up to 0.5% more input than the estimate to protect against price movement.
+- **Aggregator routes are refreshed before execution.** The route shown while quoting may be updated to match the buffered input amount that is actually sent.
+- **V4 pools with custom hooks** are supported, but hooks with dynamic fees can change between quote time and execution time. Your output is still protected by the exact-amount minimum, so the transaction reverts rather than delivering less — but you may need to retry.
+- **Tax / fee-on-transfer tokens** can trigger a V2 fallback path. The fallback still protects your exact output minimum.
+
+#### When exact output is unavailable
+
+- Wrap/unwrap (USDC ↔ wUSDC) is always exact-input because the conversion is 1:1.
+- Gasless swaps currently require exact-input mode.
+
 ### Gasless Swap Flow
 
 1. Click the **Zap** icon to enable gasless mode
