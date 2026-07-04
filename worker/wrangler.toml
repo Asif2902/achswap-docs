@@ -1,0 +1,36 @@
+name = "achswap-ai-worker"
+main = "src/index.ts"
+compatibility_date = "2025-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Environment variables (non-secret)
+# Deployed via `wrangler secret` and `wrangler deploy`
+[vars]
+QDRANT_URL = "https://YOUR_QDRANT_CLUSTER.qdrant.io"   # CHANGE ME (or use cloud / self-hosted)
+QDRANT_COLLECTION = "achswap-docs"
+CEREBRAS_BASE_URL = "https://api.cerebras.ai/v1"
+CEREBRAS_MODEL = "gemma-4-31b"   # Change if your account uses a different available model id
+
+# IMPORTANT:
+# 1. Set secret:   wrangler secret put CHAT_API
+#    (this will be your Cerebras API key)
+#
+# 2. For production Qdrant, also set:
+#    wrangler secret put QDRANT_API_KEY   (if your instance requires it)
+#
+# 3. Bind Workers AI (used for query embeddings - completely free):
+[ai]
+binding = "AI"
+
+# Rate limiting is implemented in code (simple in-memory + IP based)
+# For stronger production rate limiting consider KV or Durable Objects.
+
+# CORS: We allow the docs domain(s). Adjust as needed.
+# In code we set dynamic but safe headers.
+
+# To deploy:
+#   cd worker
+#   wrangler deploy
+#
+# To develop (note: Workers AI may require login + real usage):
+#   wrangler dev

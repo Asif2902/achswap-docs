@@ -1,5 +1,15 @@
 // @ts-check
 
+/**
+ * AchSwap Documentation — Docusaurus Config
+ *
+ * AI Assistant Integration:
+ *   The official AchSwap AI lives in src/components/AIAssistant and is injected site-wide via src/theme/Root.tsx.
+ *   - All requests go through the Cloudflare Worker (never directly to Cerebras).
+ *   - Configure worker URL in src/lib/aiConfig.ts (WORKER_URL).
+ *   - Run `npm run index-docs` after doc changes (requires Qdrant + local embeddings).
+ */
+
 const config = {
   title: 'AchSwap & AchMarket Documentation',
   tagline: 'Decentralized Exchange & Prediction Markets on ARC',
@@ -11,6 +21,11 @@ const config = {
 
   organizationName: 'achswap',
   projectName: 'achswap-docs',
+
+  // Expose to client code. AI worker URL can be overridden at build time via env if desired.
+  customFields: {
+    aiWorkerUrl: process.env.ACHSWAP_AI_WORKER_URL || undefined,
+  },
 
   presets: [
     [

@@ -102,6 +102,69 @@ Edit `docusaurus.config.js` for:
 - [React 18](https://reactjs.org/) - UI library
 - [TypeScript](https://www.typescriptlang.org/) - Type safety
 
+## AchSwap AI Assistant
+
+A production-grade, documentation-backed AI assistant available on every page.
+
+### Features
+- Floating button (uses the official AchSwap logo)
+- Full RAG over **all** documentation using Qdrant + free local embeddings (`bge-small-en-v1.5`)
+- Intelligent chunking by headings + rich metadata (title, breadcrumbs, URLs)
+- All LLM calls go exclusively through a **Cloudflare Worker** (no keys exposed)
+- Streaming responses from Cerebras
+- Conversation memory, regenerate, stop, copy, suggested questions
+- Current page context awareness
+- Premium ChatGPT-like UI (dark/light, mobile responsive)
+
+### Architecture
+```
+Browser (Docusaurus)
+    ↓ only calls
+Cloudflare Worker
+    ├── Embed query (Workers AI @cf/baai/bge-small-en-v1.5)
+    ├── Search entire Qdrant collection
+    ├── Build full prompt (system + docs + history + page context)
+    └── Stream from Cerebras → client
+```
+
+### Setup & Running
+
+1. **Start Qdrant** (local recommended for development):
+   ```bash
+   docker run -p 6333:6333 qdrant/qdrant
+   ```
+
+2. **Index the documentation** (run whenever docs change):
+   ```bash
+   cp .env.example .env
+   # edit QDRANT_URL (and API key if needed)
+   npm run index-docs
+   ```
+
+3. **Configure & deploy the Worker**:
+   ```bash
+   cd worker
+   # edit wrangler.toml
+   wrangler secret put CHAT_API             # your Cerebras key
+   wrangler deploy
+   ```
+
+4. **Point frontend at the worker**:
+   Edit `src/lib/aiConfig.ts` → `WORKER_URL`
+
+5. **Start the docs site**:
+   ```bash
+   npm run start
+   ```
+
+The AI button will appear in the bottom-right corner.
+
+### Production Notes
+- Use a hosted Qdrant (Qdrant Cloud free tier works great).
+- Set production `WORKER_URL` before building.
+- Re-index after any documentation updates.
+- The worker contains rate limiting and strict prompt rules against hallucination.
+
 ## Contributing
 
 1. Fork the repository

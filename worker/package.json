@@ -1,0 +1,14 @@
+{
+  "name": "achswap-ai-worker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AchSwap AI Assistant Cloudflare Worker (RAG + Cerebras streaming)",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^3.63.0"
+  }
+}
