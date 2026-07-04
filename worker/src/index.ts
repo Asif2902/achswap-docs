@@ -2,15 +2,17 @@
  * AchSwap AI Assistant — Cloudflare Worker
  *
  * This is the single source of truth for all AI requests.
+ *
+ * DEPLOYMENT NOTE:
+ * If you deploy by selecting the "worker" folder in the Cloudflare dashboard:
+ *   → You must manually add the "AI" binding + all variables/secrets in the UI.
+ *   → See worker/README.md for exact steps.
+ *
  * - Never called directly from browser to Cerebras
  * - Receives user messages + optional current page
  * - Retrieves relevant docs from entire site via Qdrant RAG
  * - Builds a high-quality prompt containing full retrieved context
  * - Streams response from Cerebras back to client
- *
- * Security:
- *   - CHAT_API lives only as a Cloudflare secret
- *   - All external calls happen here
  */
 
 import type { Env, ChatRequest, ChatMessage } from './types';

@@ -142,27 +142,36 @@ Cloudflare Worker
    ```
 
 3. **Configure & deploy the Worker**:
+   - Easiest for most people: Go to the Cloudflare dashboard → Workers & Pages
+   - Connect your repo and select the **`worker`** folder as root directory
+   - Add the required **Bindings** (AI) and **Secrets** (CHAT_API) directly in the UI
+   - See `worker/README.md` for detailed dashboard steps
+
+   Or using CLI:
    ```bash
    cd worker
-   # edit wrangler.toml
-   wrangler secret put CHAT_API             # your Cerebras key
+   wrangler secret put CHAT_API
    wrangler deploy
    ```
 
 4. **Point frontend at the worker**:
    Edit `src/lib/aiConfig.ts` → `WORKER_URL`
 
-5. **Start the docs site**:
+5. **Start everything together (recommended)**:
    ```bash
-   npm run start
+   npm run dev
    ```
+   This starts **both** the documentation site + the AI Worker backend automatically on their respective ports.
 
-The AI button will appear in the bottom-right corner.
+   The floating AI button will appear in the bottom-right corner.
+
+   (Alternative: `npm run start` for docs only + `npm run worker:dev` in another terminal)
 
 ### Production Notes
 - Use a hosted Qdrant (Qdrant Cloud free tier works great).
-- Set production `WORKER_URL` before building.
-- Re-index after any documentation updates.
+- Deploy the worker separately to Cloudflare (`cd worker && wrangler deploy`).
+- **Update `src/lib/aiConfig.ts` → `WORKER_URL`** to your deployed worker URL before building the docs site.
+- Re-index after any documentation updates (`npm run index-docs`).
 - The worker contains rate limiting and strict prompt rules against hallucination.
 
 ## Contributing

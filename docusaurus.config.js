@@ -6,9 +6,13 @@
  * AI Assistant Integration:
  *   The official AchSwap AI lives in src/components/AIAssistant and is injected site-wide via src/theme/Root.tsx.
  *   - All requests go through the Cloudflare Worker (never directly to Cerebras).
- *   - Configure worker URL in src/lib/aiConfig.ts (WORKER_URL).
+ *   - Set WORKER_URL in root .env or as env var before `npm run build` for production.
  *   - Run `npm run index-docs` after doc changes (requires Qdrant + local embeddings).
  */
+
+require('dotenv').config();
+
+const { DefinePlugin } = require('webpack');
 
 const config = {
   title: 'AchSwap & AchMarket Documentation',
@@ -22,9 +26,9 @@ const config = {
   organizationName: 'achswap',
   projectName: 'achswap-docs',
 
-  // Expose to client code. AI worker URL can be overridden at build time via env if desired.
+  // Expose to client code. Set WORKER_URL in root .env or env for production.
   customFields: {
-    aiWorkerUrl: process.env.ACHSWAP_AI_WORKER_URL || undefined,
+    aiWorkerUrl: process.env.WORKER_URL || process.env.ACHSWAP_AI_WORKER_URL || undefined,
   },
 
   presets: [
@@ -102,5 +106,25 @@ const config = {
     },
   },
 };
+
+// Inject WORKER_URL at build time so the AI client uses the value from root .env or env var
+// Usage: WORKER_URL=https://your-worker.workers.dev npm run build
+config.plugins = config.plugins || [];
+config.plugins.push(function () {
+  return {
+    name: 'ai-worker-url-define',
+    configureWebpack() {
+      return {
+        plugins: [
+          new DefinePlugin({
+            'process.env.WORKER_URL': JSON.stringify(
+              process.env.WORKER_URL || process.env.ACHSWAP_AI_WORKER_URL || 'http://localhost:8787'
+            ),
+          }),
+        ],
+      };
+    },
+  };
+});
 
 module.exports = config;

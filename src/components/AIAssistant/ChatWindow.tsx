@@ -94,11 +94,17 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps): JSX.El
   };
 
   const handleError = (err: Error) => {
+    let msg = err.message || 'Something went wrong. Please try again.';
+
+    if (msg.includes('Failed to fetch') || msg.includes('ERR_CONNECTION_REFUSED') || msg.includes('ECONNREFUSED')) {
+      msg = 'Cannot connect to the AI backend. Make sure the worker is running (try `npm run dev`).';
+    }
+
     setState((s) => ({
       ...s,
       isStreaming: false,
       streamingContent: '',
-      error: err.message || 'Something went wrong. Please try again.',
+      error: msg,
     }));
   };
 

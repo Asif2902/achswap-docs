@@ -15,20 +15,80 @@ This Cloudflare Worker is the **only** component allowed to talk to Cerebras and
 
 ## Setup
 
-1. `cd worker`
-2. `npm install -g wrangler` (or use npx)
-3. Copy `wrangler.toml` values and update QDRANT_URL + COLLECTION
-4. Set secrets:
-   ```bash
-   wrangler secret put CHAT_API
-   wrangler secret put QDRANT_API_KEY   # if needed
-   ```
-5. Deploy:
-   ```bash
-   wrangler deploy
-   ```
+### Option A: Deploy via Cloudflare Dashboard (Web UI) ← You are doing this
 
-## Local Development
+You mentioned you're selecting the `worker/` folder directly in the Cloudflare website and adding your private keys there.
+
+**Steps in the Dashboard:**
+
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com) → Workers & Pages → **Create application** → Worker.
+2. Choose **"Deploy via Git"** (recommended for ongoing updates) or create a new Worker.
+3. Connect your GitHub repo (`achswap-docs`).
+4. **Important settings**:
+   - **Root directory**: `worker`
+   - Build command: leave empty or `npm install`
+   - Framework preset: None
+5. After the Worker is created:
+   - Go to your Worker → **Settings** tab
+
+**Required configuration in Dashboard (Settings):**
+
+**Bindings** (critical):
+- Click **Add binding** → **AI** (Workers AI)
+  - Variable name: `AI`
+
+**Variables** (Environment variables):
+- `QDRANT_URL` → your Qdrant URL (use Qdrant Cloud for production, e.g. `https://xxx.qdrant.io`)
+- `QDRANT_COLLECTION` → `achswap-docs`
+- `CEREBRAS_BASE_URL` → `https://api.cerebras.ai/v1`
+- `CEREBRAS_MODEL` → `gemma-4-31b` (or the model available in your account)
+
+**Secrets** (click "Add variable" and choose "Secret"):
+- `CHAT_API` → Your Cerebras API key (this is the main one)
+- `QDRANT_API_KEY` → Your Qdrant API key (only if your Qdrant instance requires it)
+
+6. Save and redeploy.
+
+**After deployment**:
+- Copy the Worker URL (e.g. `https://achswap-ai-worker.your-subdomain.workers.dev`)
+- Update `src/lib/aiConfig.ts`:
+  ```ts
+  WORKER_URL: 'https://achswap-ai-worker.your-subdomain.workers.dev',
+  ```
+- Commit, push, and redeploy your docs site on Vercel.
+
+**Critical for the AI to actually know your docs**:
+- You must run the indexer against the **same Qdrant** the worker uses:
+  ```bash
+  npm run index-docs
+  ```
+  (make sure `.env` points to your production Qdrant)
+
+**Note**: Cloudflare Workers cannot reach a local Qdrant. Use Qdrant Cloud (free tier is fine) for production.
+
+### Option B: Using Wrangler CLI (recommended for developers)
+
+```bash
+cd worker
+wrangler deploy
+```
+
+Set secrets with CLI:
+```bash
+wrangler secret put CHAT_API
+wrangler secret put QDRANT_API_KEY
+```
+
+## Local Development (from root)
+
+From the project root:
+
+```bash
+npm run dev          # starts docs + worker together (best)
+npm run worker:dev   # worker only
+```
+
+Or inside worker folder:
 
 ```bash
 wrangler dev

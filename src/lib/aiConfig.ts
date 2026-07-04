@@ -1,44 +1,53 @@
 /**
  * AchSwap AI Assistant Configuration
  *
- * Update WORKER_URL before deploying to production.
- * - Development: http://localhost:8787 (run `wrangler dev` inside /worker)
- * - Production: Your deployed Cloudflare Worker URL
+ * LOCAL DEVELOPMENT:
+ *   Run `npm run dev`  → starts BOTH Docusaurus (docs) + Worker (AI backend) together.
+ *   The worker will be available at http://localhost:8787
+ *
+ * PRODUCTION:
+ *   1. Deploy the worker: cd worker && wrangler deploy
+ *   2. Update WORKER_URL below to your live worker URL (https://xxx.workers.dev)
+ *   3. Rebuild and deploy the docs site
  *
  * NEVER put any API keys here.
- *
- * TIP: After changing this, run `npm run build` to verify.
  */
 
 export const AI_CONFIG = {
   /**
    * The base URL of your Cloudflare Worker.
    * All chat traffic goes exclusively through this endpoint.
+   *
+   * Set via root .env as WORKER_URL=... or env var before build.
+   * For local dev: use `npm run dev` (defaults to localhost:8787)
    */
-  WORKER_URL: 'http://localhost:8787',
+  WORKER_URL: (typeof process !== 'undefined' && process.env.WORKER_URL)
+    ? process.env.WORKER_URL
+    : 'https://achswap-ai-worker.freefirebangladeshofficial01.workers.dev',
 
   // UI behavior
   MAX_HISTORY_TURNS: 10,
   STREAM_TIMEOUT_MS: 45000,
 
   // Suggested prompts shown before first message
+  // Kept relevant to actual content in the documentation
   SUGGESTED_QUESTIONS: [
-    'How do swaps work?',
-    'Explain the Aggregator',
-    'Explain V2 vs V3 vs V4',
-    'Explain RWA',
+    'How does smart routing work?',
+    'What are V4 pools and hooks?',
+    'How do gasless swaps work?',
+    'Explain concentrated liquidity',
     'How do I add liquidity?',
     'How do I remove liquidity?',
-    'Explain routing and smart routing',
+    'What is the Aggregator?',
     'Explain Exact Output swaps',
-    'SDK Integration examples',
-    'API examples',
-    'How do I connect a wallet?',
+    'How does bridging USDC work?',
+    'What contract addresses are used?',
+    'Explain the fee structure',
     'What networks are supported?',
-    'Explain fees and fee structure',
-    'What are pools?',
-    'How does gasless swap work?',
+    'How do I setup my wallet?',
     'What is AchMarket?',
+    'How do prediction markets work?',
+    'What are V2 vs V3 vs V4 pools?',
   ] as const,
 } as const;
 
@@ -52,12 +61,15 @@ export type SuggestedQuestion = (typeof AI_CONFIG.SUGGESTED_QUESTIONS)[number];
  *   3. Default in AI_CONFIG
  */
 export function getWorkerUrl(): string {
+  // Build-time injection via DefinePlugin (from root .env or WORKER_URL env)
+  if (typeof process !== 'undefined' && process.env.WORKER_URL) {
+    return process.env.WORKER_URL;
+  }
   if (typeof window !== 'undefined') {
     // @ts-ignore - optional global escape hatch
     const runtime = (window as any).__ACHSWAP_AI_WORKER_URL__;
     if (runtime) return runtime;
   }
-  // Note: full Docusaurus context injection can be added in Root if desired.
   return AI_CONFIG.WORKER_URL;
 }
 
