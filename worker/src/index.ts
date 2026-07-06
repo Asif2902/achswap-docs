@@ -8,23 +8,23 @@
  *   → You must manually add the "AI" binding + all variables/secrets in the UI.
  *   → See worker/README.md for exact steps.
  *
- * - Never called directly from browser to Cerebras
+ * - Never called directly from browser to OpenRouter
  * - Receives user messages + optional current page
  * - Retrieves relevant docs from entire site via Qdrant RAG
  * - Builds a high-quality prompt containing full retrieved context
- * - Streams response from Cerebras back to client
+ * - Streams response from OpenRouter back to client
  */
 
 import type { Env, ChatRequest, ChatMessage } from './types';
 import { embedQuery, searchQdrant, buildQueryText } from './rag';
 import { buildFinalMessages, trimHistory } from './prompt';
-import { callCerebrasStream, createStreamingResponse } from './stream';
+import { callLLMStream, createStreamingResponse } from './stream';
 
 // ---------------- CONFIG ----------------
 const MAX_MESSAGES = 12; // safety limit
 const MAX_MESSAGE_LENGTH = 2000;
 const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX = 20; // per IP per window
+const RATE_LIMIT_MAX = 15; // per IP per minute for browser calls (as requested)
 
 // Very lightweight in-memory rate limiter (resets on worker restart)
 const rateLimitMap = new Map<string, number[]>();
@@ -90,6 +90,7 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const origin = request.headers.get('Origin');
+    console.log('Worker received:', request.method, url.pathname, 'origin:', origin);
 
     // CORS preflight
     if (request.method === 'OPTIONS') {
@@ -102,7 +103,7 @@ export default {
         JSON.stringify({
           ok: true,
           service: 'achswap-ai-worker',
-          model: env.CEREBRAS_MODEL,
+          model: env.OPENROUTER_MODEL,
           collection: env.QDRANT_COLLECTION,
         }),
         {
@@ -111,9 +112,10 @@ export default {
       );
     }
 
-    if (request.method !== 'POST' || url.pathname !== '/chat') {
+    if (request.method !== 'POST') {
       return new Response('Not found', { status: 404, headers: corsHeaders(origin) });
     }
+    // Accept any POST as chat request (robust for different deploys)
 
     // Rate limit
     const ip = getClientIp(request);
@@ -145,6 +147,20 @@ export default {
     }
 
     try {
+      // Basic validation for required bindings / vars (important for dashboard deploys)
+      if (!env.AI) {
+        throw new Error("Workers AI binding 'AI' is missing. In dashboard: Settings > Bindings > Add binding > Workers AI. Variable name must be exactly 'AI'.");
+      }
+      if (!env.QDRANT_URL || !env.QDRANT_COLLECTION) {
+        throw new Error("Missing QDRANT_URL or QDRANT_COLLECTION. Set them in dashboard Variables.");
+      }
+      if (!env.CHAT_API) {
+        throw new Error("Missing CHAT_API secret. Add it in dashboard as a Secret.");
+      }
+      if (!env.OPENROUTER_BASE_URL || !env.OPENROUTER_MODEL) {
+        throw new Error("Missing OPENROUTER_BASE_URL or OPENROUTER_MODEL in Variables. (or use defaults)");
+      }
+
       // 1. Extract latest user question
       const lastUserMessage = [...body.messages].reverse().find((m) => m.role === 'user');
       if (!lastUserMessage) {
@@ -155,9 +171,11 @@ export default {
 
       // 2. Embed the query (free via Workers AI)
       const queryVector = await embedQuery(env, queryText);
+      console.log('Query embedded, searching Qdrant...');
 
       // 3. Retrieve relevant documentation from ENTIRE site
-      const retrieved = await searchQdrant(env, queryVector, 8);
+      const retrieved = await searchQdrant(env, queryVector, 10);
+      console.log('Retrieved', retrieved.length, 'chunks from Qdrant');
 
       // 4. Prepare clean history (trimmed)
       const trimmedHistory = trimHistory(body.messages);
@@ -165,18 +183,18 @@ export default {
       // 5. Build the final high-signal prompt
       const finalMessages = buildFinalMessages(trimmedHistory, retrieved, body.currentPage);
 
-      // 6. Call Cerebras with streaming
-      const cerebrasStream = await callCerebrasStream(
+      // 6. Call OpenRouter with streaming
+      const llmStream = await callLLMStream(
         {
-          CEREBRAS_BASE_URL: env.CEREBRAS_BASE_URL,
-          CEREBRAS_MODEL: env.CEREBRAS_MODEL,
+          OPENROUTER_BASE_URL: env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1',
+          OPENROUTER_MODEL: env.OPENROUTER_MODEL || 'google/gemma-4-31b-it:free',
           CHAT_API: env.CHAT_API,
         },
         finalMessages
       );
 
       // 7. Transform and return stream to client
-      const response = createStreamingResponse(cerebrasStream);
+      const response = createStreamingResponse(llmStream);
 
       // Merge CORS headers
       const headers = new Headers(response.headers);
@@ -190,7 +208,7 @@ export default {
       console.error('Worker error:', err);
 
       // Return clean error (never leak secrets)
-      const msg = err?.message?.includes('Cerebras')
+      const msg = err?.message?.includes('OpenRouter')
         ? 'The AI service is temporarily unavailable. Please try again shortly.'
         : err?.message || 'Unexpected error while processing your request.';
 

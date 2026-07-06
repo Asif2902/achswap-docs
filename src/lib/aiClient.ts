@@ -50,7 +50,12 @@ export async function streamChat(
 
     if (!res.ok || !res.body) {
       const text = await res.text().catch(() => '');
-      throw new Error(text || `Request failed with status ${res.status}`);
+      let msg = text || `Request failed with status ${res.status}`;
+      try {
+        const parsed = JSON.parse(text);
+        if (parsed.error) msg = parsed.error;
+      } catch {}
+      throw new Error(msg);
     }
 
     const reader = res.body.getReader();

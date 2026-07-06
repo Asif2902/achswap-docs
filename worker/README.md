@@ -1,6 +1,6 @@
 # AchSwap AI Worker
 
-This Cloudflare Worker is the **only** component allowed to talk to Cerebras and Qdrant.
+This Cloudflare Worker is the **only** component allowed to talk to OpenRouter (LLM) and Qdrant (vector DB).
 
 ## Responsibilities
 - Accept chat requests from the frontend
@@ -11,7 +11,7 @@ This Cloudflare Worker is the **only** component allowed to talk to Cerebras and
   - All relevant retrieved documentation chunks
   - Conversation history
   - Current page context (when available)
-- Stream tokens from Cerebras back to the user
+- Stream tokens from OpenRouter back to the user
 
 ## Setup
 
@@ -33,18 +33,20 @@ You mentioned you're selecting the `worker/` folder directly in the Cloudflare w
 
 **Required configuration in Dashboard (Settings):**
 
-**Bindings** (critical):
+**Bindings** (critical - this fixes the "Cannot read properties of undefined (reading 'run')" error):
 - Click **Add binding** → **AI** (Workers AI)
   - Variable name: `AI`
 
+  **This is the #1 reason for the 500 + 'undefined (reading run)' error when deploying via dashboard.**
+
 **Variables** (Environment variables):
 - `QDRANT_URL` → your Qdrant URL (use Qdrant Cloud for production, e.g. `https://xxx.qdrant.io`)
-- `QDRANT_COLLECTION` → `achswap-docs`
-- `CEREBRAS_BASE_URL` → `https://api.cerebras.ai/v1`
-- `CEREBRAS_MODEL` → `gemma-4-31b` (or the model available in your account)
+- `QDRANT_COLLECTION` → `achswap`
+- `OPENROUTER_BASE_URL` → `https://openrouter.ai/api/v1` (for the LLM calls)
+- `OPENROUTER_MODEL` → `google/gemma-4-31b-it:free` (or the model you want, e.g. the free one you specified)
 
 **Secrets** (click "Add variable" and choose "Secret"):
-- `CHAT_API` → Your Cerebras API key (this is the main one)
+- `CHAT_API` → Your OpenRouter API key (sk-or-... this is the main one)
 - `QDRANT_API_KEY` → Your Qdrant API key (only if your Qdrant instance requires it)
 
 6. Save and redeploy.
@@ -97,7 +99,7 @@ wrangler dev
 Note: Workers AI embedding may require being logged in (`wrangler login`) and may have limitations locally.
 
 ## Important
-- Never put the Cerebras key in any client code or repo.
+- Never put the OpenRouter key in any client code or repo.
 - The frontend must only ever call this worker.
 - After updating docs, re-run `npm run index-docs` from project root.
 

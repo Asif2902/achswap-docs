@@ -62,14 +62,17 @@ export type SuggestedQuestion = (typeof AI_CONFIG.SUGGESTED_QUESTIONS)[number];
  */
 export function getWorkerUrl(): string {
   // Build-time injection via DefinePlugin (from root .env or WORKER_URL env)
+  let url = '';
   if (typeof process !== 'undefined' && process.env.WORKER_URL) {
-    return process.env.WORKER_URL;
-  }
-  if (typeof window !== 'undefined') {
+    url = process.env.WORKER_URL;
+  } else if (typeof window !== 'undefined') {
     // @ts-ignore - optional global escape hatch
     const runtime = (window as any).__ACHSWAP_AI_WORKER_URL__;
-    if (runtime) return runtime;
+    if (runtime) url = runtime;
+  } else {
+    url = AI_CONFIG.WORKER_URL;
   }
-  return AI_CONFIG.WORKER_URL;
+  // Ensure no trailing slash
+  return url.replace(/\/$/, '');
 }
 

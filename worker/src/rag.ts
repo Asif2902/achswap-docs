@@ -1,10 +1,13 @@
 import type { Env, RetrievedChunk, ChatRequest } from './types';
 
 const EMBEDDING_MODEL = '@cf/baai/bge-small-en-v1.5';
-const DEFAULT_TOP_K = 8;
-const MIN_SCORE = 0.22; // tunable relevance floor
+const DEFAULT_TOP_K = 10; // increased for better recall
 
 export async function embedQuery(env: Env, text: string): Promise<number[]> {
+  if (!env.AI) {
+    throw new Error("Workers AI binding 'AI' is missing. In the Cloudflare dashboard, go to Settings > Bindings > Add binding > AI (variable name must be 'AI').");
+  }
+
   // Use Cloudflare's free hosted embedding - identical model family to indexing
   const result = await env.AI.run(EMBEDDING_MODEL as any, {
     text: [text],
@@ -38,7 +41,7 @@ export async function searchQdrant(
     vector,
     limit: topK,
     with_payload: true,
-    score_threshold: MIN_SCORE,
+    // score_threshold removed to allow more results (even lower similarity)
   };
 
   const res = await fetch(url, {
@@ -55,7 +58,7 @@ export async function searchQdrant(
   const json = (await res.json()) as any;
   const points = json.result || json.points || [];
 
-  return points
+  const results = points
     .map((p: any) => ({
       content: p.payload?.content ?? '',
       metadata: {
@@ -68,6 +71,9 @@ export async function searchQdrant(
       score: p.score,
     }))
     .filter((c: RetrievedChunk) => c.content && c.content.length > 12);
+
+  console.log('Qdrant search returned', results.length, 'results with scores:', results.map(r => r.score ? r.score.toFixed(3) : 'n/a'));
+  return results;
 }
 
 export function buildQueryText(userMessage: string, currentPage?: ChatRequest['currentPage']): string {

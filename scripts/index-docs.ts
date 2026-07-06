@@ -18,7 +18,6 @@
 import 'dotenv/config';
 import { glob } from 'glob';
 import matter from 'gray-matter';
-import { QdrantClient } from '@qdrant/qdrant-js';
 import { pipeline, Pipeline } from '@xenova/transformers';
 import crypto from 'crypto';
 import fs from 'fs/promises';
@@ -235,39 +234,56 @@ function splitIntoChunks(filePath: string, rawMarkdown: string): DocChunk[] {
   }
 }
 
-// ----------------------------- QDRANT -----------------------------
-async function ensureCollection(client: QdrantClient, name: string): Promise<void> {
-  const collections = await client.getCollections();
-  const exists = collections.collections.some((c) => c.name === name);
+// ----------------------------- QDRANT (direct fetch to avoid undici compatibility issues on Node 26+) -----------------------------
+async function qdrantRequest(path: string, method: string, body?: any) {
+  const base = QDRANT_URL.replace(/\/$/, '');
+  const url = `${base}${path}`;
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (QDRANT_API_KEY) headers['api-key'] = QDRANT_API_KEY;
+  const res = await fetch(url, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Qdrant ${method} ${path} failed: ${res.status} ${text}`);
+  }
+  return res.json();
+}
 
-  if (!exists) {
-    console.log(`Creating collection "${name}" (dim=${VECTOR_DIM})...`);
-    await client.createCollection(name, {
-      vectors: {
-        size: VECTOR_DIM,
-        distance: 'Cosine',
-      },
-      optimizers_config: {
-        default_segment_number: 2,
-      },
-    });
+async function ensureCollection(name: string): Promise<void> {
+  try {
+    const cols = await qdrantRequest('/collections', 'GET');
+    const exists = cols.result?.collections?.some((c: any) => c.name === name);
+    if (!exists) {
+      console.log(`Creating collection "${name}" (dim=${VECTOR_DIM})...`);
+      await qdrantRequest(`/collections/${name}`, 'PUT', {
+        vectors: { size: VECTOR_DIM, distance: 'Cosine' },
+        optimizers_config: { default_segment_number: 2 },
+      });
+    }
+  } catch (e: any) {
+    if (e.message.includes('404') || e.message.includes('Not found')) {
+      console.log(`Creating collection "${name}" (dim=${VECTOR_DIM})...`);
+      await qdrantRequest(`/collections/${name}`, 'PUT', {
+        vectors: { size: VECTOR_DIM, distance: 'Cosine' },
+      });
+    } else {
+      throw e;
+    }
   }
 }
 
-async function deletePointsForFile(client: QdrantClient, filePath: string): Promise<void> {
+async function deletePointsForFile(name: string, filePath: string): Promise<void> {
   try {
-    await client.delete(COLLECTION, {
+    await qdrantRequest(`/collections/${name}/points/delete`, 'POST', {
       filter: {
-        must: [
-          {
-            key: 'filePath',
-            match: { value: filePath },
-          },
-        ],
+        must: [{ key: 'filePath', match: { value: filePath } }],
       },
     });
   } catch (err) {
-    // Collection may be empty — ignore
+    // ignore if empty or not exist
   }
 }
 
@@ -308,13 +324,8 @@ async function main() {
   console.log(`Force reindex: ${FORCE}`);
   console.log(`Dry run: ${DRY_RUN}`);
 
-  const client = new QdrantClient({
-    url: QDRANT_URL,
-    apiKey: QDRANT_API_KEY,
-  });
-
   if (!DRY_RUN) {
-    await ensureCollection(client, COLLECTION);
+    await ensureCollection(COLLECTION);
   } else {
     console.log('[DRY RUN] Skipping Qdrant connection and collection creation.');
   }
@@ -355,7 +366,7 @@ async function main() {
 
     if (!DRY_RUN) {
       // Delete old points belonging to this file
-      await deletePointsForFile(client, file);
+      await deletePointsForFile(COLLECTION, file);
     }
 
     // Embed
@@ -374,7 +385,7 @@ async function main() {
     }));
 
     if (!DRY_RUN && points.length > 0) {
-      await client.upsert(COLLECTION, { points });
+      await qdrantRequest(`/collections/${COLLECTION}/points`, 'PUT', { points });
       totalChunks += points.length;
       console.log(`   → Indexed ${points.length} chunks`);
     } else if (DRY_RUN) {
@@ -393,7 +404,7 @@ async function main() {
       delete newCache[cachedFile];
       // Best effort: delete any leftover points
       try {
-        await client.delete(COLLECTION, {
+        await qdrantRequest(`/collections/${COLLECTION}/points/delete`, 'POST', {
           filter: { must: [{ key: 'filePath', match: { value: cachedFile } }] },
         });
       } catch {}

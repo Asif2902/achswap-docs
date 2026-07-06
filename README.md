@@ -111,7 +111,7 @@ A production-grade, documentation-backed AI assistant available on every page.
 - Full RAG over **all** documentation using Qdrant + free local embeddings (`bge-small-en-v1.5`)
 - Intelligent chunking by headings + rich metadata (title, breadcrumbs, URLs)
 - All LLM calls go exclusively through a **Cloudflare Worker** (no keys exposed)
-- Streaming responses from Cerebras
+- Streaming responses from OpenRouter (LLM router)
 - Conversation memory, regenerate, stop, copy, suggested questions
 - Current page context awareness
 - Premium ChatGPT-like UI (dark/light, mobile responsive)
@@ -124,7 +124,7 @@ Cloudflare Worker
     ├── Embed query (Workers AI @cf/baai/bge-small-en-v1.5)
     ├── Search entire Qdrant collection
     ├── Build full prompt (system + docs + history + page context)
-    └── Stream from Cerebras → client
+    └── Stream from OpenRouter → client
 ```
 
 ### Setup & Running

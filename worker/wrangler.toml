@@ -4,18 +4,32 @@ compatibility_date = "2025-06-01"
 compatibility_flags = ["nodejs_compat"]
 
 # Placeholders only. Real values go in:
-# - Cloudflare Dashboard (for production deployment via UI)
+# - Cloudflare Dashboard (for production deployment via UI)  <--- YOU ARE USING THIS
 # - root .env (for local indexing / build)
 # - worker/.dev.vars (for local wrangler dev)
 
 [vars]
-QDRANT_URL = "https://YOUR_QDRANT_CLUSTER.qdrant.io"
+QDRANT_URL = "https://YOUR_QDRANT_URL"
 QDRANT_COLLECTION = "achswap"
-CEREBRAS_BASE_URL = "https://api.cerebras.ai/v1"
-CEREBRAS_MODEL = "gemma-4-31b"
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+OPENROUTER_MODEL = "google/gemma-4-31b-it:free"
+
+# IMPORTANT: Dashboard deployment instructions
+# Because you deploy by selecting the "worker" folder in the web UI,
+# wrangler.toml bindings/vars are NOT auto-applied. You must configure in dashboard.
+#
+# After deploying:
+# 1. Go to your Worker > Settings > Bindings
+#    Add binding > Workers AI
+#    Variable name: AI   (exact, this is what provides env.AI for the .run() call)
+#
+# 2. Settings > Variables and Secrets
+#    - Environment variables (Plaintext): QDRANT_URL, QDRANT_COLLECTION, OPENROUTER_BASE_URL, OPENROUTER_MODEL
+#    - Secrets: CHAT_API (required)
+#      (add QDRANT_API_KEY as Secret if your Qdrant instance requires authentication)
 
 # Secrets set in Dashboard or .dev.vars:
-# CHAT_API = your-cerebras-key
+# CHAT_API = your-openrouter-key
 # QDRANT_API_KEY = your-qdrant-key-if-needed
 
 [ai]

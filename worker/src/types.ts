@@ -31,14 +31,14 @@ export interface RetrievedChunk {
 
 export interface Env {
   // Secrets
-  CHAT_API: string; // Cerebras key - set via wrangler secret
+  CHAT_API: string; // OpenRouter key - set via dashboard secret
   QDRANT_API_KEY?: string;
 
   // Vars
   QDRANT_URL: string;
   QDRANT_COLLECTION: string;
-  CEREBRAS_BASE_URL: string;
-  CEREBRAS_MODEL: string;
+  OPENROUTER_BASE_URL: string;
+  OPENROUTER_MODEL: string;
 
   // Bindings
   AI: Ai; // Cloudflare Workers AI binding
