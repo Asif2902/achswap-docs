@@ -3,6 +3,12 @@ main = "src/index.ts"
 compatibility_date = "2025-06-01"
 compatibility_flags = ["nodejs_compat"]
 
+# Observability (optional)
+[observability]
+enabled = true
+logs = { enabled = true, head_sampling_rate = 1, persist = true, invocation_logs = true }
+traces = { enabled = false, persist = true, head_sampling_rate = 1 }
+
 # Placeholders only. Real values go in:
 # - Cloudflare Dashboard (for production deployment via UI)  <--- YOU ARE USING THIS
 # - root .env (for local indexing / build)
