@@ -697,10 +697,10 @@ tr:nth-child(even) td {
   gap: 9px;
 }
 
-.ai-floating-logo {
+.ai-floating-icon {
   display: block;
-  border-radius: 4px;
-  filter: brightness(0) invert(1);
+  flex-shrink: 0;
+  color: white;
 }
 
 .ai-floating-label {
