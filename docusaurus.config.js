@@ -6,13 +6,11 @@
  * AI Assistant Integration:
  *   The official AchSwap AI lives in src/components/AIAssistant and is injected site-wide via src/theme/Root.tsx.
  *   - All requests go through the Cloudflare Worker (never directly to Cerebras).
- *   - Set WORKER_URL in root .env or as env var before `npm run build` for production.
+ *   - WORKER_URL is read at RUNTIME from window.__ACHSWAP_AI_WORKER_URL__ (set via Cloudflare Pages env or meta tag).
  *   - Run `npm run index-docs` after doc changes (requires Qdrant + local embeddings).
  */
 
-require('dotenv').config();
-
-const { DefinePlugin } = require('webpack');
+const workerUrl = process.env.WORKER_URL || process.env.ACHSWAP_AI_WORKER_URL || '';
 
 const config = {
   title: 'AchSwap & AchMarket Documentation',
@@ -26,7 +24,7 @@ const config = {
   organizationName: 'achswap',
   projectName: 'achswap-docs',
 
-  // Expose to client code. Set WORKER_URL in root .env or env for production.
+  // Expose to client code at build time (optional fallback)
   customFields: {
     aiWorkerUrl: process.env.WORKER_URL || process.env.ACHSWAP_AI_WORKER_URL || undefined,
   },
@@ -105,26 +103,19 @@ const config = {
       isCloseable: true,
     },
   },
-};
 
-// Inject WORKER_URL at build time so the AI client uses the value from root .env or env var
-// Usage: WORKER_URL=https://your-worker.workers.dev npm run build
-config.plugins = config.plugins || [];
-config.plugins.push(function () {
-  return {
-    name: 'ai-worker-url-define',
-    configureWebpack() {
-      return {
-        plugins: [
-          new DefinePlugin({
-            'process.env.WORKER_URL': JSON.stringify(
-              process.env.WORKER_URL || process.env.ACHSWAP_AI_WORKER_URL
-            ),
-          }),
-        ],
-      };
-    },
-  };
-});
+  // Inject WORKER_URL at runtime via meta tag (works with Cloudflare Pages build env vars)
+  headTags: workerUrl
+    ? [
+        {
+          tagName: 'meta',
+          attributes: {
+            name: 'achswap-ai-worker-url',
+            content: workerUrl,
+          },
+        },
+      ]
+    : [],
+};
 
 module.exports = config;

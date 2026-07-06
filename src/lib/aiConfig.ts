@@ -7,24 +7,13 @@
  *
  * PRODUCTION:
  *   1. Deploy the worker: cd worker && wrangler deploy
- *   2. Update WORKER_URL below to your live worker URL (https://xxx.workers.dev)
- *   3. Rebuild and deploy the docs site
+ *   2. Set WORKER_URL in Cloudflare Pages Build Environment Variables
+ *   3. The build injects it into a meta tag, read at runtime
  *
  * NEVER put any API keys here.
  */
 
 export const AI_CONFIG = {
-  /**
-   * The base URL of your Cloudflare Worker.
-   * All chat traffic goes exclusively through this endpoint.
-   *
-   * Set via root .env as WORKER_URL=... or env var before build.
-   * For local dev: use `npm run dev` (defaults to localhost:8787)
-   */
-  WORKER_URL: (typeof process !== 'undefined' && process.env.WORKER_URL)
-    ? process.env.WORKER_URL
-    : undefined,
-
   // UI behavior
   MAX_HISTORY_TURNS: 10,
   STREAM_TIMEOUT_MS: 45000,
@@ -56,21 +45,29 @@ export type SuggestedQuestion = (typeof AI_CONFIG.SUGGESTED_QUESTIONS)[number];
 /**
  * Returns the effective worker URL.
  * Priority:
- *   1. Runtime override: window.__ACHSWAP_AI_WORKER_URL__
- *   2. Build-time Docusaurus custom field (if injected)
- *   3. Default in AI_CONFIG
+ *   1. Runtime global override: window.__ACHSWAP_AI_WORKER_URL__
+ *   2. Meta tag injected at build: <meta name="achswap-ai-worker-url" content="...">
+ *   3. Build-time Docusaurus custom field (if injected)
  */
 export function getWorkerUrl(): string {
-  // Build-time injection via DefinePlugin (from root .env or WORKER_URL env)
-  let url = '';
-  if (typeof process !== 'undefined' && process.env.WORKER_URL) {
-    url = process.env.WORKER_URL;
-  } else if (typeof window !== 'undefined') {
+  // 1. Runtime escape hatch (highest priority)
+  if (typeof window !== 'undefined') {
     // @ts-ignore - optional global escape hatch
     const runtime = (window as any).__ACHSWAP_AI_WORKER_URL__;
-    if (runtime) url = runtime;
+    if (runtime) return runtime.replace(/\/$/, '');
   }
-  // Ensure no trailing slash
-  return url.replace(/\/$/, '');
+
+  // 2. Meta tag injected by Docusaurus headTags (works with Cloudflare Pages build env vars)
+  if (typeof document !== 'undefined') {
+    const meta = document.querySelector('meta[name="achswap-ai-worker-url"]');
+    if (meta?.content) return meta.content.replace(/\/$/, '');
+  }
+
+  // 3. Build-time injection via DefinePlugin (from root .env or WORKER_URL env)
+  if (typeof process !== 'undefined' && process.env.WORKER_URL) {
+    return process.env.WORKER_URL.replace(/\/$/, '');
+  }
+
+  return '';
 }
 
