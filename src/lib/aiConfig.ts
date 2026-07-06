@@ -23,7 +23,7 @@ export const AI_CONFIG = {
    */
   WORKER_URL: (typeof process !== 'undefined' && process.env.WORKER_URL)
     ? process.env.WORKER_URL
-    : 'https://achswap-ai-worker.freefirebangladeshofficial01.workers.dev',
+    : undefined,
 
   // UI behavior
   MAX_HISTORY_TURNS: 10,
@@ -69,8 +69,6 @@ export function getWorkerUrl(): string {
     // @ts-ignore - optional global escape hatch
     const runtime = (window as any).__ACHSWAP_AI_WORKER_URL__;
     if (runtime) url = runtime;
-  } else {
-    url = AI_CONFIG.WORKER_URL;
   }
   // Ensure no trailing slash
   return url.replace(/\/$/, '');
