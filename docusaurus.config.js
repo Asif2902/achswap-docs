@@ -118,7 +118,7 @@ config.plugins.push(function () {
         plugins: [
           new DefinePlugin({
             'process.env.WORKER_URL': JSON.stringify(
-              process.env.WORKER_URL || process.env.ACHSWAP_AI_WORKER_URL || 'http://localhost:8787'
+              process.env.WORKER_URL || process.env.ACHSWAP_AI_WORKER_URL || 'https://achswap-ai-worker.freefirebangladeshofficial01.workers.dev'
             ),
           }),
         ],
