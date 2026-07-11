@@ -105,6 +105,7 @@ const sidebars = {
         'technical/fee-structure',
         'technical/contract-addresses',
         'technical/mcp',
+        'technical/sdk',
       ],
     },
     {
