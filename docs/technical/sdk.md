@@ -120,6 +120,124 @@ must be approved:
 Two control tools appear only in manual mode: `confirm_transaction` and
 `list_pending`.
 
+## CLI command reference
+
+`achswap` is the command-line control panel for the SDK. It manages the wallet,
+configuration, and the local MCP server your AI client connects to. All commands:
+
+| Command | Purpose |
+|---------|---------|
+| `achswap init [-p PASS]` | Create the encrypted wallet (prints a 12-word recovery phrase once) |
+| `achswap recover -m "w1 … w12" [-p PASS]` | Restore the wallet from its recovery phrase |
+| `achswap backup [path]` | Copy `keystore.json` to an offline/safe location |
+| `achswap address` | Print your wallet address (no unlock needed) |
+| `achswap balance` | Print your native USDC balance |
+| `achswap status` | Show settings + any running MCP server |
+| `achswap running` (`ps`) | List running Achswap MCP processes |
+| `achswap config` | Print the resolved config as JSON |
+| `achswap set <key> <value>` | Change a persisted setting |
+| `achswap install <client>` | Inject the MCP config into an AI client |
+| `achswap pending` | List queued (manual-mode) transactions |
+| `achswap approve <id>` | Sign + broadcast a pending transaction |
+| `achswap serve [opts]` | Start the local MCP server (normally launched by your client) |
+| `achswap run --tool <t> --args <json>` | Call one tool and exit (no AI client needed) |
+| `achswap` | Interactive mode |
+| `achswap --version` / `--help` | Print version / list commands |
+
+> Config set via `achswap set` is written to `~/.achswap/config.json`.
+> **Environment variables (`ACHSWAP_*`) always override it**, so they win in case
+> of conflict.
+
+### Wallet lifecycle
+
+**`achswap init`** — creates `~/.achswap/keystore.json` (password-encrypted) and
+prints the **12-word recovery phrase once**. Refuses to overwrite an existing
+keystore.
+- `achswap init` → password auto-managed (`~/.achswap/.session-pw`)
+- `achswap init -p "your long password"` → use your own password (recommended for
+  real funds; nothing plaintext is written to disk)
+
+**`achswap recover`** — rebuilds `keystore.json` from the phrase if the file is
+lost. Refuses to overwrite.
+- `achswap recover -m "word1 word2 … word12"`
+
+**`achswap backup [path]`** — copies the encrypted keystore offline. With no path
+it just prints the location and reminds you to write down the phrase.
+- `achswap backup D:\USB\` → copies to that folder as `keystore.json`
+- The copy is password-encrypted and useless without your password.
+
+### Quick reads (no unlock)
+
+- **`achswap address`** — prints your address without decrypting the keystore.
+- **`achswap balance`** — prints your native USDC balance.
+
+### Status & troubleshooting
+
+- **`achswap status`** — shows mode, `autoSign`/`autoPassword`/`allowAiConfirm`,
+  `remoteUrl`, `rpcUrl`, `chainId`, pending count, and any running server. Use it
+  to confirm your setup (this is what prints `mode: local, autoSign: true`, etc.).
+- **`achswap config`** — prints the fully resolved config (env > file > defaults).
+- **`achswap running`** (alias **`ps`**) — lists the Achswap MCP processes your
+  client launched. If your AI client's tools don't appear, check here first.
+  - `achswap running --kill 2` — kill the process listed as #2
+  - `achswap running --kill-all` — kill them all (asks for confirmation unless
+    `ACHSWAP_YES=true`)
+- **`achswap install <client>`** — writes the one-line MCP config into a client.
+  `<client>` is one of `claude | cursor | opencode | codex`. It writes **local
+  mode** so it works with no backend. Restart the client afterwards.
+
+### Configuration with `set`
+
+`achswap set <key> <value>` changes a persisted setting. Valid keys:
+
+| Key | Value | Effect |
+|-----|-------|--------|
+| `autoSign` | `true`/`false` | Sign + broadcast writes immediately (`true`) or queue them (`false`) |
+| `autoPassword` | `true`/`false` | Auto-manage the signing password (no plaintext on disk when `false` + `ACHSWAP_PASSWORD`) |
+| `allowAiConfirm` | `true`/`false` | Let the AI release pending txs via `confirm_transaction` (requires `ACHSWAP_PASSWORD`) |
+| `mode` | `local`/`remote` | Where txs are built (local = on-device; remote = hosted Worker, not deployed yet) |
+| `remoteUrl` | URL | Hosted backend URL (remote mode) |
+| `rpcUrl` | URL | ARC RPC endpoint |
+| `chainId` | number | Chain ID (`5042002` for ARC Testnet) |
+| `builderToken` | string | Optional Worker builder token |
+
+Examples:
+- `achswap set autoSign false` → enable manual approval (you release txs with `approve`)
+- `achswap set allowAiConfirm false` → the AI can only *queue*, never self-approve
+- `achswap set mode local` → build txs on-device (recommended; no backend needed)
+
+After any `set`, **restart the MCP server / your AI client** for it to take effect.
+
+### Manual approval workflow
+
+With `autoSign=false`, writes are queued instead of sent:
+1. The agent (or `achswap run`) creates a pending transaction.
+2. `achswap pending` lists them with an id.
+3. `achswap approve <id>` signs + broadcasts it from your terminal.
+
+This is the **human-in-the-loop** path: the AI can prepare trades, but only you
+can send them. (The AI can self-release only if `allowAiConfirm=true` *and*
+`ACHSWAP_PASSWORD` is set.)
+
+### Running the server: `serve` and `run`
+
+**`achswap serve`** starts the local MCP server. You normally never run this by
+hand — your AI client launches it automatically via the `install` config
+(`type: local, command: npx -y @achswap/mcp-sdk serve`). Options (advanced):
+- `--http` — run an HTTP server instead of stdio
+- `--port <port>` — HTTP port (default `8080`)
+- `--host <host>` — bind host (default `127.0.0.1`); use `--insecure-bind` to bind
+  a LAN address (**dangerous** — anyone on the network could reach your signer)
+- `--single` — refuse to start if another instance is already running
+
+**`achswap run --tool <tool> --args <json>`** calls a single MCP tool and prints
+the result, then exits. Use it to test the server or query the chain **without an
+AI client** — and to convert amounts the right way:
+- `achswap run --tool get_decimals --args '{"token_address":"USDC"}'` → `18`
+- `achswap run --tool to_wei --args '{"token_address":"USDC","amount":"1.5"}'` →
+  `1500000000000000000`
+- `achswap run --tool get_native_balance --args '{}'`
+
 ## Tools (37) {#tools}
 
 The SDK exposes **37 tools** to the agent. `generate_wallet` is hidden (the wallet
