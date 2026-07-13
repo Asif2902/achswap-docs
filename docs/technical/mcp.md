@@ -43,7 +43,8 @@ never sent over the network, never sent to the hosted server, and never logged.
 
 Both modes use the **same local SDK signer** and the **same 37 tools**. The only
 difference is *where transactions get built* — on AchSwap's hosted server
-(`remote` mode, the default) or entirely on your device (`local` mode).
+(`remote` mode, optional) or entirely on your device (`local` mode, the
+recommended default — works with no backend).
 
 ## Hosted MCP server
 
@@ -56,12 +57,16 @@ Because signing is local, the hosted server is safe to point your agent at: it c
 read your public balances and prepare transactions, but it cannot move funds
 without your local signer.
 
-### Connect your AI client (remote mode)
+### Connect your AI client
 
-In remote mode the SDK talks to the hosted server automatically — you usually do
-not need to configure anything. If you want to point a client *directly* at the
-hosted MCP endpoint, use a remote MCP config (no `X-Private-Key` is required or
-accepted — the design is keyless):
+Your AI client does **not** connect to AchSwap's hosted server directly. It
+connects to the **local SDK running on your machine**, because only the local SDK
+can sign transactions — the hosted server is keyless and cannot sign. The SDK then
+talks to the hosted server *internally* to build transactions (in `remote` mode),
+or builds them entirely on-device (in `local` mode).
+
+So the MCP endpoint your client points at is **always the local SDK**. Use a
+`local` MCP config that launches the SDK:
 
 **OpenCode** (`~/.config/opencode/opencode.jsonc`):
 
@@ -69,8 +74,13 @@ accepted — the design is keyless):
 {
   "mcp": {
     "achswap": {
-      "type": "remote",
-      "url": "https://mcp-api.achswap.app/mcp/message",
+      "type": "local",
+      "command": ["npx", "-y", "@achswap/mcp-sdk", "serve"],
+      "environment": {
+        "ACHSWAP_MODE": "local",
+        "ACHSWAP_AUTO_SIGN": "true",
+        "ACHSWAP_AUTO_PASSWORD": "true"
+      },
       "enabled": true
     }
   }
@@ -83,14 +93,30 @@ accepted — the design is keyless):
 {
   "mcpServers": {
     "achswap": {
-      "url": "https://mcp-api.achswap.app/mcp/message"
+      "command": "npx",
+      "args": ["-y", "@achswap/mcp-sdk", "serve"],
+      "env": {
+        "ACHSWAP_MODE": "local",
+        "ACHSWAP_AUTO_SIGN": "true",
+        "ACHSWAP_AUTO_PASSWORD": "true"
+      }
     }
   }
 }
 ```
 
-> The SDK's own `achswap install <client>` command writes these for you. For the
-> fully self-hosted path (no AchSwap server at all), set `ACHSWAP_MODE=local`.
+> The fastest path is `achswap install <client>` (opencode | claude | codex |
+> cursor) — it writes the config above for you, in `local` mode, so it works with
+> no backend. Restart your client afterwards and check the MCP tool list.
+
+### Remote mode (optional — needs the hosted Worker)
+
+`remote` mode only changes *where transactions are built*: instead of building on
+your device, the SDK asks AchSwap's hosted server (`mcp-api.achswap.app`) to build
+the unsigned transaction. **Signing is still local in both modes** — your key never
+leaves the SDK. Remote mode requires the hosted Worker to be deployed; it is not
+live yet, so use `local` mode until then. When it is available, set
+`ACHSWAP_MODE=remote` (and optionally `ACHSWAP_MCP_SERVER_URL`).
 
 ## What the server provides
 

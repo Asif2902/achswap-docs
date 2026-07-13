@@ -5,9 +5,10 @@ sidebar_position: 5
 # AchSwap SDK (Local Signer)
 
 `@achswap/mcp-sdk` is the piece that actually **holds your keys and signs
-transactions**. It runs entirely on your machine, talks to an MCP server (AchSwap's
-hosted one by default, or a fully local one), and broadcasts signed transactions
-to ARC. This is what makes AchSwap **self-custodial**: your private key never
+transactions**. It runs entirely on your machine and broadcasts signed transactions
+to ARC. By default it runs in `local` mode (builds transactions on your device, no
+AchSwap server needed); optionally it can use AchSwap's hosted builder in `remote`
+mode. This is what makes AchSwap **self-custodial**: your private key never
 leaves your computer.
 
 For the hosted server it connects to, see [MCP Server](./mcp.md).
@@ -49,7 +50,7 @@ achswap init
 
 # 2. Fund the printed address with native USDC on ARC Testnet
 
-# 3. Connect your AI client (writes the MCP config for you)
+# 3. Connect your AI client (writes the MCP config for you, in local mode)
 achswap install opencode      # or: claude | codex | cursor
 
 # 4. (Optional) Use your own password instead of the auto-managed one
@@ -64,12 +65,14 @@ The wallet address is always available to the agent via `get_wallet_address`
 
 | Mode | `ACHSWAP_MODE` | Tx building | Backend |
 |------|----------------|-------------|---------|
-| Remote (default) | `remote` | On AchSwap's hosted server | `mcp-api.achswap.app` |
-| Local | `local` | On your machine | none |
+| Local (recommended) | `local` | On your machine | none (works out of the box) |
+| Remote (optional) | `remote` | On AchSwap's hosted server | `mcp-api.achswap.app` (must be deployed) |
 
-Local mode is the most private: the SDK builds and signs entirely on-device.
-Remote mode is the default and just means "use AchSwap's hosted builder"; signing
-is still local in both.
+Local mode is the recommended default and the most private: the SDK builds and
+signs entirely on-device with no AchSwap server involved, so it works immediately.
+Remote mode is optional and just means "use AchSwap's hosted builder"; signing is
+still local. **Remote mode requires the hosted Worker to be deployed — it is not
+live yet, so use `local` mode for now.**
 
 ## Configuration
 
@@ -77,7 +80,7 @@ All config is env > `config.json` (in `~/.achswap`) > built-in defaults.
 
 | Variable | Default | Meaning |
 |----------|---------|---------|
-| `ACHSWAP_MODE` | `remote` | `remote` or `local` |
+| `ACHSWAP_MODE` | `local` | `remote` or `local` (local works with no backend) |
 | `ACHSWAP_AUTO_SIGN` | `true` | SDK signs + broadcasts writes immediately |
 | `ACHSWAP_AUTO_PASSWORD` | `true` | Auto-generate + store the signing password |
 | `ACHSWAP_PASSWORD` | — | Your own password (preferred for real funds) |
