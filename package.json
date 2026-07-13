@@ -11,8 +11,8 @@
     "start": "docusaurus start",
     "dev": "concurrently -n \"DOCS,WORKER\" -c \"blue,green\" \"docusaurus start\" \"wrangler dev --config worker/wrangler.toml\"",
     "build": "docusaurus build",
-    "preview": "docusaurus preview",
-    "deploy": "docusaurus deploy",
+    "preview": "npm run build && wrangler dev",
+    "deploy": "npm run build && wrangler deploy",
     "clear": "docusaurus clear",
     "write-heading-ids": "docusaurus write-heading-ids",
     "index-docs": "tsx scripts/index-docs.ts",
@@ -45,6 +45,6 @@
     "remark-gfm": "^4.0.1",
     "tsx": "^4.23.0",
     "typescript": "^5.6.3",
-    "wrangler": "^4.107.0"
+    "wrangler": "^4.110.0"
   }
 }
