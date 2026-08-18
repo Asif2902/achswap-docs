@@ -17,12 +17,13 @@ For the hosted server it connects to, see [MCP Server](./mcp.md).
 
 - **Your keys never leave your machine.** The server only ever sees unsigned
   transactions.
-- **You control signing.** Auto-sign for convenience, or manual approval for
-  safety.
+- **You approve every trade.** Writes queue for your approval by default; the AI
+  cannot broadcast on its own.
 - **Local transaction building.** Switch to `local` mode and nothing touches
   AchSwap's servers at all.
-- **Encrypted, recoverable wallet.** Keystore is password-encrypted; a 12-word
-  recovery phrase backs it up.
+- **Vault-sealed wallet.** The keystore password is a 256-bit random value sealed
+  by your OS credential store, so copying the Achswap folder does not reveal your
+  wallet. A 12-word phrase and a portable recovery bundle back it up.
 
 ## Install
 
@@ -45,18 +46,25 @@ achswap --version
 ## Quick start
 
 ```bash
-# 1. Create an encrypted wallet (prints a 12-word recovery phrase — write it down)
+# 1. Create the wallet — offers a passphrase, then prints your 12-word phrase
 achswap init
 
-# 2. Fund the printed address with native USDC on ARC Testnet
+# 2. (only if you skipped it above) add the passphrase later
+achswap passphrase set
 
-# 3. Connect your AI client (writes the MCP config for you, in local mode)
+# 3. Save a portable backup somewhere offline (USB, encrypted folder)
+achswap export-recovery /path/to/usb/achswap-recovery.json
+
+# 4. Fund the printed address with native USDC on ARC Testnet
+
+# 5. Connect your AI client (writes the MCP config for you, in local mode)
 achswap install opencode      # or: claude | codex | cursor
 
-# 4. (Optional) Use your own password instead of the auto-managed one
-achswap set autoPassword false
-ACHSWAP_PASSWORD='your-long-strong-password' achswap serve
+# 6. Check how you are protected
+achswap security
 ```
+
+Writes queue for approval by default. Release them with `achswap approve <id>`.
 
 The wallet address is always available to the agent via `get_wallet_address`
 (no arguments needed — the SDK fills in your address).
@@ -81,44 +89,138 @@ All config is env > `config.json` (in `~/.achswap`) > built-in defaults.
 | Variable | Default | Meaning |
 |----------|---------|---------|
 | `ACHSWAP_MODE` | `local` | `remote` or `local` (local works with no backend) |
-| `ACHSWAP_AUTO_SIGN` | `true` | SDK signs + broadcasts writes immediately |
-| `ACHSWAP_AUTO_PASSWORD` | `true` | Auto-generate + store the signing password |
-| `ACHSWAP_PASSWORD` | — | Your own password (preferred for real funds) |
-| `ACHSWAP_ALLOW_AI_CONFIRM` | `false` | Let the AI confirm pending txs in chat |
+| `ACHSWAP_AUTO_SIGN` | `false` | Sign + broadcast writes with no human step |
+| `ACHSWAP_DEVICE_UNLOCK` | `true` | Allow unlocking a `device` vault without a prompt |
+| `ACHSWAP_AUTO_CREATE_WALLET` | `false` | Allow a missing wallet to be created silently on first use |
+| `ACHSWAP_PASSPHRASE` | — | Your vault passphrase (only if you set one) |
+| `ACHSWAP_ALLOW_AI_CONFIRM` | `false` | Let the AI confirm pending txs in chat (also needs `ACHSWAP_PASSPHRASE`) |
 | `ACHSWAP_MCP_SERVER_URL` | `https://mcp-api.achswap.app` | Hosted backend URL |
 | `ACHSWAP_KEYSTORE_DIR` / `ACHSWAP_HOME` | `~/.achswap` | Where the keystore lives |
 
+> `ACHSWAP_PASSWORD` still works as an alias for `ACHSWAP_PASSPHRASE`.
+> **Never put either into an AI client config file** — those files are plaintext on
+> disk. `achswap install` deliberately writes only mode and flags.
+
 ## Wallet, encryption & recovery
 
-- **Storage:** `~/.achswap/keystore.json`, encrypted with
-  `ethers.Wallet.encrypt(password)`.
-- **Password:** auto-managed in `~/.achswap/.session-pw` by default
-  (`autoPassword=true`). For real funds, set `ACHSWAP_PASSWORD` so no plaintext
-  password is written to disk.
-- **Recovery phrase:** on `achswap init` (and auto-create) a **12-word BIP39
-  phrase** is shown **once**. This is the only way to restore the wallet if the
-  keystore file is lost. Store it offline.
-- **Recover:** `achswap recover -m "word1 word2 … word12"` rebuilds the keystore
-  from the phrase.
-- **Backup:** `achswap backup <path>` copies the encrypted keystore to a safe
-  location (USB / encrypted folder).
+### How your key is protected
 
-> A leaked `keystore.json` is **useless without your password**. A leaked phrase,
-> however, lets anyone recreate the wallet — never paste it into chat, logs, or a
-> website.
+The keystore password is **not** something you choose and **not** stored in the
+Achswap folder. It is a 256-bit random value that only exists in memory while a
+transaction is being signed.
 
-## Signing: auto vs manual
+```
+~/.achswap/keystore.json   V3 keystore  ← scrypt(N=2^18) + AES-128-CTR
+                           encrypted with a 256-bit random password
+~/.achswap/vault.json      AES-256-GCM envelope holding that password
 
-**Auto-sign (default):** writes are signed and broadcast immediately.
-**Manual mode** (`achswap set autoSign false`): writes are queued as pending and
+  key = HKDF-SHA512( device secret ‖ scrypt(your passphrase, N=2^18) )
+
+  device secret   32 random bytes in your OS credential store — never on disk
+  passphrase      optional, in your head — never on disk
+```
+
+The device secret lives in **Windows Credential Manager**, **macOS Keychain**, or
+**Secret Service (libsecret)** depending on your platform. On Windows the vault is
+additionally wrapped with **DPAPI**, binding it to your Windows logon session.
+
+This is the point: **copying the whole `~/.achswap` folder is not enough to steal
+the wallet.** There is no low-entropy password in it to guess offline — an attacker
+also needs your OS user session, and your passphrase if you set one.
+
+### Unlock modes
+
+| Mode | What it takes to sign | How to get it |
+|------|----------------------|---------------|
+| `device` | Your OS credential store | Default after `achswap init` |
+| `device + passphrase` | OS credential store **and** your passphrase | `achswap passphrase set` (recommended) |
+| `passphrase` | Your passphrase only | Automatic on systems with no credential store |
+
+Run **`achswap security`** to see which mode you are in and get warned about
+anything weak.
+
+**Device mode protects your files, not your running session.** The credential
+store hands the device secret to any process running as your OS user — that is
+how the SDK itself unlocks. So malware, or an AI agent with shell access, can
+sign and read your recovery phrase without asking you. A passphrase is the one
+factor your machine does not hold, which is why `achswap init` offers it up
+front and `achswap security` warns until you set one.
+
+If no credential store is available *and* you give no passphrase, the SDK
+**refuses to create a wallet** rather than writing a generated password to disk.
+
+### Three ways to recover
+
+Security must not lock *you* out. Any one of these restores your wallet:
+
+**1. Portable recovery bundle (best for disaster recovery)**
+
+```bash
+achswap export-recovery /path/to/usb/achswap-recovery.json
+# on any other machine:
+achswap import-recovery /path/to/usb/achswap-recovery.json
+```
+
+Sealed with a passphrase you choose, and deliberately **not** tied to any device,
+so it works on a brand-new computer. Keep it offline — anyone with the file *and*
+its passphrase controls the wallet.
+
+**2. 12-word recovery phrase**
+
+```bash
+achswap recover -m "word1 word2 … word12"
+```
+
+Shown once at `achswap init`. Store it offline. Never paste it into chat, logs, or
+a website.
+
+**3. The vault on your own machine** — as long as your OS credential store and
+(if set) your passphrase are intact.
+
+> **`achswap backup` is not disaster recovery.** It copies `keystore.json` +
+> `vault.json`, but that copy only opens on the same machine and OS account,
+> because the device secret stays in the credential store and is never written to
+> disk. For a backup that survives losing the machine, use `export-recovery` or
+> the 12-word phrase.
+
+### Upgrading from an older SDK
+
+Versions up to **1.0.7** stored an auto-generated keystore password in plaintext at
+`~/.achswap/.session-pw`, right next to `keystore.json` — so anyone who copied the
+folder got both halves.
+
+```bash
+achswap migrate
+```
+
+This runs automatically when the SDK starts, and also on demand. It decrypts your
+key with the old password, **re-encrypts it under a fresh 256-bit password**, seals
+that in the vault, and overwrites and deletes `.session-pw`. Your address and
+private key do not change.
+
+The old password must be treated as compromised, which is why the keystore is
+re-encrypted rather than simply re-sealed. After migrating, export a fresh recovery
+bundle.
+
+## Signing: manual by default
+
+**Manual mode is the default (`autoSign=false`).** Writes are queued as pending and
 must be approved:
 
-- In a terminal: `achswap approve <id>` (recommended — human present)
+- In a terminal: `achswap approve <id>` — recommended, a human is present
 - In chat: `confirm_transaction` — only if `ACHSWAP_ALLOW_AI_CONFIRM=true` **and**
-  `ACHSWAP_PASSWORD` is set (never with the auto-managed session password alone)
+  `ACHSWAP_PASSPHRASE` is set for that process
 
-Two control tools appear only in manual mode: `confirm_transaction` and
-`list_pending`.
+Holding the device secret is never treated as authorization for the AI. Otherwise
+any process running on an unlocked machine could spend your funds.
+
+Two control tools appear in manual mode: `confirm_transaction` and `list_pending`.
+
+To let the agent sign without a terminal step (convenience over safety):
+
+```bash
+achswap set autoSign true
+```
 
 ## CLI command reference
 
@@ -127,9 +229,16 @@ configuration, and the local MCP server your AI client connects to. All commands
 
 | Command | Purpose |
 |---------|---------|
-| `achswap init [-p PASS]` | Create the encrypted wallet (prints a 12-word recovery phrase once) |
+| `achswap init [-p PASS]` | Create the wallet (prints a 12-word recovery phrase once) |
+| `achswap security` | Show how the wallet is protected; flag anything weak |
+| `achswap show-phrase` | Re-display the 12-word recovery phrase |
+| `achswap delete-wallet` | Permanently delete keystore, vault, and device secret |
+| `achswap passphrase set\|remove\|status` | Manage the passphrase (second unlock factor) |
+| `achswap export-recovery <path>` | Write a portable, passphrase-sealed backup |
+| `achswap import-recovery <path>` | Restore from that backup on any machine |
+| `achswap migrate` | Upgrade a pre-1.1 wallet off the plaintext `.session-pw` |
 | `achswap recover -m "w1 … w12" [-p PASS]` | Restore the wallet from its recovery phrase |
-| `achswap backup [path]` | Copy `keystore.json` to an offline/safe location |
+| `achswap backup [dir]` | Copy keystore + vault locally (same machine only) |
 | `achswap address` | Print your wallet address (no unlock needed) |
 | `achswap balance` | Print your native USDC balance |
 | `achswap status` | Show settings + any running MCP server |
@@ -150,21 +259,46 @@ configuration, and the local MCP server your AI client connects to. All commands
 
 ### Wallet lifecycle
 
-**`achswap init`** — creates `~/.achswap/keystore.json` (password-encrypted) and
-prints the **12-word recovery phrase once**. Refuses to overwrite an existing
-keystore.
-- `achswap init` → password auto-managed (`~/.achswap/.session-pw`)
-- `achswap init -p "your long password"` → use your own password (recommended for
-  real funds; nothing plaintext is written to disk)
+**`achswap init`** — creates `~/.achswap/keystore.json` plus `~/.achswap/vault.json`
+and prints the **12-word recovery phrase**. Refuses to overwrite an existing
+keystore. In a terminal it offers a passphrase first, explaining the trade-off.
+- `achswap init` → offers a passphrase; press Enter to skip (device-only)
+- `achswap init -p "your long passphrase"` → set it non-interactively
+- `achswap init --skip-passphrase` → device-only, no prompt (scripts)
 
-**`achswap recover`** — rebuilds `keystore.json` from the phrase if the file is
-lost. Refuses to overwrite.
+**A wallet is never created behind your back.** If an AI client connects before
+you have run `init`, the SDK refuses and tells the agent to ask you to run it.
+That way you always see the recovery phrase and choose a passphrase. To opt into
+the old silent behaviour: `achswap set autoCreateWallet true`.
+
+**`achswap show-phrase`** — re-displays the 12-word phrase (it lives encrypted
+inside `keystore.json`). Requires an interactive terminal and typing `SHOW`; it
+has no scriptable flag on purpose. Use this if the phrase scrolled past you at
+creation.
+
+**`achswap delete-wallet`** — permanently removes `keystore.json`, `vault.json`,
+and the device secret from the credential store. Requires typing `DELETE`. After
+this the wallet only comes back from a recovery bundle or the 12-word phrase.
+
+**`achswap passphrase set|remove|status`** — adds, changes, or removes the
+passphrase by re-sealing the vault. Your address and key never change. Re-sealing
+also **rotates the device secret**, so older copies of `vault.json` stop working.
+
+**`achswap export-recovery <path>`** — writes a self-contained, passphrase-sealed
+bundle that restores on any machine. This is your real disaster backup.
+
+**`achswap import-recovery <path>`** — rebuilds `keystore.json` and a fresh local
+vault from that bundle. Refuses to overwrite an existing keystore.
+
+**`achswap recover`** — rebuilds from the 12-word phrase if everything else is lost.
 - `achswap recover -m "word1 word2 … word12"`
 
-**`achswap backup [path]`** — copies the encrypted keystore offline. With no path
-it just prints the location and reminds you to write down the phrase.
-- `achswap backup D:\USB\` → copies to that folder as `keystore.json`
-- The copy is password-encrypted and useless without your password.
+**`achswap migrate`** — one-time upgrade for wallets created before v1.1. See
+[Upgrading from an older SDK](#upgrading-from-an-older-sdk).
+
+**`achswap backup [dir]`** — copies `keystore.json` + `vault.json` to another
+folder. **Only opens on the same machine and OS account** — use `export-recovery`
+for a backup that survives losing the device.
 
 ### Quick reads (no unlock)
 
@@ -173,7 +307,10 @@ it just prints the location and reminds you to write down the phrase.
 
 ### Status & troubleshooting
 
-- **`achswap status`** — shows mode, `autoSign`/`autoPassword`/`allowAiConfirm`,
+- **`achswap security`** — shows your unlock factors, KDF parameters, credential
+  store, and warns about single-factor setups, `autoSign`, or a leftover
+  `.session-pw`. Run this first if you are unsure how protected you are.
+- **`achswap status`** — shows mode, `autoSign`/unlock mode/`allowAiConfirm`,
   `remoteUrl`, `rpcUrl`, `chainId`, pending count, and any running server. Use it
   to confirm your setup (this is what prints `mode: local, autoSign: true`, etc.).
 - **`achswap config`** — prints the fully resolved config (env > file > defaults).
@@ -192,9 +329,10 @@ it just prints the location and reminds you to write down the phrase.
 
 | Key | Value | Effect |
 |-----|-------|--------|
-| `autoSign` | `true`/`false` | Sign + broadcast writes immediately (`true`) or queue them (`false`) |
-| `autoPassword` | `true`/`false` | Auto-manage the signing password (no plaintext on disk when `false` + `ACHSWAP_PASSWORD`) |
-| `allowAiConfirm` | `true`/`false` | Let the AI release pending txs via `confirm_transaction` (requires `ACHSWAP_PASSWORD`) |
+| `autoSign` | `true`/`false` | Sign + broadcast immediately (`true`) or queue for approval (`false`, default) |
+| `deviceUnlock` | `true`/`false` | Allow a `device` vault to unlock without prompting (default `true`) |
+| `autoCreateWallet` | `true`/`false` | Allow silent wallet creation on first use (default `false`) |
+| `allowAiConfirm` | `true`/`false` | Let the AI release pending txs via `confirm_transaction` (also requires `ACHSWAP_PASSPHRASE`) |
 | `mode` | `local`/`remote` | Where txs are built (local = on-device; remote = hosted Worker, not deployed yet) |
 | `remoteUrl` | URL | Hosted backend URL (remote mode) |
 | `rpcUrl` | URL | ARC RPC endpoint |
@@ -202,7 +340,7 @@ it just prints the location and reminds you to write down the phrase.
 | `builderToken` | string | Optional Worker builder token |
 
 Examples:
-- `achswap set autoSign false` → enable manual approval (you release txs with `approve`)
+- `achswap set autoSign true` → let the agent broadcast without asking you (convenience over safety)
 - `achswap set allowAiConfirm false` → the AI can only *queue*, never self-approve
 - `achswap set mode local` → build txs on-device (recommended; no backend needed)
 
@@ -210,14 +348,14 @@ After any `set`, **restart the MCP server / your AI client** for it to take effe
 
 ### Manual approval workflow
 
-With `autoSign=false`, writes are queued instead of sent:
+With `autoSign=false` (the default), writes are queued instead of sent:
 1. The agent (or `achswap run`) creates a pending transaction.
 2. `achswap pending` lists them with an id.
 3. `achswap approve <id>` signs + broadcasts it from your terminal.
 
-This is the **human-in-the-loop** path: the AI can prepare trades, but only you
-can send them. (The AI can self-release only if `allowAiConfirm=true` *and*
-`ACHSWAP_PASSWORD` is set.)
+This is the **human-in-the-loop** path and the default: the AI can prepare trades,
+but only you can send them. (The AI can self-release only if `allowAiConfirm=true`
+*and* `ACHSWAP_PASSPHRASE` is set for its process.)
 
 ### Running the server: `serve` and `run`
 
@@ -311,17 +449,55 @@ use `to_wei` to convert a human amount, and always call `get_decimals` first —
 ## Security & trust {#security}
 
 - **Private key never leaves your machine.** It is created and stored only in
-  `~/.achswap/keystore.json`, encrypted with your password. The MCP server
-  (hosted or local) only ever receives *unsigned* transactions.
-- **Encrypted at rest.** A stolen keystore file cannot be used without the
-  password.
-- **Recoverable.** The 12-word phrase shown at creation is the backup;
-  `achswap recover` restores it.
-- **No key in logs or network.** The key is never printed, never returned by a
-  tool, and never sent to any server.
-- **You choose the trust level.** `remote` mode uses AchSwap's hosted builder;
-  `local` mode builds on-device with no AchSwap server involved. Manual mode adds
-  a human approval step.
+  `~/.achswap/keystore.json`. The MCP server (hosted or local) only ever receives
+  *unsigned* transactions.
+- **The keystore password is 256-bit random**, not something you or an attacker can
+  guess, and it is never written to the Achswap folder.
+- **It is sealed in a vault** whose key comes from your OS credential store and/or
+  your passphrase — never from anything on disk. On Windows the vault is also
+  DPAPI-bound to your logon session.
+- **A stolen `~/.achswap` folder is not enough.** An attacker also needs your OS
+  user session, and your passphrase if you set one. There is no low-entropy secret
+  in the folder to attack offline.
+- **Keys are never cached.** Each signature unlocks, signs, and releases; a
+  long-running MCP process holds no decrypted key between transactions.
+- **Manual approval by default.** `autoSign=false`, so a compromised AI or MCP
+  process cannot move funds on its own.
+- **AI self-approval is doubly gated** — it needs `ACHSWAP_ALLOW_AI_CONFIRM=true`
+  *and* an explicit passphrase. Device unlock alone is never authorization.
+- **Transactions are validated before signing.** The SDK checks `chainId` and that
+  the destination matches the tool, so a malicious builder cannot swap in a drain
+  transaction.
+- **No key in logs, errors, or tool output.** Errors returned over MCP are scrubbed
+  of long hex values, anything labelled password/passphrase/secret/mnemonic, and
+  BIP39-looking word runs.
+- **Recoverable by you.** Portable recovery bundle, 12-word phrase, or the local
+  vault.
+
+### What this does *not* protect against
+
+- **Live code execution as your logged-in user.** Malware — or an AI coding agent
+  with shell access — can ask the OS credential store for the device secret,
+  exactly as the SDK does, then sign or run `achswap show-phrase`. Device mode
+  protects data at rest, not a live session compromise.
+  **`achswap passphrase set` is the fix**: with a passphrase, code running as you
+  still cannot sign or reveal the phrase, because that factor is only in your head.
+
+  Note the boundary this does *not* cross: an agent restricted to the achswap
+  **MCP tools** cannot extract key material at all. No tool returns a private key
+  or mnemonic, `generate_wallet` is removed from the catalog, and errors are
+  scrubbed. The exposure comes from shell access, not from the tool surface —
+  prompt injection alone does not reach the key.
+- **A weak recovery-bundle passphrase.** The bundle is deliberately not
+  device-bound, so its passphrase is all that protects it. Make it long and keep
+  the file offline.
+- **A passphrase in the environment.** `ACHSWAP_PASSPHRASE` is readable by anything
+  that can inspect the process environment. Prefer a short-lived shell, and never
+  put it in an AI client config file.
+- **A leaked 12-word phrase.** It reconstructs the wallet with no other factor.
+  Treat it like the key itself.
+
+Run `achswap security` to audit your own install.
 
 AchSwap cannot move your funds: it has no key, only the ability to prepare
 transactions that your local signer approves.

@@ -166,8 +166,12 @@ For the full contract reference (including V3 pools) see
 - The hosted server is **keyless**: it builds unsigned transactions and serves
   public data. It cannot sign or move funds.
 - Your private key lives only in an **encrypted keystore** on your machine
-  (`~/.achswap/keystore.json`), encrypted with a password via `ethers.Wallet.encrypt`.
-- A stolen/leaked keystore file is **useless without your password**.
-- On wallet creation you are shown a **12-word recovery phrase** — that is the
-  only backup of the key. Store it offline.
+  (`~/.achswap/keystore.json`), encrypted with a 256-bit random password.
+- That password is **sealed in `~/.achswap/vault.json`** under a key derived from
+  your OS credential store (and your passphrase, if you set one) — so copying the
+  Achswap folder is **not** enough to open the wallet.
+- **Writes require your approval by default** (`autoSign=false`): the AI can
+  prepare a transaction, but you release it with `achswap approve <id>`.
+- On wallet creation you are shown a **12-word recovery phrase**. Combined with
+  `achswap export-recovery`, that is your backup. Store both offline.
 - See [AchSwap SDK → Security & Trust](./sdk.md#security) for the full model.
