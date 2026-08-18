@@ -141,10 +141,18 @@ anything weak.
 
 **Device mode protects your files, not your running session.** The credential
 store hands the device secret to any process running as your OS user — that is
-how the SDK itself unlocks. So malware, or an AI agent with shell access, can
-sign and read your recovery phrase without asking you. A passphrase is the one
-factor your machine does not hold, which is why `achswap init` offers it up
-front and `achswap security` warns until you set one.
+how the SDK itself unlocks.
+
+To blunt the common version of that attack, a device-only vault **will not unlock
+in a non-interactive process**. An agent shelling out to `node`, an injected
+prompt, or a remote session gets an error telling it to ask you. Revealing the
+recovery phrase is stricter still: it always needs an interactive terminal, with
+no scriptable flag.
+
+This raises the bar but is not a wall — a determined attacker can allocate a
+terminal. A passphrase is the one factor your machine does not hold, which is why
+`achswap init` offers it up front and `achswap security` warns until you set one.
+Set `ACHSWAP_ALLOW_HEADLESS_UNLOCK=true` only for automation you trust.
 
 If no credential store is available *and* you give no passphrase, the SDK
 **refuses to create a wallet** rather than writing a generated password to disk.
@@ -207,7 +215,9 @@ bundle.
 **Manual mode is the default (`autoSign=false`).** Writes are queued as pending and
 must be approved:
 
-- In a terminal: `achswap approve <id>` — recommended, a human is present
+- In a terminal: `achswap approve <id>` — recommended, a human is present.
+  It prints the destination, amount, chain, calldata selector, expected effects
+  and the arguments the tool was called with, then asks you to confirm.
 - In chat: `confirm_transaction` — only if `ACHSWAP_ALLOW_AI_CONFIRM=true` **and**
   `ACHSWAP_PASSPHRASE` is set for that process
 
@@ -232,6 +242,7 @@ configuration, and the local MCP server your AI client connects to. All commands
 | `achswap init [-p PASS]` | Create the wallet (prints a 12-word recovery phrase once) |
 | `achswap security` | Show how the wallet is protected; flag anything weak |
 | `achswap show-phrase` | Re-display the 12-word recovery phrase |
+| `achswap pending --clear` | Discard the queue (after an integrity warning) |
 | `achswap delete-wallet` | Permanently delete keystore, vault, and device secret |
 | `achswap passphrase set\|remove\|status` | Manage the passphrase (second unlock factor) |
 | `achswap export-recovery <path>` | Write a portable, passphrase-sealed backup |
@@ -465,9 +476,13 @@ use `to_wei` to convert a human amount, and always call `get_decimals` first —
   process cannot move funds on its own.
 - **AI self-approval is doubly gated** — it needs `ACHSWAP_ALLOW_AI_CONFIRM=true`
   *and* an explicit passphrase. Device unlock alone is never authorization.
-- **Transactions are validated before signing.** The SDK checks `chainId` and that
-  the destination matches the tool, so a malicious builder cannot swap in a drain
-  transaction.
+- **Transactions are validated before signing.** The SDK checks `chainId`, that
+  the destination matches the tool, and that the amount moved equals the amount
+  requested — so a call for 10 cannot come back as a transaction for 10,000.
+- **The pending queue is tamper-evident.** It carries an HMAC keyed from the
+  device secret, and approval refuses to sign a queue edited outside Achswap.
+- **Approval shows you the transaction** — destination, amount, chain, calldata
+  and expected effects — before asking you to confirm.
 - **No key in logs, errors, or tool output.** Errors returned over MCP are scrubbed
   of long hex values, anything labelled password/passphrase/secret/mnemonic, and
   BIP39-looking word runs.
