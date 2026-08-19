@@ -90,6 +90,7 @@ All config is env > `config.json` (in `~/.achswap`) > built-in defaults.
 |----------|---------|---------|
 | `ACHSWAP_MODE` | `local` | `remote` or `local` (local works with no backend) |
 | `ACHSWAP_AUTO_SIGN` | `false` | Sign + broadcast writes with no human step |
+| `ACHSWAP_AUTO_SIGN_TRANSFERS` | `false` | Include transfers and approvals in auto-signing |
 | `ACHSWAP_DEVICE_UNLOCK` | `true` | Allow unlocking a `device` vault without a prompt |
 | `ACHSWAP_AUTO_CREATE_WALLET` | `false` | Allow a missing wallet to be created silently on first use |
 | `ACHSWAP_PASSPHRASE` | — | Your vault passphrase (only if you set one) |
@@ -99,7 +100,31 @@ All config is env > `config.json` (in `~/.achswap`) > built-in defaults.
 
 > `ACHSWAP_PASSWORD` still works as an alias for `ACHSWAP_PASSPHRASE`.
 > **Never put either into an AI client config file** — those files are plaintext on
-> disk. `achswap install` deliberately writes only mode and flags.
+> disk. `achswap install` writes only `ACHSWAP_MODE` and the remote URL.
+
+### Environment variables cannot grant permissions
+
+Permission settings live in `~/.achswap/config.json` and are changed with
+`achswap set` or the Settings menu. An environment variable can turn a permission
+**off**, but never **on**.
+
+This matters because `achswap install` writes into your AI client's config file,
+and that file is plain JSON the agent itself can edit. If the environment won, a
+prompt-injected agent could grant itself `autoSign` by appending one line to its
+own MCP config and waiting for a restart — without ever touching the vault.
+
+Any refused attempt is reported by `achswap security`:
+
+```
+▲  ACHSWAP_AUTO_SIGN_TRANSFERS=true was ignored.
+   Something in this process's environment tried to enable autoSignTransfers,
+   which config.json has off.
+```
+
+The rule covers `autoSign`, `autoSignTransfers`, `allowAiConfirm`,
+`autoCreateWallet`, `deviceUnlock` and `allowHeadlessUnlock`. It does not apply to
+`ACHSWAP_PASSPHRASE` (a secret, not a permission) or to `mode` / `rpcUrl` /
+`chainId`.
 
 ## Wallet, encryption & recovery
 
@@ -212,6 +237,22 @@ bundle.
 
 ## Signing: manual by default
 
+**Transfers and approvals always wait for you.** `transfer_token`,
+`transfer_native`, `approve_token` and `approve_for_router` queue for manual
+approval **even when `autoSign` is on**. These are the operations that hand value,
+or the right to take it, to another address — and an unlimited approval is simply
+a transfer the spender can execute later, which is why both sit behind the same
+switch.
+
+To allow them to sign automatically:
+
+```bash
+achswap set autoSignTransfers true    # default: false
+```
+
+The agent cannot work around this by queueing a transfer and then calling
+`confirm_transaction` — that path is gated by the same setting.
+
 **Manual mode is the default (`autoSign=false`).** Writes are queued as pending and
 must be approved:
 
@@ -241,6 +282,7 @@ configuration, and the local MCP server your AI client connects to. All commands
 |---------|---------|
 | `achswap init [-p PASS]` | Create the wallet (prints a 12-word recovery phrase once) |
 | `achswap security` | Show how the wallet is protected; flag anything weak |
+| `achswap` (no args) | Interactive menu — settings, pending, wallet, security |
 | `achswap show-phrase` | Re-display the 12-word recovery phrase |
 | `achswap pending --clear` | Discard the queue (after an integrity warning) |
 | `achswap delete-wallet` | Permanently delete keystore, vault, and device secret |
@@ -316,6 +358,30 @@ for a backup that survives losing the device.
 - **`achswap address`** — prints your address without decrypting the keystore.
 - **`achswap balance`** — prints your native USDC balance.
 
+### The interactive menu
+
+Running `achswap` with no arguments opens a menu, so nothing has to be memorised:
+
+```
+  [1]  ◈  Pending transactions   list · review · approve
+  [2]  ⚙  Running processes      list · kill
+  [3]  ⚑  Settings               view · edit · toggles
+  [4]  🔒 Wallet                 address · balance · init · recover
+  [5]  ⇄  MCP Install            Claude · Cursor · OpenCode · Codex
+  [6]  ⚒  Tools                  run a tool · config · help
+  [7]  ⛨  Security               what protects this wallet
+```
+
+**Settings (`[3]`)** lists every option with its current value, colour-coded by
+whether it is the safe setting. Press `w` for a plain-English description of each
+one, or `r` to reset all permissions to safe defaults. Turning a permission *on*
+asks you to confirm first — there is no way to quietly weaken the wallet by
+mistyping a number.
+
+**Help (`h`)** groups every command by what you are trying to do — first run,
+everyday use, protecting the wallet, recovery, running the server — rather than
+listing them alphabetically.
+
 ### Status & troubleshooting
 
 - **`achswap security`** — shows your unlock factors, KDF parameters, credential
@@ -341,6 +407,8 @@ for a backup that survives losing the device.
 | Key | Value | Effect |
 |-----|-------|--------|
 | `autoSign` | `true`/`false` | Sign + broadcast immediately (`true`) or queue for approval (`false`, default) |
+| `autoSignTransfers` | `true`/`false` | Include transfers and approvals in auto-signing (default `false` — they always wait) |
+| `allowHeadlessUnlock` | `true`/`false` | Allow unlocking with no terminal present (default `false`) |
 | `deviceUnlock` | `true`/`false` | Allow a `device` vault to unlock without prompting (default `true`) |
 | `autoCreateWallet` | `true`/`false` | Allow silent wallet creation on first use (default `false`) |
 | `allowAiConfirm` | `true`/`false` | Let the AI release pending txs via `confirm_transaction` (also requires `ACHSWAP_PASSPHRASE`) |
