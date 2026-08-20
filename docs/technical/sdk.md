@@ -89,12 +89,10 @@ All config is env > `config.json` (in `~/.achswap`) > built-in defaults.
 | Variable | Default | Meaning |
 |----------|---------|---------|
 | `ACHSWAP_MODE` | `local` | `remote` or `local` (local works with no backend) |
-| `ACHSWAP_AUTO_SIGN` | `false` | Sign + broadcast writes with no human step |
-| `ACHSWAP_AUTO_SIGN_TRANSFERS` | `false` | Include transfers and approvals in auto-signing |
-| `ACHSWAP_DEVICE_UNLOCK` | `true` | Allow unlocking a `device` vault without a prompt |
+| `ACHSWAP_AUTOMATION` | `manual` | `manual` / `trade` / `full` — may only *lower* the configured level |
 | `ACHSWAP_AUTO_CREATE_WALLET` | `false` | Allow a missing wallet to be created silently on first use |
+| `ACHSWAP_ALLOW_HEADLESS_KEY_ACCESS` | `false` | CI only — read key material with no terminal |
 | `ACHSWAP_PASSPHRASE` | — | Your vault passphrase (only if you set one) |
-| `ACHSWAP_ALLOW_AI_CONFIRM` | `false` | Let the AI confirm pending txs in chat (also needs `ACHSWAP_PASSPHRASE`) |
 | `ACHSWAP_MCP_SERVER_URL` | `https://mcp-api.achswap.app` | Hosted backend URL |
 | `ACHSWAP_KEYSTORE_DIR` / `ACHSWAP_HOME` | `~/.achswap` | Where the keystore lives |
 
@@ -110,19 +108,19 @@ Permission settings live in `~/.achswap/config.json` and are changed with
 
 This matters because `achswap install` writes into your AI client's config file,
 and that file is plain JSON the agent itself can edit. If the environment won, a
-prompt-injected agent could grant itself `autoSign` by appending one line to its
+prompt-injected agent could raise its own `automation` level by appending one line to its
 own MCP config and waiting for a restart — without ever touching the vault.
 
 Any refused attempt is reported by `achswap security`:
 
 ```
-▲  ACHSWAP_AUTO_SIGN_TRANSFERS=true was ignored.
-   Something in this process's environment tried to enable autoSignTransfers,
-   which config.json has off.
+▲  ACHSWAP_AUTOMATION=full was ignored.
+   Something in this process's environment tried to raise automation above
+   what config.json allows.
 ```
 
-The rule covers `autoSign`, `autoSignTransfers`, `allowAiConfirm`,
-`autoCreateWallet`, `deviceUnlock` and `allowHeadlessUnlock`. It does not apply to
+The rule covers `automation`, `autoCreateWallet` and `allowHeadlessKeyAccess`.
+`ACHSWAP_AUTOMATION` may lower the level but never raise it. It does not apply to
 `ACHSWAP_PASSPHRASE` (a secret, not a permission) or to `mode` / `rpcUrl` /
 `chainId`.
 
@@ -237,41 +235,50 @@ bundle.
 
 ## Signing: manual by default
 
-**Transfers and approvals always wait for you.** `transfer_token`,
-`transfer_native`, `approve_token` and `approve_for_router` queue for manual
-approval **even when `autoSign` is on**. These are the operations that hand value,
-or the right to take it, to another address — and an unlimited approval is simply
-a transfer the spender can execute later, which is why both sit behind the same
-switch.
+One setting decides how much the agent may do on its own.
 
-To allow them to sign automatically:
+| `automation` | The agent can | You approve |
+|---|---|---|
+| `manual` *(default)* | build and quote | everything |
+| `trade` | swap, wrap, add/remove liquidity | transfers, approvals |
+| `full` | everything | nothing |
 
 ```bash
-achswap set autoSignTransfers true    # default: false
+achswap set automation trade
 ```
+
+**Transfers and approvals are held back at `trade`.** `transfer_token`,
+`transfer_native`, `approve_token` and `approve_for_router` queue for you even
+though everything else signs itself. These hand value, or the right to take it,
+to another address — and an unlimited approval is simply a transfer the spender
+can execute later, which is why both sit at the same level. Only `full` includes
+them.
 
 The agent cannot work around this by queueing a transfer and then calling
-`confirm_transaction` — that path is gated by the same setting.
+`confirm_transaction`; that path is gated identically.
 
-**Manual mode is the default (`autoSign=false`).** Writes are queued as pending and
-must be approved:
+### Setting the level is what grants the unlock
 
-- In a terminal: `achswap approve <id>` — recommended, a human is present.
-  It prints the destination, amount, chain, calldata selector, expected effects
-  and the arguments the tool was called with, then asks you to confirm.
-- In chat: `confirm_transaction` — only if `ACHSWAP_ALLOW_AI_CONFIRM=true` **and**
-  `ACHSWAP_PASSPHRASE` is set for that process
+At `trade` or `full` you are saying the signer may open the vault with no one
+present, so it does — **for signing only**. There is no second switch to find.
 
-Holding the device secret is never treated as authorization for the AI. Otherwise
-any process running on an unlocked machine could spend your funds.
+Reading key material is a different act and keeps its own rule: `show-phrase`,
+`export-recovery` and a script calling `loadWallet()` **always require a
+terminal**, at every automation level. Signing is bounded (right chain, right
+destination, amount matching the request, transfer gate applied); extracting a
+key is not.
 
-Two control tools appear in manual mode: `confirm_transaction` and `list_pending`.
+If your vault has a passphrase, unattended signing additionally needs
+`ACHSWAP_PASSPHRASE` in the signer's environment — otherwise writes queue and
+`achswap security` tells you exactly that, rather than silently doing nothing.
 
-To let the agent sign without a terminal step (convenience over safety):
+### Approving queued writes
 
-```bash
-achswap set autoSign true
-```
+- In a terminal: `achswap approve <id>` — it prints destination, amount, chain,
+  calldata selector, expected effects and the arguments the tool was called with,
+  then asks you to confirm.
+- In chat: `confirm_transaction`, available at `trade` and `full` only, and never
+  for transfers or approvals unless the level is `full`.
 
 ## CLI command reference
 
@@ -385,11 +392,12 @@ listing them alphabetically.
 ### Status & troubleshooting
 
 - **`achswap security`** — shows your unlock factors, KDF parameters, credential
-  store, and warns about single-factor setups, `autoSign`, or a leftover
+  store, and warns about single-factor setups, an automation level that is set
+  but inactive, or a leftover
   `.session-pw`. Run this first if you are unsure how protected you are.
-- **`achswap status`** — shows mode, `autoSign`/unlock mode/`allowAiConfirm`,
+- **`achswap status`** — shows mode, `automation`, unlock mode,
   `remoteUrl`, `rpcUrl`, `chainId`, pending count, and any running server. Use it
-  to confirm your setup (this is what prints `mode: local, autoSign: true`, etc.).
+  to confirm your setup (this is what prints `mode: local, automation: manual`, etc.).
 - **`achswap config`** — prints the fully resolved config (env > file > defaults).
 - **`achswap running`** (alias **`ps`**) — lists the Achswap MCP processes your
   client launched. If your AI client's tools don't appear, check here first.
@@ -406,12 +414,9 @@ listing them alphabetically.
 
 | Key | Value | Effect |
 |-----|-------|--------|
-| `autoSign` | `true`/`false` | Sign + broadcast immediately (`true`) or queue for approval (`false`, default) |
-| `autoSignTransfers` | `true`/`false` | Include transfers and approvals in auto-signing (default `false` — they always wait) |
-| `allowHeadlessUnlock` | `true`/`false` | Allow unlocking with no terminal present (default `false`) |
-| `deviceUnlock` | `true`/`false` | Allow a `device` vault to unlock without prompting (default `true`) |
+| `automation` | `manual`/`trade`/`full` | How much the agent may do alone (default `manual`) |
 | `autoCreateWallet` | `true`/`false` | Allow silent wallet creation on first use (default `false`) |
-| `allowAiConfirm` | `true`/`false` | Let the AI release pending txs via `confirm_transaction` (also requires `ACHSWAP_PASSPHRASE`) |
+| `allowHeadlessKeyAccess` | `true`/`false` | CI only — read key material with no terminal (default `false`) |
 | `mode` | `local`/`remote` | Where txs are built (local = on-device; remote = hosted Worker, not deployed yet) |
 | `remoteUrl` | URL | Hosted backend URL (remote mode) |
 | `rpcUrl` | URL | ARC RPC endpoint |
@@ -419,22 +424,21 @@ listing them alphabetically.
 | `builderToken` | string | Optional Worker builder token |
 
 Examples:
-- `achswap set autoSign true` → let the agent broadcast without asking you (convenience over safety)
-- `achswap set allowAiConfirm false` → the AI can only *queue*, never self-approve
+- `achswap set automation trade` → the agent trades on its own; sends still ask you
+- `achswap set automation manual` → the agent can only *queue*, never send
 - `achswap set mode local` → build txs on-device (recommended; no backend needed)
 
 After any `set`, **restart the MCP server / your AI client** for it to take effect.
 
 ### Manual approval workflow
 
-With `autoSign=false` (the default), writes are queued instead of sent:
+At `automation: manual` (the default), writes are queued instead of sent:
 1. The agent (or `achswap run`) creates a pending transaction.
 2. `achswap pending` lists them with an id.
 3. `achswap approve <id>` signs + broadcasts it from your terminal.
 
-This is the **human-in-the-loop** path and the default: the AI can prepare trades,
-but only you can send them. (The AI can self-release only if `allowAiConfirm=true`
-*and* `ACHSWAP_PASSPHRASE` is set for its process.)
+This is the **human-in-the-loop** path and the default: the agent can prepare
+trades, but only you can send them.
 
 ### Running the server: `serve` and `run`
 
@@ -540,7 +544,7 @@ use `to_wei` to convert a human amount, and always call `get_decimals` first —
   in the folder to attack offline.
 - **Keys are never cached.** Each signature unlocks, signs, and releases; a
   long-running MCP process holds no decrypted key between transactions.
-- **Manual approval by default.** `autoSign=false`, so a compromised AI or MCP
+- **Manual approval by default.** `automation: manual`, so a compromised AI or MCP
   process cannot move funds on its own.
 - **AI self-approval is doubly gated** — it needs `ACHSWAP_ALLOW_AI_CONFIRM=true`
   *and* an explicit passphrase. Device unlock alone is never authorization.
