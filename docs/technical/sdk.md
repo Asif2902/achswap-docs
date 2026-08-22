@@ -64,7 +64,9 @@ achswap install opencode      # or: claude | codex | cursor
 achswap security
 ```
 
-Writes queue for approval by default. Release them with `achswap approve <id>`.
+Writes queue for approval by default. Release them with `achswap approve <id>`,
+or let the agent trade on its own with `achswap set automation trade` — transfers
+and approvals will still wait for you.
 
 The wallet address is always available to the agent via `get_wallet_address`
 (no arguments needed — the SDK fills in your address).
@@ -379,11 +381,27 @@ Running `achswap` with no arguments opens a menu, so nothing has to be memorised
   [7]  ⛨  Security               what protects this wallet
 ```
 
-**Settings (`[3]`)** lists every option with its current value, colour-coded by
-whether it is the safe setting. Press `w` for a plain-English description of each
-one, or `r` to reset all permissions to safe defaults. Turning a permission *on*
-asks you to confirm first — there is no way to quietly weaken the wallet by
-mistyping a number.
+**Settings (`[3]`)** lists every option with its current value:
+
+```
+  [ 1] automation           trade   (swaps auto · transfers ask)
+  [ 2] autoCreateWallet     false
+  [ 3] mode                 local
+  ...
+```
+
+`automation` shows what the level actually means, and flags itself when it is set
+but not in effect — for example a passphrase-sealed vault with no
+`ACHSWAP_PASSPHRASE` in the signer's environment:
+
+```
+  [ 1] automation           trade   ⚠ inactive: This wallet has a passphrase,
+                                      which is not in the signer's environment.
+```
+
+Press `w` for a plain-English description of each setting, or `r` to reset back to
+`manual`. Raising `automation` asks you to confirm first, and spells out that
+`full` includes sending funds to any address.
 
 **Help (`h`)** groups every command by what you are trying to do — first run,
 everyday use, protecting the wallet, recovery, running the server — rather than

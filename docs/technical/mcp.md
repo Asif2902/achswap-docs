@@ -170,8 +170,10 @@ For the full contract reference (including V3 pools) see
 - That password is **sealed in `~/.achswap/vault.json`** under a key derived from
   your OS credential store (and your passphrase, if you set one) — so copying the
   Achswap folder is **not** enough to open the wallet.
-- **Writes require your approval by default** (`autoSign=false`): the AI can
-  prepare a transaction, but you release it with `achswap approve <id>`.
+- **Writes require your approval by default** (`automation: manual`): the AI can
+  prepare a transaction, but you release it with `achswap approve <id>`. Raising
+  the level to `trade` lets swaps sign themselves while transfers and approvals
+  keep waiting for you.
 - On wallet creation you are shown a **12-word recovery phrase**. Combined with
   `achswap export-recovery`, that is your backup. Store both offline.
 - See [AchSwap SDK → Security & Trust](./sdk.md#security) for the full model.
