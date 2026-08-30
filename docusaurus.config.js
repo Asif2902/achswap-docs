@@ -1,17 +1,6 @@
 // @ts-check
 
-/**
- * AchSwap Documentation — Docusaurus Config
- *
- * AI Assistant Integration:
- *   The official AchSwap AI lives in src/components/AIAssistant and is injected site-wide via src/theme/Root.tsx.
- *   - All requests go through the Cloudflare Worker (never directly to Cerebras).
- *   - WORKER_URL is read at RUNTIME from window.__ACHSWAP_AI_WORKER_URL__ (set via Cloudflare Pages env or meta tag).
- *   - Run `npm run index-docs` after doc changes (requires Qdrant + local embeddings).
- */
-
-const workerUrl = process.env.WORKER_URL || process.env.ACHSWAP_AI_WORKER_URL || '';
-
+/** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'AchSwap & AchMarket Documentation',
   tagline: 'Decentralized Exchange & Prediction Markets on ARC',
@@ -19,15 +8,10 @@ const config = {
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.png',
+  favicon: 'img/favicon.ico',
 
   organizationName: 'achswap',
   projectName: 'achswap-docs',
-
-  // Expose to client code at build time (optional fallback)
-  customFields: {
-    aiWorkerUrl: process.env.WORKER_URL || process.env.ACHSWAP_AI_WORKER_URL || undefined,
-  },
 
   presets: [
     [
@@ -43,20 +27,26 @@ const config = {
         theme: {
           customCss: './src/css/custom.css',
         },
+        sitemap: {
+          changefreq: 'weekly',
+          priority: 0.5,
+          filename: 'sitemap.xml',
+        },
       },
     ],
   ],
 
   themeConfig: {
+    image: 'img/og-image.png',
     colorMode: {
       defaultMode: 'dark',
       disableSwitch: false,
       respectPrefersColorScheme: false,
     },
     navbar: {
-      title: 'AchSwap & AchMarket',
+      title: 'Docs',
       logo: {
-        alt: 'AchSwap Logo',
+        alt: 'AchSwap',
         src: 'img/achswap-logo.png',
       },
       items: [
@@ -93,29 +83,55 @@ const config = {
     },
     footer: {
       style: 'dark',
-      copyright: `Copyright © ${new Date().getFullYear()} AchSwap. Built with Docusaurus.`,
+      links: [
+        {
+          title: 'Products',
+          items: [
+            {label: 'AchSwap', to: '/achswap/swap'},
+            {label: 'AchRWA', to: '/achrwa/overview'},
+            {label: 'AchMarket', to: '/achmarket/browse-markets'},
+          ],
+        },
+        {
+          title: 'Docs',
+          items: [
+            {label: 'Introduction', to: '/introduction'},
+            {label: 'Quick start', to: '/getting-started/quick-start'},
+            {label: 'Smart contracts', to: '/technical/smart-contracts'},
+          ],
+        },
+        {
+          title: 'Links',
+          items: [
+            {label: 'Website', href: 'https://achswap.app'},
+            {label: 'X @AchProtocol', href: 'https://x.com/AchProtocol'},
+            {label: 'Telegram @AchProtocol', href: 'https://t.me/AchProtocol'},
+          ],
+        },
+      ],
+      copyright: `Copyright © ${new Date().getFullYear()} AchSwap.`,
     },
     announcementBar: {
-      id: 'announcement',
+      id: 'announcement-brand-2026',
       content: 'Welcome to AchSwap & AchMarket Documentation',
-      backgroundColor: '#2563eb',
+      backgroundColor: '#003579',
       textColor: '#ffffff',
       isCloseable: true,
     },
+    metadata: [
+      {name: 'theme-color', content: '#003579'},
+    ],
   },
 
-  // Inject WORKER_URL at runtime via meta tag (works with Cloudflare Pages build env vars)
-  headTags: workerUrl
-    ? [
-        {
-          tagName: 'meta',
-          attributes: {
-            name: 'achswap-ai-worker-url',
-            content: workerUrl,
-          },
-        },
-      ]
-    : [],
+  headTags: [
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'apple-touch-icon',
+        href: '/img/apple-touch-icon.png',
+      },
+    },
+  ],
 };
 
 module.exports = config;

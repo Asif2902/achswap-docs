@@ -1,7 +1,9 @@
 import React from 'react';
 import Link from '@docusaurus/Link';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
+import ThemedImage from '@theme/ThemedImage';
 
 const products = [
   {
@@ -37,7 +39,15 @@ export default function Home(): JSX.Element {
       <main>
         <section className="homeHero">
           <div className="container homeHero__inner">
-            <p className="homeHero__eyebrow">Arc DeFi documentation</p>
+            <p className="homeHero__eyebrow">Official documentation</p>
+            <ThemedImage
+              className="homeHero__logo"
+              alt="AchSwap"
+              sources={{
+                light: useBaseUrl('/img/achswap-lockup-blue.svg'),
+                dark: useBaseUrl('/img/achswap-lockup-white.svg'),
+              }}
+            />
             <h1 className="homeHero__title">{siteConfig.title}</h1>
             <p className="homeHero__subtitle">{siteConfig.tagline}</p>
 
