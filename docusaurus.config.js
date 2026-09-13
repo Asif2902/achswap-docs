@@ -7,7 +7,11 @@ const config = {
   url: 'https://docs.achswap.app',
   baseUrl: '/',
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
   favicon: 'img/favicon.ico',
 
   organizationName: 'achswap',
