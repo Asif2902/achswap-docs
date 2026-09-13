@@ -2,8 +2,8 @@
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'AchSwap & AchMarket Documentation',
-  tagline: 'Decentralized Exchange & Prediction Markets on ARC',
+  title: 'AchSwap Documentation',
+  tagline: 'Swaps and liquidity on Arc Mainnet',
   url: 'https://docs.achswap.app',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -57,27 +57,16 @@ const config = {
           activeBasePath: 'achswap',
         },
         {
-          to: '/achmarket/browse-markets',
-          label: 'AchMarket',
+          to: '/achswap/add-liquidity',
+          label: 'Liquidity',
           position: 'left',
-          activeBasePath: 'achmarket',
+          activeBasePath: 'achswap',
         },
         {
-          to: '/achrwa/overview',
-          label: 'AchRWA',
-          position: 'left',
-          activeBasePath: 'achrwa',
-        },
-        {
-          to: '/technical/smart-contracts',
-          label: 'Technical',
+          to: '/technical/contract-addresses',
+          label: 'Contracts',
           position: 'left',
           activeBasePath: 'technical',
-        },
-        {
-          href: 'https://achswap.app',
-          label: 'Website',
-          position: 'right',
         },
       ],
     },
@@ -88,8 +77,8 @@ const config = {
           title: 'Products',
           items: [
             {label: 'AchSwap', to: '/achswap/swap'},
-            {label: 'AchRWA', to: '/achrwa/overview'},
-            {label: 'AchMarket', to: '/achmarket/browse-markets'},
+            {label: 'Liquidity', to: '/achswap/add-liquidity'},
+            {label: 'Bridge', to: '/achswap/bridge'},
           ],
         },
         {
@@ -103,7 +92,6 @@ const config = {
         {
           title: 'Links',
           items: [
-            {label: 'Website', href: 'https://achswap.app'},
             {label: 'X @AchProtocol', href: 'https://x.com/AchProtocol'},
             {label: 'Telegram @AchProtocol', href: 'https://t.me/AchProtocol'},
           ],
@@ -112,8 +100,8 @@ const config = {
       copyright: `Copyright © ${new Date().getFullYear()} AchSwap.`,
     },
     announcementBar: {
-      id: 'announcement-brand-2026',
-      content: 'Welcome to AchSwap & AchMarket Documentation',
+      id: 'announcement-mainnet-2026',
+      content: 'AchSwap on Arc Mainnet · Chain ID 5042',
       backgroundColor: '#003579',
       textColor: '#ffffff',
       isCloseable: true,

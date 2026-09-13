@@ -7,25 +7,25 @@ import ThemedImage from '@theme/ThemedImage';
 
 const products = [
   {
-    title: 'AchSwap',
+    title: 'Swap',
     description:
-      'Swap tokens with smart routing across V2, V3, and V4 pools, use gasless swaps, and bridge USDC on Arc.',
+      'Compare aggregator and LI.FI quotes, inspect the route, and swap on Arc Mainnet.',
     href: '/achswap/swap',
-    items: ['Token swaps', 'V4 hook-enabled pools', 'Gasless swaps', 'Cross-chain USDC bridge'],
+    items: ['Token swaps', 'Split and mixed-DEX routes', 'Route map'],
   },
   {
-    title: 'AchRWA',
+    title: 'Liquidity',
     description:
-      'Buy and redeem vault-backed synthetic assets for stocks, commodities, and forex using native USDC.',
-    href: '/achrwa/overview',
-    items: ['10 supported RWA assets', 'Oracle-based pricing', 'USDC-backed redemptions'],
+      'Provide liquidity in AchSwap V2 pools or manage concentrated V3 positions.',
+    href: '/achswap/add-liquidity',
+    items: ['V2 pools', 'V3 positions', 'Fees and ranges'],
   },
   {
-    title: 'AchMarket',
+    title: 'Contracts',
     description:
-      'Create and trade prediction markets with LMSR pricing, outcome shares, and transparent resolution flows.',
-    href: '/achmarket/browse-markets',
-    items: ['Browse markets', 'Trade outcome shares', 'Resolve with proof'],
+      'Find the deployed Arc Mainnet contracts and all seven registered routing adapters.',
+    href: '/technical/contract-addresses',
+    items: ['AchSwap V2 and V3', 'Aggregator contracts', 'Adapter registry'],
   },
 ];
 
@@ -35,7 +35,7 @@ export default function Home(): JSX.Element {
   return (
     <Layout
       title="Documentation"
-      description="AchSwap & AchMarket Documentation - Decentralized Exchange and Prediction Markets on ARC">
+      description="AchSwap swaps, liquidity, routing, and contract addresses on Arc Mainnet">
       <main>
         <section className="homeHero">
           <div className="container homeHero__inner">
@@ -58,11 +58,11 @@ export default function Home(): JSX.Element {
               <Link className="button button--secondary button--lg" to="/achswap/swap">
                 AchSwap
               </Link>
-              <Link className="button button--secondary button--lg" to="/achrwa/overview">
-                AchRWA
+              <Link className="button button--secondary button--lg" to="/achswap/add-liquidity">
+                Liquidity
               </Link>
-              <Link className="button button--secondary button--lg" to="/achmarket/browse-markets">
-                AchMarket
+              <Link className="button button--secondary button--lg" to="/technical/contract-addresses">
+                Contracts
               </Link>
             </div>
           </div>
@@ -88,11 +88,11 @@ export default function Home(): JSX.Element {
             <div className="networkPanel">
               <div>
                 <span className="networkPanel__label">Network</span>
-                <strong>ARC Testnet</strong>
+                <strong>Arc Mainnet</strong>
               </div>
               <div>
                 <span className="networkPanel__label">Chain ID</span>
-                <strong>5042002</strong>
+                <strong>5042</strong>
               </div>
               <div>
                 <span className="networkPanel__label">Gas token</span>

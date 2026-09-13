@@ -3,7 +3,7 @@ const sidebars = {
     'introduction',
     {
       type: 'category',
-      label: 'Getting Started',
+      label: 'Getting started',
       collapsed: false,
       items: [
         'getting-started/quick-start',
@@ -13,10 +13,11 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Features',
+      label: 'Using AchSwap',
       collapsed: false,
       items: [
         'achswap/swap',
+        'achswap/smart-routing',
         'achswap/add-liquidity',
         'achswap/remove-liquidity',
         'achswap/pools',
@@ -25,94 +26,21 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Advanced',
+      label: 'Liquidity concepts',
       collapsed: true,
       items: [
-        'achswap/v4-pools',
-        'achswap/gasless-swap',
         'achswap/v2-vs-v3',
         'achswap/concentrated-liquidity',
-        'achswap/smart-routing',
-        'achswap/adapter',
-      ],
-    },
-  ],
-
-  achmarketSidebar: [
-    'introduction',
-    {
-      type: 'category',
-      label: 'Getting Started',
-      collapsed: false,
-      items: [
-        'getting-started/quick-start',
-        'getting-started/wallet-setup',
-        'getting-started/network-setup',
       ],
     },
     {
       type: 'category',
-      label: 'Using AchMarket',
-      collapsed: false,
-      items: [
-        'achmarket/browse-markets',
-        'achmarket/trading',
-        'achmarket/portfolio',
-        'achmarket/market-lifecycle',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Market Creator',
+      label: 'Technical reference',
       collapsed: true,
-      items: [
-        'achmarket/create-market',
-        'achmarket/manage-markets',
-        'achmarket/fee-management',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Integration',
-      collapsed: false,
-      items: [
-        'achmarket/integration',
-      ],
-    },
-  ],
-
-  achrwaSidebar: [
-    {
-      type: 'category',
-      label: 'AchRWA',
-      collapsed: false,
-      items: [
-        'achrwa/overview',
-        'achrwa/supported-assets',
-        'achrwa/security',
-      ],
-    },
-  ],
-
-  technicalSidebar: [
-    {
-      type: 'category',
-      label: 'Architecture',
-      collapsed: false,
       items: [
         'technical/smart-contracts',
-        'technical/lmsr-mechanism',
-        'technical/fee-structure',
         'technical/contract-addresses',
-        'technical/mcp',
-        'technical/sdk',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Resources',
-      collapsed: true,
-      items: [
+        'technical/fee-structure',
         'technical/faq',
         'technical/glossary',
       ],

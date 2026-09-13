@@ -1,65 +1,23 @@
-# AchSwap & AchMarket Documentation
+# AchSwap Documentation
 
-Official documentation for AchSwap, AchRWA, and AchMarket.
+Documentation for AchSwap on **Arc Mainnet (chain ID 5042)**. The site covers swaps, V2/V3 liquidity, routing, and deployed contract addresses. It does not document unrelated products or undeployed AchSwap V4 and gasless features.
 
-## Prerequisites
+## Run locally
 
-- **Node.js 20.x, 22.x, or 24.x**
-- **npm >= 10.0**
-
-## Installation
+Requires Node.js 20, 22, or 24 and npm 10 or newer.
 
 ```bash
-npm install
+npm ci
 npm run start
 npm run build
-npm run preview
 ```
 
-## Project Structure
+The Docusaurus build output is `build/`. The site is configured for `https://docs.achswap.app`.
 
-```
-achswap-docs/
-├── docs/                    # Documentation files
-│   ├── introduction.md
-│   ├── getting-started/
-│   ├── achswap/
-│   ├── achrwa/
-│   ├── achmarket/
-│   └── technical/
-├── src/
-│   ├── css/custom.css       # AchSwap brand theme
-│   └── pages/               # Custom pages
-├── static/                  # Logos, favicons, robots.txt
-├── docusaurus.config.js
-└── sidebars.js
-```
+This branch documents the Arc Mainnet frontend and deployments. As checked on 14 September 2026, the public `achswap.app` URL still redirects to a site advertising Arc Testnet. The mainnet docs therefore do not link users to that live app until its host is switched to chain 5042. The repository's `vercel.json` defines only the build and output directories; branch-to-domain deployment is configured outside this repository.
 
-## Writing Documentation
+## Address sources
 
-1. Create a `.md` file in `docs/`
-2. Add it to `sidebars.js`
+The public address reference is checked against the Arc Mainnet deployment manifest in `Achswap/achswap` and the deployment records in `Achswap/achswap-contracts`. The seven aggregator adapter slots were also checked against the live `AchQuoteEngine.adapterExecutionInfo` and `adapterMetadata` reads on chain 5042 on 14 September 2026.
 
-## Deployment
-
-### Vercel
-
-1. Connect the repository to Vercel
-2. Framework Preset: `Docusaurus`
-3. Install Command: `npm install`
-4. Build Command: `npm run build`
-5. Output Directory: `build`
-
-## Brand
-
-Theme tokens follow the AchSwap brand kit:
-
-- Primary: `#003579`
-- Dark background: `#0D1117`
-- Surface: `#161B22`
-- Muted text: `#8B949E`
-- Typeface: Inter
-
-## License
-
-MIT License
+This `mainnet` branch is separate from the former testnet documentation on `main`.
