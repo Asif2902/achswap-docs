@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # Arc Mainnet contract addresses
 
-**Network:** Arc Mainnet, chain ID **5042**. Addresses below are from the [frontend's public deployment manifest](https://github.com/Achswap/achswap/blob/mainnet-test/shared/deployment-config.js) and the [contracts deployment records](https://github.com/Achswap/achswap-contracts/blob/codex/aggregator-v3/achswap-agg/deployments/arcMainnet-aggregator-v3.json). Deployed contracts were checked for code on chain 5042 on **14 September 2026**; the seven adapter indices and metadata were also read from the live quote engine. The native sentinel and fee recipients are not contract deployments. Check live contract state again before building transactions, especially fees and registry membership.
+**Network:** Arc Mainnet, chain ID **5042**. Addresses below are from the [frontend's public deployment manifest](https://github.com/Achswap/achswap/blob/mainnet-test/shared/deployment-config.js) and the [contracts deployment records](https://github.com/Asif2902/achswap-contracts/blob/codex/aggregator-v3/achswap-agg/deployments/arcMainnet-aggregator-v3.json). Updated **15 September 2026** for the V3 adapter replacements and exact-output quoter. The replacement adapters' bytecode, registry state, quotes and native-input execution simulations were checked on chain 5042. Other addresses retain the 14 September baseline. The native sentinel and fee recipients are not contract deployments. Check live contract state again before building transactions, especially fees and registry membership.
 
 ## Tokens and native handling
 
@@ -35,6 +35,7 @@ sidebar_position: 2
 | AchFeeController | `0x98a90461f0D4E442914A0848faC7c1fd1630D189` |
 | AchVault | `0x4b31cf5a5Ce8cC3C7fB3DcCA244eeE5F6Bd72CAa` |
 | AchQuoteEngine | `0x07A2583092711D15dd9C854C7ec21f8fD5819285` |
+| AchExactOutputQuoter | `0x099163157daFdC4a7819F04442A5Ae686801214d` |
 | AchExecutionRouter | `0xb1C3B6B8B371aFd9c938AC064f7aeD33d6BC26cA` |
 | Arc-native USDC adapter | `0x097d6546db9fba2F908A88eE30FC870eb55fde90` |
 | AchMultiHopRouter | `0xbc66DbbD4f0753850f5401C3ca12B7AE021A17E6` |
@@ -42,19 +43,36 @@ sidebar_position: 2
 
 The fee recipient is a controller setting, not a fixed contract dependency. Its value and the base 30 bps fee were read on chain at the verification date.
 
-## Registered aggregator adapters
+The [exact-output quoter deployment record](https://github.com/Asif2902/achswap-contracts/blob/codex/aggregator-v3/achswap-agg/deployments/arcMainnet-exact-output-quoter.json) binds the new quoter to the existing quote engine. It helps find an exact-input route meeting the requested net output; it does not replace the execution router or provide an exact-output refund primitive.
 
-The mask is `1 << index`. These seven slots were **active** in `AchQuoteEngine` at the verification date. A registered source only contributes when a usable quote exists.
+## Active aggregator adapters
+
+The mask is `1 << index`. The registry has **11 entries: seven active and four retired**. These seven slots were active after the 15 September upgrade. All-active mask: **1933**; V3-only mask: **1920**. Derive masks from the current manifest rather than assuming contiguous indices. A source only contributes when a usable quote exists.
 
 | Index | Mask | Source | Adapter contract |
 | ---: | ---: | --- | --- |
 | 0 | 1 | Uniswap V2 | `0xe44Af61361C865F57d8dD01e23F4A1345e4D8295` |
-| 1 | 2 | Uniswap V3 | `0xD4a72c30cDfae65C24BEE00bcc214b336c538da9` |
+| 7 | 128 | Uniswap V3 | `0x0b5e9c5c603b310563AD6f91A2817f49148221fe` |
 | 2 | 4 | Uniswap V4 | `0xB131a72daa17c072Ea7819E60991F22b4B8D7063` |
 | 3 | 8 | AchSwap V2 | `0x4d6F3B4F9d458D721545b2B870C59A7649304d6b` |
-| 4 | 16 | AchSwap V3 | `0x733B9e4Bf981F5fC18E6e3bD39903B9C9E91D7B5` |
-| 5 | 32 | Synthra V3 | `0x90A2A4fe619aC2aF9440f4566fF4F178e637F139` |
-| 6 | 64 | UnitFlow V3 | `0xE9C9f26a11c69f901bEeb37f84d4a4f913314f4f` |
+| 8 | 256 | AchSwap V3 | `0x121091C3748AD9e14d8d60c69e8943fE7d1f27Fd` |
+| 9 | 512 | Synthra V3 | `0x573d00726A0d1308fEf99d330acC6152a17B1a11` |
+| 10 | 1024 | UnitFlow V3 | `0x93379541341480be03aE3E180B33cbF80E3453C3` |
+
+All four V3 replacements bound quoter simulations and reject fee-tier splits containing a failed slice. Their existing router/quoter interfaces, native-USDC scaling and liquidity domains are preserved. Expensive routes exceeding the simulation budget can still be unavailable. Explorer source verification for these replacements remains pending; bytecode checks and successful simulations are not an independent security audit.
+
+### Retired adapters — historical reference only
+
+The following slots are **disabled on chain** and excluded from new frontend routes. Keep them only for decoding older transactions; do not use them to construct new swaps.
+
+| Retired index | Source | Old adapter | Replacement index |
+| ---: | --- | --- | ---: |
+| 1 | Uniswap V3 | `0xD4a72c30cDfae65C24BEE00bcc214b336c538da9` | 7 |
+| 4 | AchSwap V3 | `0x733B9e4Bf981F5fC18E6e3bD39903B9C9E91D7B5` | 8 |
+| 5 | Synthra V3 | `0x90A2A4fe619aC2aF9440f4566fF4F178e637F139` | 9 |
+| 6 | UnitFlow V3 | `0xE9C9f26a11c69f901bEeb37f84d4a4f913314f4f` | 10 |
+
+Deployment, registration and deactivation transaction hashes are recorded in the contracts repository's `arcMainnet-v3-quote-gas-upgrade.json` and `arcMainnet-{achswap_v3,synthra_v3,unitflow_v3}-v3-quote-gas-upgrade.json` deployment files. Rebuild the frontend with the updated public manifest; no new environment variable is required.
 
 ## External DEX dependencies
 

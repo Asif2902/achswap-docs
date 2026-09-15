@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Smart contracts
 
-AchSwap's Arc Mainnet deployment has two parts: its own V2/V3 liquidity contracts and the swap aggregator. The frontend manifest is the address source for the app; the [address reference](/technical/contract-addresses) records those contracts and the aggregator's seven registered adapters.
+AchSwap's Arc Mainnet deployment has two parts: its own V2/V3 liquidity contracts and the swap aggregator. The frontend manifest is the address source for the app; the [address reference](/technical/contract-addresses) records those contracts and the aggregator's seven active adapters.
 
 ## AchSwap pools
 

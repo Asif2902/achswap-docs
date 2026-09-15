@@ -18,6 +18,6 @@ This branch documents the Arc Mainnet frontend and deployments. As checked on 14
 
 ## Address sources
 
-The public address reference is checked against the Arc Mainnet deployment manifest in `Achswap/achswap` and the deployment records in `Achswap/achswap-contracts`. The seven aggregator adapter slots were also checked against the live `AchQuoteEngine.adapterExecutionInfo` and `adapterMetadata` reads on chain 5042 on 14 September 2026.
+The public address reference follows the Arc Mainnet deployment manifest in `Achswap/achswap` (`mainnet-test`) and deployment records in `Asif2902/achswap-contracts` (`codex/aggregator-v3`). Updated 15 September 2026: Uniswap V3, AchSwap V3, Synthra V3 and UnitFlow V3 now use slots 7/8/9/10; old slots 1/4/5/6 are disabled. There are seven active adapters across eleven registry entries. Replacement bytecode, registry bindings, buy/sell quotes and native-input execution simulations passed on chain 5042. The additive `AchExactOutputQuoter` is also listed. Other contract addresses retain the 14 September baseline. Retired addresses are clearly separated for historical receipt decoding, not new swaps.
 
 This `mainnet` branch is separate from the former testnet documentation on `main`.

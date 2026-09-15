@@ -23,7 +23,7 @@ const products = [
   {
     title: 'Contracts',
     description:
-      'Find the deployed Arc Mainnet contracts and all seven registered routing adapters.',
+      'Find the deployed Arc Mainnet contracts and all seven active routing adapters.',
     href: '/technical/contract-addresses',
     items: ['AchSwap V2 and V3', 'Aggregator contracts', 'Adapter registry'],
   },

@@ -14,7 +14,7 @@ Arc exposes the same balance as an 18-decimal gas currency and a 6-decimal ERC-2
 
 ### Which DEXs can the aggregator use?
 
-Seven registered adapters cover Uniswap V2/V3/V4, AchSwap V2/V3, Synthra V3, and UnitFlow V3. A usable pool and quote are still needed for each trade. See [smart routing](/achswap/smart-routing) and [adapter addresses](/technical/contract-addresses).
+Seven active adapters cover Uniswap V2/V3/V4, AchSwap V2/V3, Synthra V3, and UnitFlow V3. A usable pool and quote are still needed for each trade. See [smart routing](/achswap/smart-routing) and [adapter addresses](/technical/contract-addresses).
 
 ### Why did my quote change?
 
