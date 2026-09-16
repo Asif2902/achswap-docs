@@ -10,7 +10,7 @@ AchSwap's mainnet deployment is on **Arc Mainnet**, chain ID **5042** (`0x13b2`)
 | --- | --- |
 | Network name | Arc Mainnet |
 | Chain ID | `5042` |
-| RPC URL | `https://niorfun.com/api/rpc` |
+| RPC URL | `https://rpc.mainnet.arc.io` |
 | Currency symbol | USDC |
 | Block explorer | [explorer.arc.io](https://explorer.arc.io) |
 

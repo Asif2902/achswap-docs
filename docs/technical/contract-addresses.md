@@ -41,7 +41,7 @@ sidebar_position: 2
 | AchMultiHopRouter | `0xbc66DbbD4f0753850f5401C3ca12B7AE021A17E6` |
 | Current aggregator fee recipient | `0x5820cdcEE868F395eB26fA9b00123f4b7530DC11` |
 
-The fee recipient is a controller setting, not a fixed contract dependency. Its value and the base 30 bps fee were read on chain at the verification date.
+The fee recipient is a controller setting, not a fixed contract dependency. Its value and the base 25 bps fee were read on chain at the verification date.
 
 The [exact-output quoter deployment record](https://github.com/Asif2902/achswap-contracts/blob/codex/aggregator-v3/achswap-agg/deployments/arcMainnet-exact-output-quoter.json) binds the new quoter to the existing quote engine. It helps find an exact-input route meeting the requested net output; it does not replace the execution router or provide an exact-output refund primitive.
 

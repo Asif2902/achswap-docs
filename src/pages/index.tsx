@@ -9,7 +9,7 @@ const products = [
   {
     title: 'Swap',
     description:
-      'Compare aggregator and LI.FI quotes, inspect the route, and swap on Arc Mainnet.',
+      'Compare aggregator, LI.FI, and KyberSwap quotes, inspect the route, and swap on Arc Mainnet.',
     href: '/achswap/swap',
     items: ['Token swaps', 'Split and mixed-DEX routes', 'Route map'],
   },

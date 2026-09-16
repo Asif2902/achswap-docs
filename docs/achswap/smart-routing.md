@@ -8,7 +8,7 @@ The AchSwap aggregator compares quotes from seven active adapters on Arc Mainnet
 
 For example, one leg may use Uniswap V3 while the next uses AchSwap V2 and UnitFlow V3 as a split. This is a routing capability, not a promised route for a particular token pair. Liquidity and quoted output determine the result.
 
-The app compares the aggregator result with a separate LI.FI quote in normal mode. Direct AchSwap V2/V3 quotes can also be enabled in Developer mode. LI.FI's execution and fee path are separate from AchSwap's aggregator. In Developer mode, disabling **Deep route search** skips the more expensive split and mixed-DEX exploration; it can return a quicker but inferior quote.
+The app compares the aggregator result with separate LI.FI and KyberSwap quotes in normal mode. Direct AchSwap V2/V3 quotes can also be enabled in Developer mode. LI.FI's and KyberSwap's execution and fee paths are separate from AchSwap's aggregator. In Developer mode, disabling **Deep route search** skips the more expensive split and mixed-DEX exploration; it can return a quicker but inferior quote.
 
 The expanded [route map](/achswap/swap) shows the quoted token hops, DEX/version, and split percentages. Percentages within a leg are input shares for that leg. Routes and amounts can change when quotes refresh or pool state moves. Always review the current quote immediately before signing.
 

@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # AchSwap on Arc Mainnet
 
-AchSwap is a decentralized exchange for token swaps and V2/V3 liquidity on **Arc Mainnet (chain ID 5042)**. Its swap screen compares AchSwap aggregator routes with LI.FI same-chain quotes. The aggregator can combine liquidity across registered DEXs; a quoted route can still change as pool state changes.
+AchSwap is a decentralized exchange for token swaps and V2/V3 liquidity on **Arc Mainnet (chain ID 5042)**. Its swap screen compares AchSwap aggregator routes with LI.FI same-chain and KyberSwap quotes. The aggregator can combine liquidity across registered DEXs; a quoted route can still change as pool state changes.
 
 Start with [network setup](/getting-started/network-setup), then [swap](/achswap/swap) or [add liquidity](/achswap/add-liquidity). The [contract address reference](/technical/contract-addresses) lists deployed contracts and all seven active adapters.
 

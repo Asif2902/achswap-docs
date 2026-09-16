@@ -10,6 +10,6 @@ sidebar_position: 1
 4. Enter an amount, then review the quoted output, price impact, minimum received, and route.
 5. Approve a token if the selected route requires an ERC-20 allowance, then confirm the swap in your wallet.
 
-The swap screen normally compares the AchSwap aggregator and LI.FI. A quote is an estimate until the transaction executes. If no route appears, try a smaller amount or check whether that token pair has liquidity.
+The swap screen normally compares the AchSwap aggregator, LI.FI, and KyberSwap. A quote is an estimate until the transaction executes. If no route appears, try a smaller amount or check whether that token pair has liquidity.
 
 To provide liquidity instead, choose an [AchSwap V2 or V3 pool](/achswap/add-liquidity).
