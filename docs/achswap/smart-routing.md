@@ -20,8 +20,8 @@ The expanded [route map](/achswap/swap) shows the quoted token hops, DEX/version
 | 3 | AchSwap V2 | 8 |
 | 8 | AchSwap V3 | 256 |
 | 9 | Synthra V3 | 512 |
-| 10 | UnitFlow V3 | 1024 |
+| 11 | UnitFlow V3 | 2048 |
 
-Old V3 slots 1, 4, 5 and 6 are disabled. The seven active slots above are not contiguous; do not use array position as a registry index. The replacements isolate expensive pool simulations and reject splits with failed slices, while preserving each DEX's router and quoter model.
+Old V3 slots 1, 4, 5, 6 and 10 are disabled. The seven active slots above are not contiguous; do not use array position as a registry index. The replacements isolate expensive pool simulations and reject splits with failed slices, while preserving each DEX's router and quoter model.
 
 These are the registered source slots, not a claim that every source has an active pool for every pair. AchSwap's own V4 pools are not deployed; the Uniswap V4 adapter is an independent source. Addresses and the verified on-chain registry are in [contract addresses](/technical/contract-addresses).

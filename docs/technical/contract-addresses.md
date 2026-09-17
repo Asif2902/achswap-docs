@@ -47,7 +47,7 @@ The [exact-output quoter deployment record](https://github.com/Asif2902/achswap-
 
 ## Active aggregator adapters
 
-The mask is `1 << index`. The registry has **11 entries: seven active and four retired**. These seven slots were active after the 15 September upgrade. All-active mask: **1933**; V3-only mask: **1920**. Derive masks from the current manifest rather than assuming contiguous indices. A source only contributes when a usable quote exists.
+The mask is `1 << index`. The registry has **12 entries: seven active and five retired**. These seven slots are active after the UnitFlow V3 redeployment. All-active mask: **2957**; V3-only mask: **2944**. Derive masks from the current manifest rather than assuming contiguous indices. A source only contributes when a usable quote exists.
 
 | Index | Mask | Source | Adapter contract |
 | ---: | ---: | --- | --- |
@@ -57,7 +57,7 @@ The mask is `1 << index`. The registry has **11 entries: seven active and four r
 | 3 | 8 | AchSwap V2 | `0x4d6F3B4F9d458D721545b2B870C59A7649304d6b` |
 | 8 | 256 | AchSwap V3 | `0x121091C3748AD9e14d8d60c69e8943fE7d1f27Fd` |
 | 9 | 512 | Synthra V3 | `0x573d00726A0d1308fEf99d330acC6152a17B1a11` |
-| 10 | 1024 | UnitFlow V3 | `0x93379541341480be03aE3E180B33cbF80E3453C3` |
+| 11 | 2048 | UnitFlow V3 | `0xa780116bF3De4F4894A3b925bA0DC39201DEf391` |
 
 All four V3 replacements bound quoter simulations and reject fee-tier splits containing a failed slice. Their existing router/quoter interfaces, native-USDC scaling and liquidity domains are preserved. Expensive routes exceeding the simulation budget can still be unavailable. Explorer source verification for these replacements remains pending; bytecode checks and successful simulations are not an independent security audit.
 
@@ -71,6 +71,7 @@ The following slots are **disabled on chain** and excluded from new frontend rou
 | 4 | AchSwap V3 | `0x733B9e4Bf981F5fC18E6e3bD39903B9C9E91D7B5` | 8 |
 | 5 | Synthra V3 | `0x90A2A4fe619aC2aF9440f4566fF4F178e637F139` | 9 |
 | 6 | UnitFlow V3 | `0xE9C9f26a11c69f901bEeb37f84d4a4f913314f4f` | 10 |
+| 10 | UnitFlow V3 | `0x93379541341480be03aE3E180B33cbF80E3453C3` | 11 |
 
 Deployment, registration and deactivation transaction hashes are recorded in the contracts repository's `arcMainnet-v3-quote-gas-upgrade.json` and `arcMainnet-{achswap_v3,synthra_v3,unitflow_v3}-v3-quote-gas-upgrade.json` deployment files. Rebuild the frontend with the updated public manifest; no new environment variable is required.
 
@@ -104,16 +105,18 @@ The Synthra recipient belongs to Synthra; it is **not** the AchSwap aggregator f
 
 | UnitFlow contract | Address |
 | --- | --- |
-| V3 Factory | `0xc9719bF56c4C22BaA1549885B03F38a04897ff10` |
-| InterfaceMulticall | `0xD4BB7b3b1e4563480cEd52Bf5Ff0b8d0B5012FE9` |
-| TickLens | `0x1c2eC90a61b238Dc5e0D79F1D737d735E795Df66` |
-| NFTDescriptor | `0xd84Ce312Dc2C1C7bf447ED6ABc38558D7B90BD6b` |
-| NonfungibleTokenPositionDescriptor | `0xbD9B978993c4F48bdc49708e0bf1bAe12999aF06` |
-| V3 PositionManager | `0x771AB382ca3770416D2C71E076fc6C3760Bb0ccf` |
-| V3 Router **(legacy)** | `0xc53D630e43d565DA0D84b8D637982cA61dC3f4B6` |
-| Quoter **(legacy)** | `0x73D01db0dfA3C7E31F97cDDB73F8Bbf21cAFcB08` |
-| V3 Migrator | `0xdd3b7F43b1281A3CFea726C0F7F0051467b51A33` |
+| V3 Factory | `0x5bfBCeb73d39F722B1cB83fD2F11736b28c1Be6d` |
+| InterfaceMulticall | `0xc9E1780bA34698C1067EA6B2fcF78f111a5F110b` |
+| TickLens | `0x20Df732207340234E490a1e686A3A8055AF59b4e` |
+| NFTDescriptor | `0x9Ca8e324380Aa2E80011A16C4d684366E47d4Ab4` |
+| NonfungibleTokenPositionDescriptor | `0x5Bc0735F5D806C184EDE0A7731632F7c491B3B02` |
+| V3 PositionManager | `0x300F5f2861eF0d9D3c6B812797C0A4c8b15C86a8` |
+| V3 Router **(legacy)** | `0x6fD8351b9596C1F0b2f2479BfA6A171cb3d0f410` |
+| Quoter **(legacy)** | `0x5AF6E89F0960Ff375AF84d9911D8153ef6240E34` |
+| V3 Migrator | `0x36E9b24b9CF39c4C7069B75f01FA0419547F977a` |
 
 UnitFlow's adapter uses the legacy router and quoter interfaces; do not substitute the Synthra or Uniswap Router02 ABI.
+
+UnitFlow was redeployed (new factory/router/quoter above) and the aggregator migrated to a new `AchV3LegacyQuoterNativeTokenAdapter` at slot 11 (`0xa780116bF3De4F4894A3b925bA0DC39201DEf391`), with slot 10 deactivated. Adapter deploy tx `0xcba7f1c1174e1ca48a2a6cb765a906f7723419af98d1bedcb366b70520ffb3ea` (block 21331568), registration `0x96e7fadf233117142a40499b83a53b685e7bec7d5a293a549a4ad0c0a5ea5234`, deactivation `0x8ca696c024efd4c64abfd9c69cd65e5e848d431ce9c5f23fe21a5b57a010b675`. Record: `achswap-agg/deployments/arcMainnet-unitflow_v3-factory-migration.json`.
 
 For contract interaction details, see [smart contracts](/technical/smart-contracts). For live transaction history, use [Arc explorer](https://explorer.arc.io).
