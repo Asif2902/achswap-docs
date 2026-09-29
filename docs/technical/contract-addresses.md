@@ -45,6 +45,17 @@ The fee recipient is a controller setting, not a fixed contract dependency. Its 
 
 The [exact-output quoter deployment record](https://github.com/Asif2902/achswap-contracts/blob/codex/aggregator-v3/achswap-agg/deployments/arcMainnet-exact-output-quoter.json) binds the new quoter to the existing quote engine. It helps find an exact-input route meeting the requested net output; it does not replace the execution router or provide an exact-output refund primitive.
 
+## Gasless
+
+| Contract | Address | Notes |
+| --- | --- | --- |
+| AchSponsoredExecutorV3 | `0x5D5B486D032Da0B9d02651375CEe1107D40bef0b` | One-signature gasless executor; deploy tx `0xbfb020e4a99a2bf7d27ce7bf965486344b978e83cb96ef4f561180ebfabfde26` |
+| Permit2 | `0x000000000022D473030F116dDEE9F6B43aC78BA3` | Canonical; verifies the gasless signature and pulls the input |
+| Relayer | `0x8bbB0990B9Ba9DeFDb10389e59955886F79B19cC` | Allowlisted on the executor |
+| Relayer | `0x6e0df2d65d309b55B217B5237657302386E75584` | Allowlisted on the executor |
+
+Superseded gasless executors, not used by the app: `0x114FFB915eF00173D1c986c6FF5d445175622442` (v2), `0x1bC5c96ce21bc721e97DcBeABe787B9d83Dc8b1d` (v1). See [gasless architecture](/technical/gasless).
+
 ## Active aggregator adapters
 
 The mask is `1 << index`. The registry has **12 entries: seven active and five retired**. These seven slots are active after the UnitFlow V3 redeployment. All-active mask: **2957**; V3-only mask: **2944**. Derive masks from the current manifest rather than assuming contiguous indices. A source only contributes when a usable quote exists.

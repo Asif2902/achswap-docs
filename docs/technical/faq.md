@@ -24,9 +24,13 @@ Pool reserves, active V3 liquidity, gas conditions, and available provider route
 
 Deep route search checks splits and mixed-DEX hops across multiple sources. In Profile, enable Developer mode to turn off Deep route search for faster, narrower quoting. That can produce a worse price.
 
-### Does AchSwap have V4 liquidity or gasless swaps on Arc Mainnet?
+### Does AchSwap have gasless swaps on Arc Mainnet?
 
-AchSwap's own V4 liquidity and gasless contracts are not deployed here. The registered Uniswap V4 aggregator adapter belongs to a different protocol.
+Yes. With gasless mode on, swaps from USDC, EURC or cirBTC through KyberSwap, LI.FI or the AchSwap aggregator need one signature, and a relayer pays the gas. The first gasless swap of a token needs a one-time Permit2 approval. See [gasless swaps](/achswap/gasless).
+
+### Does AchSwap have V4 liquidity on Arc Mainnet?
+
+AchSwap's own V4 liquidity contracts are not deployed here. The registered Uniswap V4 aggregator adapter belongs to a different protocol.
 
 ### Why is there no bridge route to Arc?
 

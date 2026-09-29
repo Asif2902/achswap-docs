@@ -10,4 +10,4 @@ Start with [network setup](/getting-started/network-setup), then [swap](/achswap
 
 Arc uses USDC for gas. The same USDC balance is exposed as a 6-decimal ERC-20 at `0x3600000000000000000000000000000000000000` and as an 18-decimal native currency. Pools and ordinary router calls use the ERC-20 form; the aggregator's native-USDC path can accept `msg.value`.
 
-AchSwap's own V4 liquidity and gasless swap features are not deployed on this network. The registered **Uniswap V4** routing adapter is a separate integration; a registered adapter alone does not imply an available pool.
+[Gasless swaps](/achswap/gasless) let you pay with USDC, EURC or cirBTC by signing once while a relayer pays the gas. AchSwap's own V4 liquidity is not deployed on this network. The registered **Uniswap V4** routing adapter is a separate integration; a registered adapter alone does not imply an available pool.

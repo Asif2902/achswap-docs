@@ -17,6 +17,7 @@ const sidebars = {
       collapsed: false,
       items: [
         'achswap/swap',
+        'achswap/gasless',
         'achswap/smart-routing',
         'achswap/add-liquidity',
         'achswap/remove-liquidity',
@@ -39,6 +40,7 @@ const sidebars = {
       collapsed: true,
       items: [
         'technical/smart-contracts',
+        'technical/gasless',
         'technical/contract-addresses',
         'technical/fee-structure',
         'technical/faq',
