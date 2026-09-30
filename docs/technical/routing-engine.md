@@ -12,12 +12,16 @@ AchSwap's aggregator is split in two. An off-chain **router** discovers pools, k
 | --- | --- |
 | Discovery | Pool-creation events from every configured factory and the Uniswap V4 PoolManager are indexed into SQLite. Creation events from unknown factories are counted, so new liquidity sources show up automatically. |
 | State | One log query per poll covers the whole chain. `Sync`, `Swap`, `Mint`, `Burn`, `Initialize`, `ModifyLiquidity` and `ProtocolFeeUpdated` update each pool exactly: reserves, price, active liquidity, and the full set of initialized ticks. Pools that existed before indexing are read once through a read-only lens. |
-| Quote plugins | V2 constant product; a bit-exact port of Uniswap's V3 tick math, shared by V3 forks, Slipstream and V4; V4 hook cuts learned by simulation, used only when they reproduce the chain exactly. |
-| Optimizer | Candidate paths (direct, through one or two hub tokens), then a split allocation that simulates pools shared between branches in execution order and accounts for gas. |
+| Quote plugins | V2 constant product; a bit-exact port of Uniswap's V3 tick math, shared by V3 forks, Slipstream and V4. V4 hooks that run during swaps are learned by simulation, as a normal wallet calling through the executor's adapter, and used only when one fixed effect reproduces the chain exactly. |
+| Transfer screen | Tokens that do not move exactly (transfer taxes, reflection, sell blocks) are never routed. Each token is test-sent out of and back into every pool (or the V4 PoolManager) a route would use, by simulation, because some tokens tax one pool and not another. |
+| Optimizer | Candidate paths (direct, through one or two hub tokens), then a split allocation that simulates pools shared between branches in execution order and accounts for gas, including small slices into shallow pools when they pay. |
 | Plan | Independent branches of typed steps for `AchRouteExecutor`: up to 8 branches and 32 steps. |
-| Simulation | The exact `execute()` call is run as `eth_call` from the user's wallet before signing. Missing funds or approvals are supplied with state overrides, so the check works before approval. |
+| Verification | Before a quote is returned, its exact `execute()` call runs as `eth_call` at the block the quote was computed on. The executor must reproduce the quoted amount to the unit. If it does not, the router corrects a stale fee or hook model, or excludes the hop responsible, and routes again. |
+| Simulation | At build time the exact `execute()` call is run again as `eth_call` from the user's wallet. Missing funds or approvals are supplied with state overrides, so the check works before approval. |
 
-Safety nets: the math is tested against on-chain quotes and must match to the unit. A verifier re-reads random pools every 30 seconds and repairs any drift. Log pages count only when the serving node has reached the requested block.
+Safety nets: the math is tested against on-chain quotes and must match to the unit. A verifier re-reads random pools every 30 seconds and repairs any drift. Log pages count only when the serving node has reached the requested block. Slipstream fees are re-read at the block of every swap in those pools.
+
+Price impact is the route's output valued at reference prices, before the AchSwap fee. Each token's reference price comes from its deepest route to USDC, so a small or stale pool cannot distort it.
 
 ## Executor
 

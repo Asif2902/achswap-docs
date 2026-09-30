@@ -12,9 +12,12 @@ AchSwap keeps an index of every liquidity pool on Arc, currently around 270,000,
 
 - checks direct pools and routes through deep intermediate tokens such as USDC, EURC and cirBTC, up to three hops;
 - splits a trade across several pools and routes when the split pays more, including different DEXs in one trade;
-- prices every candidate with the same integer math the pools themselves use, so the quoted amount is what the contract produces if the pools do not move before you sign.
+- prices every candidate with the same integer math the pools themselves use;
+- runs the finished route as a simulation of the real transaction before showing it, and only shows it if the result matches the quote to the unit. The amount you see is what the contract produces if the pools do not move before you sign.
 
-Quotes normally take a few milliseconds. The first quote for a token the router has not loaded yet can take up to about a second.
+Tokens with transfer taxes or transfer restrictions are not routed by AchSwap's router; LI.FI or KyberSwap may still quote them.
+
+Quotes normally take a fraction of a second. The first quote for a token the router has not loaded yet can take a few seconds.
 
 ## What executes
 
