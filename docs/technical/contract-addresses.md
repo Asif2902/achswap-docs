@@ -39,9 +39,33 @@ sidebar_position: 2
 | AchExecutionRouter | `0xb1C3B6B8B371aFd9c938AC064f7aeD33d6BC26cA` |
 | Arc-native USDC adapter | `0x097d6546db9fba2F908A88eE30FC870eb55fde90` |
 | AchMultiHopRouter | `0xbc66DbbD4f0753850f5401C3ca12B7AE021A17E6` |
-| Current aggregator fee recipient | `0x5820cdcEE868F395eB26fA9b00123f4b7530DC11` |
+| Current aggregator fee recipient | `0x5820cdcEE868F395eB26fA9b00123f4b7530DC11`, moving to the Safe `0x0dbd33291b0bc85e75465d0d7F261b4cF758BCf0` (transfer started 30 Sep 2026 in tx `0xf4285ec7c200a051b89ba7c5012fe11eebfc25e5ab55cd225e7feeb59003edc3`; complete once the Safe calls `acceptFeeRecipient()`) |
 
 The fee recipient is a controller setting, not a fixed contract dependency. Its value and the base 25 bps fee were read on chain at the verification date.
+
+## Route executor
+
+`AchRouteExecutor` executes plans from AchSwap's [routing engine](/technical/routing-engine). It charges **25 bps once on the final output**, paid to the Safe `0x0dbd33291b0bc85e75465d0d7F261b4cF758BCf0`.
+
+| Contract | Address |
+| --- | --- |
+| AchRouteExecutor | `0xcD1bc4f6A4448FeA4DE51410D3b571732FE55Af8` |
+
+| Adapter id | Executes | Address | Status |
+| ---: | --- | --- | --- |
+| 1 | Uniswap V2 (router) | `0x6E09bA0f592B5b5FCf68345543fC14493D248006` | Active |
+| 3 | Uniswap V4, hookless | `0xC3d0C39A45db9f5Cae45015d290533Ddbbf9E4d5` | Active |
+| 4 | AchSwap V2 (router) | `0x50aE6e6D358167b252186d400f0449f6823A7144` | Active |
+| 8 | Uniswap V3 (router) | `0x87B23C9160F919ef5AcCB156740bB2d33Cb44F35` | Active |
+| 9 | AchSwap V3 (router) | `0x536598BA24D45597c36E0D93D37E3220258fe1BB` | Active |
+| 10 | Synthra V3 (router) | `0x377e0233C3279812C29eDCef086664cc210269B5` | Active |
+| 12 | UnitFlow V3 (router) | `0xf808A11DFa2D9488f815Fe1Da64e274aba053B6D` | Active |
+| 13 | Native USDC ↔ `0x3600` conversion | `0x4c736E45d92b49Bc998D5407B63F4cd818809460` | Active |
+| 14 | V2 pairs, direct (Uniswap V2, AchSwap V2 and three forks) | `0x2D3C6053E69c130a868e82Dbf3833fBeF9fE7C63` | Deployed 30 Sep 2026; usable after 2 Oct 2026 08:56 UTC |
+| 15 | V3 and Slipstream pools, direct (12 factories) | `0x62a4dcb6D7cbD6eC0d43565dBfd18D4431c3a58f` | Deployed 30 Sep 2026; usable after 2 Oct 2026 08:56 UTC |
+| 16 | Uniswap V4 with hooks (owner deny-list) | `0x04732F7ACED4ddb0dfa4e10Af02356b8a2b17f61` | Deployed 30 Sep 2026; usable after 2 Oct 2026 08:56 UTC |
+
+New adapters wait out the executor's two-day delay before they can be activated; activation is a public call. All addresses above are source-verified on [arc.etherscan.io](https://arc.etherscan.io).
 
 The [exact-output quoter deployment record](https://github.com/Asif2902/achswap-contracts/blob/codex/aggregator-v3/achswap-agg/deployments/arcMainnet-exact-output-quoter.json) binds the new quoter to the existing quote engine. It helps find an exact-input route meeting the requested net output; it does not replace the execution router or provide an exact-output refund primitive.
 
@@ -53,6 +77,8 @@ The [exact-output quoter deployment record](https://github.com/Asif2902/achswap-
 | Permit2 | `0x000000000022D473030F116dDEE9F6B43aC78BA3` | Canonical; verifies the gasless signature and pulls the input |
 | Relayer | `0x8bbB0990B9Ba9DeFDb10389e59955886F79B19cC` | Allowlisted on the executor |
 | Relayer | `0x6e0df2d65d309b55B217B5237657302386E75584` | Allowlisted on the executor |
+
+Since 30 September 2026 the gasless executor may also call and approve `AchRouteExecutor` (txs `0x4f0e8dbf18997f2933841e47e772f59bcd0fd9227e14b170ba1ba2c18716057e`, `0x822d083c40d42f0b17e7f0681eb9bc871dda527fdf0bb252a293e74cf3f17bf6`), so AchSwap router routes can be gasless.
 
 Superseded gasless executors, not used by the app: `0x114FFB915eF00173D1c986c6FF5d445175622442` (v2), `0x1bC5c96ce21bc721e97DcBeABe787B9d83Dc8b1d` (v1). See [gasless architecture](/technical/gasless).
 

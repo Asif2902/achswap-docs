@@ -26,4 +26,8 @@ The ERC-20 USDC predeploy at `0x3600000000000000000000000000000000000000` has 6 
 
 **AchSponsoredExecutorV3** runs gasless swaps. The user signs one Permit2 witness that binds the whole swap. An allowlisted relayer submits it and pays the gas. The executor pulls the exact input through Permit2, calls the allowlisted KyberSwap, LI.FI or AchSwap router with the signed calldata, and enforces the minimum on the user's actual balance increase. Inputs are limited to USDC, EURC and cirBTC; output tokens are not restricted. See [gasless architecture](/technical/gasless).
 
+## Route executor
+
+**AchRouteExecutor** executes plans built by AchSwap's off-chain [routing engine](/technical/routing-engine): up to eight independent branches, each a sequence of steps through allowlisted adapters (router-based for the original sources, direct-pool for V2 pairs, V3/Slipstream pools and V4 hooked pools). It measures every step's output, charges the protocol fee once on the total, pays the user and enforces the user's minimum on the actual balance increase. New adapters can only be added after a two-day delay; fee increases are also delayed; the owner can pause or disable an adapter immediately.
+
 AchSwap's own V4 liquidity is not deployed on Arc Mainnet. Uniswap V4 is an independent registered aggregator source. See [fees](/technical/fee-structure) and [smart routing](/achswap/smart-routing).

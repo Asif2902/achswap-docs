@@ -10,7 +10,7 @@ With gasless mode on, you sign a swap instead of sending a transaction. An AchSw
 
 - **Pay with:** USDC, EURC or cirBTC.
 - **Receive:** any token you can route to, including USDC.
-- **Routes:** KyberSwap, LI.FI and the AchSwap aggregator. If the best quote uses another route, gasless mode is not available for that swap.
+- **Routes:** KyberSwap, LI.FI and AchSwap's own routes (including split and multi-hop routes from AchSwap's router). If the best quote uses another route, gasless mode is not available for that swap.
 - **Minimum size:** each input token has a minimum USD value, set by AchSwap and applied on the swap screen. Smaller amounts, and exact-output quotes, go through a normal swap where you pay the gas.
 - **Recipient:** always your connected wallet. A custom recipient is not supported in gasless mode.
 
