@@ -17,7 +17,7 @@ AchSwap keeps an index of every liquidity pool on Arc, currently around 270,000,
 
 Tokens with transfer taxes or transfer restrictions are not routed by AchSwap's router; LI.FI or KyberSwap may still quote them.
 
-Quotes normally take a fraction of a second. The first quote for a token the router has not loaded yet can take a few seconds.
+Quotes normally take a fraction of a second. The first quote for a token the router has not loaded yet can take a second or two.
 
 ## What executes
 
@@ -39,6 +39,7 @@ An AchSwap route executes in **one transaction** on the `AchRouteExecutor` contr
 | Aerodrome-style Slipstream pools (four factories) | Activating 2 October 2026 |
 | Uniswap V4 pools with hooks (e.g. launchpad tokens) | Activating 2 October 2026 |
 | Other V2 and V3 forks with liquidity | Activating 2 October 2026 |
+| Lunya pools | Activating 2 October 2026 |
 
 The sources marked "Activating" are already deployed. The route executor enforces a two-day security delay before new execution adapters can be used; from then on the router includes them automatically. A source only contributes when it actually has a pool with usable liquidity for your pair.
 

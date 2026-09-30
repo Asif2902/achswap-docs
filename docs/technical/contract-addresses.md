@@ -64,6 +64,7 @@ The fee recipient is a controller setting, not a fixed contract dependency. Its 
 | 14 | V2 pairs, direct (Uniswap V2, AchSwap V2 and three forks) | `0x2D3C6053E69c130a868e82Dbf3833fBeF9fE7C63` | Deployed 30 Sep 2026; usable after 2 Oct 2026 08:56 UTC |
 | 15 | V3 and Slipstream pools, direct (12 factories) | `0x62a4dcb6D7cbD6eC0d43565dBfd18D4431c3a58f` | Deployed 30 Sep 2026; usable after 2 Oct 2026 08:56 UTC |
 | 16 | Uniswap V4 with hooks (owner deny-list) | `0x04732F7ACED4ddb0dfa4e10Af02356b8a2b17f61` | Deployed 30 Sep 2026; usable after 2 Oct 2026 08:56 UTC |
+| 17 | Lunya pools, direct | `0xEB4b84fFa5943b3b9904a4c78fC712f476C52b36` | Deployed 30 Sep 2026; usable after 2 Oct 2026 16:01 UTC |
 
 New adapters wait out the executor's two-day delay before they can be activated; activation is a public call. All addresses above are source-verified on [arc.etherscan.io](https://arc.etherscan.io).
 
