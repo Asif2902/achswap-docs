@@ -10,10 +10,10 @@ AchSwap's router finds the route, and the [route executor](/technical/swap-execu
 
 | Source | Pools | Adapter |
 | --- | --- | ---: |
-| Uniswap V2, AchSwap V2, DyorSwap, Architex and one Uniswap V2 fork | Constant product, 0.30% | 2 |
-| Uniswap V3, AchSwap V3, Synthra V3 (two factories), UnitFlow V3, SushiSwap V3, Bugle and one Uniswap V3 fork | Concentrated liquidity, every fee tier | 3 |
-| Slipstream: Aero CL, Archery, Topaz and one Slipstream fork | Concentrated liquidity with per-pool fees | 3 |
-| Uniswap V4 | Hookless and hooked pools | 4 |
+| Uniswap V2, AchSwap V2, DyorSwap, Architex and ACTFUN | Constant product, 0.30% | 2 |
+| Uniswap V3, AchSwap V3, Synthra V3 (two factories), UnitFlow V3, SushiSwap V3, Bugle and FlutchPad | Concentrated liquidity, every fee tier | 3 |
+| Slipstream: Aero CL (two factories), Archery and Topaz | Concentrated liquidity with per-pool fees | 3 |
+| Uniswap V4, including launchpad hooks (Aka.fun, o1 Launchpad, Minara.fun, Argus, Long.supply, Foci, Faze, Peach, FlutchPad) | Hookless and hooked pools | 4 |
 | Lunya | Concentrated-liquidity and constant-product pools | 5 |
 | Native USDC ↔ `0x3600` USDC | One balance, two interfaces | 1 |
 
@@ -68,7 +68,9 @@ The route appears when **Detailed route** is on, as text or as a map. The page a
 
 ## Price impact
 
-Price impact compares the route's output, valued at reference prices, with its input, before the AchSwap fee. Each token's reference price comes from its deepest route to USDC, so a small or stale pool cannot distort it.
+Price impact compares the route's output, valued at reference prices, with its input, before the AchSwap fee. Pool fees, hook fees and depth count toward it; the AchSwap fee is shown separately. Each token's reference price comes from its deepest route to USDC through pools whose state is their real price, so a small, stale or custom-curve pool cannot distort it.
+
+The same definition applies to every provider: KyberSwap's and LI.FI's outputs are measured against the same reference prices, so the figure means the same thing whichever route wins. A negative value means the route pays more than the reference price. Only when a token has no reference price does the page fall back to comparing the trade with a smaller quote for the same pair.
 
 ## API
 

@@ -15,7 +15,7 @@ Every quote compares three providers: AchSwap's own router, LI.FI same-chain swa
 - Uniswap V2, V3 and V4 (including V4 pools with hooks);
 - AchSwap V2 and V3;
 - Synthra, UnitFlow, Lunya, and the Slipstream DEXs Aero CL, Archery and Topaz;
-- DyorSwap, Architex, SushiSwap V3, Bugle and three unnamed forks.
+- DyorSwap, Architex, ACTFUN, SushiSwap V3, Bugle and FlutchPad.
 
 Only pools with usable liquidity contribute. LI.FI and KyberSwap are separate routing providers. The winning route reflects the quotes available at that moment, so it can change on refresh.
 
@@ -53,6 +53,6 @@ The swap settings panel controls:
 - quote refresh interval;
 - an optional recipient address.
 
-High price impact means the trade is large relative to the available liquidity. Check the route and the minimum received: a higher slippage tolerance does not create liquidity or improve the quoted price.
+Price impact is what the route pays against market reference prices, before the AchSwap fee, and it is measured the same way for every provider. High price impact means the trade is large relative to the available liquidity, or the route goes through high-fee pools. Check the route and the minimum received: a higher slippage tolerance does not create liquidity or improve the quoted price.
 
 See [smart routing](/achswap/smart-routing), [gasless swaps](/achswap/gasless), [fees](/technical/fee-structure) and [contract addresses](/technical/contract-addresses).

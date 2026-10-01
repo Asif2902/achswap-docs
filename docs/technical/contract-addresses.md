@@ -69,7 +69,7 @@ These pools can be reached by the adapters. Every configuration below is fixed i
 | AchSwap V2 | `0xb0C2B0acb9c13079dDd871eDaF43Aabf6e88C530` |
 | DyorSwap | `0x942Bd5BFdc5317C5507e326f8EB4BB6058AB5C10` |
 | Architex | `0x3648cc1323b4729e472cffdC570C6096565b0923` |
-| Uniswap V2 fork | `0x96E4955fDE3f1aDDDC2C8202b23A319bb9CF5034` |
+| ACTFUN | `0x96E4955fDE3f1aDDDC2C8202b23A319bb9CF5034` |
 
 **Adapter 3 (concentrated liquidity).** `key` is the fee tier for fee-keyed factories and the tick spacing for Slipstream factories.
 
@@ -82,13 +82,13 @@ These pools can be reached by the adapters. Every configuration below is fixed i
 | UnitFlow V3 | `0x5bfBCeb73d39F722B1cB83fD2F11736b28c1Be6d` | fee | `0x82800e84` |
 | SushiSwap V3 | `0x7282249282902e1f99c2CB0A04230091bd30FE3A` | fee | `0xfa461e33` |
 | Bugle | `0xB09f790A1907a1db006e88F14C4f0168fBee9598` | fee | `0xfa461e33` |
-| Uniswap V3 fork | `0x389016a3c28150881FD91A0063109F7107c3F193` | fee | `0xfa461e33` |
+| FlutchPad | `0x389016a3c28150881FD91A0063109F7107c3F193` | fee | `0xfa461e33` |
 | Aero CL (Slipstream) | `0xb89Df768aF2CFE637ceB352c587Fe8edAf491d03` | tick spacing | `0xfa461e33` |
 | Archery (Slipstream) | `0xC481038C013FE96F38CE7A2dC417b2B1B78b16A4` | tick spacing | `0xfa461e33` |
 | Topaz (Slipstream) | `0xaa5865dC3A60b25D305226d66fd573021f0D8fFB` | tick spacing | `0xfa461e33` |
-| Slipstream fork | `0x04625B046C69577EfC40e6c0Bb83CDBAfab5a55F` | tick spacing | `0xfa461e33` |
+| Aero CL, earlier factory (Slipstream) | `0x04625B046C69577EfC40e6c0Bb83CDBAfab5a55F` | tick spacing | `0xfa461e33` |
 
-Protocol names are taken from on-chain evidence. For V2 factories that is the LP token name of their pairs. For concentrated-liquidity factories it is the NFT position manager that minted their pools' first positions. The three "forks" use Uniswap's or Slipstream's default names, so nothing on chain identifies who runs them.
+Protocol names are taken from on-chain evidence. For V2 factories that is the LP token name of their pairs. For concentrated-liquidity factories it is the NFT position manager that minted their pools' first positions. Three factories keep Uniswap's or Slipstream's default names and are identified by who deploys and uses them: ACTFUN's launchpad graduates its tokens into `0x96E4…5034`, FlutchPad's launch contracts create the pools of `0x3890…F193`, and `0x0462…a55F` has the same owner as Aero CL's factory.
 
 **Adapter 4 (Uniswap V4).** PoolManager `0x8366a39CC670B4001A1121B8F6A443A643e40951`, for hookless and hooked pools, subject to the owner's hook deny-list.
 

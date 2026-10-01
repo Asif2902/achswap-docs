@@ -11,7 +11,7 @@ AchSwap's router covers the pools of every supported DEX on Arc:
 - Uniswap V2, V3 and V4, including hooked pools;
 - AchSwap V2 and V3;
 - Synthra, UnitFlow, Slipstream and Lunya;
-- several other forks.
+- DyorSwap, Architex, ACTFUN, SushiSwap V3, Bugle and FlutchPad.
 
 It splits and chains trades across them, and every quote is simulated against the live contracts before you see it. A route executes in one transaction on `AchRouteExecutor`, which charges a single 0.25% fee on the output.
 

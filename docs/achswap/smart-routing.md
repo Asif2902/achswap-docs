@@ -40,10 +40,9 @@ How the contract executes a route is described in [swap execution](/technical/sw
 | Uniswap V2, V3 and V4, including V4 pools with hooks | Live |
 | AchSwap V2 and V3 | Live |
 | Synthra V3 and UnitFlow V3 | Live |
-| Slipstream pools: Aero CL, Archery, Topaz | Live |
+| Slipstream pools: Aero CL (two factories), Archery, Topaz | Live |
 | Lunya concentrated and constant-product pools | Live |
-| DyorSwap, Architex, SushiSwap V3, Bugle | Live |
-| Three unnamed Uniswap V2, Uniswap V3 and Slipstream forks | Live |
+| DyorSwap, Architex, ACTFUN, SushiSwap V3, Bugle, FlutchPad | Live |
 
 A source contributes only when it has a pool with usable liquidity for your trade. New sources are added through the route executor's two-day security delay.
 

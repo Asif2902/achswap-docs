@@ -40,7 +40,7 @@ sidebar_position: 8
 
 **Permit2:** The canonical Uniswap contract that verifies signed token permissions. Gasless swaps use it.
 
-**Price impact:** The estimated effect of your trade on the price, given the available liquidity. It is distinct from slippage tolerance.
+**Price impact:** How much less the route pays than market reference prices, before the AchSwap fee: the trade's effect on the price plus pool and hook fees. Negative when the route pays more than the reference. It is distinct from slippage tolerance.
 
 **Relayer:** An allowlisted wallet that submits gasless swaps and pays their gas.
 
