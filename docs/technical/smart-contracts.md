@@ -4,30 +4,74 @@ sidebar_position: 1
 
 # Smart contracts
 
-AchSwap's Arc Mainnet deployment has two parts: its own V2/V3 liquidity contracts and the swap aggregator. The frontend manifest is the address source for the app; the [address reference](/technical/contract-addresses) records those contracts and the aggregator's seven active adapters.
+AchSwap on Arc Mainnet has four groups of contracts:
 
-## AchSwap pools
+- its own V2 and V3 liquidity;
+- the swap executor and its adapters, which execute every AchSwap route;
+- the gasless executor;
+- a helper for paying with native USDC.
 
-The **V2 factory** creates constant-product pairs and the **V2 router** handles ordinary swaps and liquidity. LP shares are fungible tokens.
+Each one is source-verified on [arc.etherscan.io](https://arc.etherscan.io). Addresses are in the [address reference](/technical/contract-addresses).
 
-The **V3 factory** creates concentrated-liquidity pools. The **SwapRouter** executes swaps, the **Quoter02** provides off-chain quotes via calls, and the **NonfungiblePositionManager** owns NFT positions. AchSwap V3 uses a **legacy SwapRouter with a deadline**, not SwapRouter02. The migrator supports V2-to-V3 position migration.
+## AchSwap V2 and V3
 
-## Aggregator
+The **V2 factory** creates constant-product pairs, and the **V2 router** handles swaps and liquidity. LP shares are fungible tokens.
 
-The **AchQuoteEngine** quotes the registered adapters and returns route data. The **AchExecutionRouter** executes the selected route and enforces its minimum output and fee ceiling. The **AchFeeController** supplies the current protocol fee and recipient; the **AchVault** credits protocol fees. Separate periphery contracts support Arc native-USDC input and mixed-DEX multi-hop execution.
+The **V3 factory** creates concentrated-liquidity pools with fee tiers of 0.01%, 0.05%, 0.3% and 1%. The other V3 contracts:
 
-Adapters are connected to Uniswap V2/V3/V4, AchSwap V2/V3, Synthra V3, and UnitFlow V3. An adapter can be registered even when no pool for a requested pair is initialized or sufficiently liquid. A route is only executable if the current quote and transaction checks pass.
+- The **SwapRouter** executes swaps. It is a legacy SwapRouter that requires a deadline, not SwapRouter02.
+- The **QuoterV2** returns quotes through calls.
+- The **NonfungiblePositionManager** owns positions as NFTs.
+- The **migrator** moves V2 positions to V3.
 
-## Arc USDC
+AchSwap's own V4 contracts are not deployed on Arc Mainnet. Uniswap V4 is an independent protocol that AchSwap routes through.
 
-The ERC-20 USDC predeploy at `0x3600000000000000000000000000000000000000` has 6 decimals. Native USDC uses 18-decimal transaction units, representing the same balance. The aggregator's native adapter converts between those scales; ordinary routers and pool positions use the ERC-20 representation. The routers' WETH placeholder is an unsupported contract, so ETH-path router methods are not used on Arc.
+## Swap execution
+
+**AchRouteExecutor** executes every AchSwap route in one transaction:
+
+- It takes an exact-input plan of up to 8 branches and 32 steps, with up to 8 steps per branch. Each step names an adapter and a pool.
+- It moves tokens straight between pools through five **execution adapters**, without any third-party router:
+  - native USDC conversion;
+  - V2 pairs;
+  - V3 and Slipstream pools;
+  - Uniswap V4 pools, including hooked pools;
+  - Lunya pools.
+- It measures what every step actually produced and charges **0.25%** once, on the final output. The fee goes straight to the AchSwap treasury Safe; there is no fee vault.
+- It pays the recipient and requires the recipient's real balance increase to reach their minimum. Otherwise the whole transaction reverts.
+- It refunds this call's residuals and holds nothing between transactions.
+
+The executor does not discover routes. AchSwap's [routing engine](/technical/routing-engine) computes them, and anyone can encode one. The interface, route encoding, adapter payloads and safety rules are on the [swap execution](/technical/swap-execution) page.
 
 ## Gasless
 
-**AchSponsoredExecutorV3** runs gasless swaps. The user signs one Permit2 witness that binds the whole swap. An allowlisted relayer submits it and pays the gas. The executor pulls the exact input through Permit2, calls the allowlisted KyberSwap, LI.FI or AchSwap router with the signed calldata, and enforces the minimum on the user's actual balance increase. Inputs are limited to USDC, EURC and cirBTC; output tokens are not restricted. See [gasless architecture](/technical/gasless).
+**AchSponsoredExecutorV3** runs gasless swaps:
 
-## Route executor
+1. The user signs one Permit2 witness that binds the whole swap.
+2. An allowlisted relayer submits it and pays the gas.
+3. The executor pulls the exact input through Permit2 and calls an allowlisted target (KyberSwap, LI.FI or AchRouteExecutor) with the signed calldata.
+4. The executor checks the minimum against the user's actual balance increase.
 
-**AchRouteExecutor** executes plans built by AchSwap's off-chain [routing engine](/technical/routing-engine): up to eight independent branches, each a sequence of steps through allowlisted adapters (router-based for the original sources, direct-pool for V2 pairs, V3/Slipstream pools, V4 hooked pools and Lunya pools). It measures every step's output, charges the protocol fee once on the total, pays the user and enforces the user's minimum on the actual balance increase. New adapters can only be added after a two-day delay; fee increases are also delayed; the owner can pause or disable an adapter immediately.
+Inputs are limited to USDC, EURC and cirBTC. Output tokens are not restricted. See [gasless architecture](/technical/gasless).
 
-AchSwap's own V4 liquidity is not deployed on Arc Mainnet. Uniswap V4 is an independent registered aggregator source. See [fees](/technical/fee-structure) and [smart routing](/achswap/smart-routing).
+## Native USDC helper
+
+**AchArcNativeUsdcAdapter** adds liquidity to AchSwap's own V2 and V3 contracts, and swaps on them, with USDC paid from the native balance. This saves the separate approval transaction.
+
+## Arc USDC
+
+The ERC-20 USDC at `0x3600000000000000000000000000000000000000` has 6 decimals. Native USDC uses 18-decimal units and is the same balance. AchRouteExecutor accepts and pays either form: adapter 1 converts between them at exactly 10¹², and the executor treats both as one balance. Pools and ordinary routers use the ERC-20 form. The V2/V3 routers' WETH placeholder is an unsupported contract, so their ETH-path methods are not used on Arc.
+
+## What the owners can and cannot do
+
+| Contract | The owner can | The owner cannot |
+| --- | --- | --- |
+| AchRouteExecutor | Pause execution. Disable an adapter. Add an adapter after a 2-day delay. Lower the fee at once, or raise it after a 2-day delay, up to 1%. Change the fee recipient after a 2-day delay, and only if the new recipient accepts. | Move user funds. Apply a new fee to a plan built under the old one (the plan carries the fee version). Point an existing adapter id at different code. Renounce ownership. |
+| Execution adapters | Deny a Uniswap V4 hook (adapter 4 only). | Change factories, fees, callback selectors or the PoolManager. Call an adapter at all: only the executor can. |
+| AchSponsoredExecutorV3 | Curate the input tokens, targets, spenders and relayers. Pause. | Change a signed swap, or pull more than the signed amount. |
+
+## Verification
+
+All live contracts are verified on [arc.etherscan.io](https://arc.etherscan.io) with exact source matches and constructor arguments. The executor and its adapters were compiled with solc 0.8.24 (via-IR, optimizer 200 runs, EVM cancun). Their deployed runtime bytecode matches the verified sources.
+
+See [fees](/technical/fee-structure) and [smart routing](/achswap/smart-routing).

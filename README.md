@@ -1,6 +1,6 @@
 # AchSwap Documentation
 
-Documentation for AchSwap on **Arc Mainnet (chain ID 5042)**. The site covers swaps, V2/V3 liquidity, routing, and deployed contract addresses. It does not document unrelated products or undeployed AchSwap V4 and gasless features.
+Documentation for AchSwap on **Arc Mainnet (chain ID 5042)**. The site covers swaps, gasless swaps, V2/V3 liquidity, routing, on-chain swap execution, and deployed contract addresses. It does not document unrelated products or the undeployed AchSwap V4 contracts.
 
 ## Run locally
 
@@ -18,6 +18,14 @@ This branch documents the Arc Mainnet frontend and deployments. As checked on 14
 
 ## Address sources
 
-The public address reference follows the Arc Mainnet deployment manifest in `Achswap/achswap` (`mainnet-test`) and deployment records in `Asif2902/achswap-contracts` (`codex/aggregator-v3`). Updated 15 September 2026: Uniswap V3, AchSwap V3, Synthra V3 and UnitFlow V3 now use slots 7/8/9/10; old slots 1/4/5/6 are disabled. There are seven active adapters across eleven registry entries. Replacement bytecode, registry bindings, buy/sell quotes and native-input execution simulations passed on chain 5042. The additive `AchExactOutputQuoter` is also listed. Other contract addresses retain the 14 September baseline. Retired addresses are clearly separated for historical receipt decoding, not new swaps.
+The address reference follows the contracts' deployment records and the app's deployment manifest. Updated 1 October 2026 for the 2026-10 swap-execution release:
+
+- AchRouteExecutor `0x1B844738455b8060D12839331b35893526E9d314` with adapters 1–5;
+- a 0.25% fee paid directly to the treasury Safe, with no fee vault;
+- the gasless executor's new target.
+
+Every live contract is source-verified on arc.etherscan.io. Retired addresses are kept in a separate section only to decode older transactions.
+
+Public pages describe contract behaviour (the verified code) and the guarantees users get. They do not describe the router's internal systems or infrastructure.
 
 This `mainnet` branch is separate from the former testnet documentation on `main`.

@@ -9,7 +9,7 @@ const products = [
   {
     title: 'Swap',
     description:
-      'Compare aggregator, LI.FI, and KyberSwap quotes, inspect the route, and swap on Arc Mainnet.',
+      'Compare AchSwap, LI.FI and KyberSwap quotes, inspect the route, and swap on Arc Mainnet.',
     href: '/achswap/swap',
     items: ['Token swaps', 'Split and mixed-DEX routes', 'Route map'],
   },
@@ -23,9 +23,9 @@ const products = [
   {
     title: 'Contracts',
     description:
-      'Find the deployed Arc Mainnet contracts and all seven active routing adapters.',
+      'Find every deployed Arc Mainnet contract and see how routes settle on chain.',
     href: '/technical/contract-addresses',
-    items: ['AchSwap V2 and V3', 'Aggregator contracts', 'Adapter registry'],
+    items: ['AchSwap V2 and V3', 'Route executor and adapters', 'Gasless executor'],
   },
 ];
 

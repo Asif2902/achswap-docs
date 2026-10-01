@@ -4,7 +4,7 @@ sidebar_position: 5
 
 # Pools
 
-A pool holds two tokens that traders swap against. AchSwap's own Arc Mainnet liquidity interface supports **V2 pools** and **V3 concentrated-liquidity pools**. Pools and liquidity from other DEXs may be available to the aggregator through its registered adapters, but their positions are not AchSwap V2/V3 positions.
+A pool holds two tokens that traders swap against. AchSwap's own Arc Mainnet liquidity interface supports **V2 pools** and **V3 concentrated-liquidity pools**. AchSwap's router also trades through pools of other DEXs on Arc, but positions in those pools are not AchSwap V2/V3 positions.
 
 Before adding liquidity, inspect the token addresses, reserves or active liquidity, V3 fee tier, and current price. A pool contract existing does not guarantee a safe price for your trade or sufficient depth for a given amount. Newly created pools need their initial price set carefully.
 

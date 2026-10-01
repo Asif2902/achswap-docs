@@ -1,58 +1,117 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # Routing engine
 
-AchSwap's aggregator is split in two. An off-chain **router** discovers pools, keeps their state, and searches routes in memory. The on-chain **AchRouteExecutor** only executes the plan it is given, settles one fee and enforces the user's minimum.
+AchSwap's router finds the route, and the [route executor](/technical/swap-execution) executes it. The router runs off chain and has no part in settlement. The route it returns is an ordinary `execute()` call that anyone can decode and simulate.
 
-## Router
+## Liquidity sources
 
-| Stage | What happens |
-| --- | --- |
-| Discovery | Pool-creation events from every configured factory and the Uniswap V4 PoolManager are indexed into SQLite. Creation events from unknown factories are counted, so new liquidity sources show up automatically. |
-| State | One log query per poll covers the whole chain. `Sync`, `Swap`, `Mint`, `Burn`, `Initialize`, `ModifyLiquidity` and `ProtocolFeeUpdated` update each pool exactly: reserves, price, active liquidity, and the full set of initialized ticks. Pools that existed before indexing are read once through a read-only lens. |
-| Quote plugins | V2 constant product; a bit-exact port of Uniswap's V3 tick math, shared by V3 forks, Aero CL (Slipstream) and V4, and a variant for Lunya pools, which step from one initialized tick straight to the next and charge their fee in one configured token (on some pools the output). Each pool uses its own fee: V2 fixed fees, V3 fee tiers, V4 LP and protocol fees, and the current fee of Slipstream and Lunya pools, which is re-read whenever the pool trades. V4 hooks that run during swaps are learned by simulation, as a normal wallet calling through the executor's adapter: a fixed fee on the input or the output, or a proven lower bound. |
-| Transfer screen | Tokens that do not move exactly (transfer taxes, reflection, sell blocks) are never routed. Each token is test-sent out of and back into every pool (or the V4 PoolManager) a route would use, by simulation, because some tokens tax one pool and not another. |
-| Optimizer | Candidate paths (direct, through one or two hub tokens), then a split allocation that simulates pools shared between branches in execution order and accounts for gas, including small slices into shallow pools when they pay. |
-| Plan | Independent branches of typed steps for `AchRouteExecutor`: up to 8 branches and 32 steps. |
-| Verification | Before a quote is returned, its exact `execute()` call runs as `eth_call` at the block the quote was computed on. The executor must reproduce the quoted amount to the unit. If it does not, the router corrects a stale fee or hook model, or excludes the hop responsible, and routes again. |
-| Simulation | At build time the exact `execute()` call is run again as `eth_call` from the user's wallet. Missing funds or approvals are supplied with state overrides, so the check works before approval. |
+| Source | Pools | Adapter |
+| --- | --- | ---: |
+| Uniswap V2, AchSwap V2 and three V2 forks | Constant product, 0.30% | 2 |
+| Uniswap V3, AchSwap V3, Synthra V3 (two factories), UnitFlow V3 and three V3 forks | Concentrated liquidity, every fee tier | 3 |
+| Slipstream (four factories, including Aero CL) | Concentrated liquidity with per-pool fees | 3 |
+| Uniswap V4 | Hookless and hooked pools | 4 |
+| Lunya | Concentrated-liquidity and constant-product pools | 5 |
+| Native USDC ↔ `0x3600` USDC | One balance, two interfaces | 1 |
 
-Safety nets: the math is tested against on-chain quotes and must match to the unit. A verifier re-reads random pools every 30 seconds and repairs any drift. Log pages count only when the serving node has reached the requested block. Slipstream fees are re-read at the block of every swap in those pools, and a route uses a pool whose fee module reprices within a transaction only once. A quote is never higher than what the simulated transaction pays.
+The exact factory list is under [configured factories](/technical/contract-addresses#configured-factories). A source only contributes when it has a pool for the pair with usable liquidity.
 
-Price impact is the route's output valued at reference prices, before the AchSwap fee. Each token's reference price comes from its deepest route to USDC, so a small or stale pool cannot distort it.
+## How a route is chosen
 
-## Executor
+- **Paths.** The router considers direct pools and paths of up to three hops through liquid intermediate tokens such as USDC, EURC and cirBTC.
+- **Exact pricing.** Every pool is priced with the same integer math the pool itself uses, including its own fee:
+  - V2 fixed fees;
+  - V3 fee tiers;
+  - V4 LP and protocol fees;
+  - the current fee of Slipstream and Lunya pools;
+  - fees taken by V4 hooks during swaps.
+- **Splits.** The input can be split across up to eight branches, over different pools and DEXs, when the split pays more after gas. When branches share a pool, the router prices it in the order the executor will trade it.
+- **Fee.** The quoted amount is net of the 0.25% AchSwap fee.
 
-`AchRouteExecutor` (`0xcD1bc4f6A4448FeA4DE51410D3b571732FE55Af8`):
+## Verification
 
-- pulls exactly `amountIn`, or takes native USDC as `msg.value`;
-- executes each branch's steps through allowlisted adapters, measuring every step's output;
-- charges the protocol fee once on the total measured output (currently 25 bps, to the Safe `0x0dbd33291b0bc85e75465d0d7F261b4cF758BCf0`). An optional partner fee is capped at 1% by the contract;
-- reverts unless the recipient's actual balance increase meets `minNetAmountOut`;
-- refunds only the residuals of the current call.
+Before a quote is shown, its exact `execute()` call is simulated against the live contracts at the block the quote was computed on. The result must equal the quoted output to the unit. If it does not, the route is corrected or dropped; a quote that does not reproduce is never shown.
 
-Adapters, their addresses and activation status are listed in [contract addresses](/technical/contract-addresses#route-executor).
+When you request the transaction, it is simulated again, this time from your wallet. Missing approvals or balances are supplied with state overrides, so the check also works before you approve.
+
+As a result:
+
+- A quote never shows more than the transaction would pay at the quote's block.
+- If pools move before your transaction is mined, it pays the new amount, or reverts if that is below your minimum.
+
+## Tokens that are not routed
+
+The executor requires every transfer to move exactly the requested amount. Tokens with transfer taxes, reflection or rebasing balances, or transfer restrictions cannot settle, so AchSwap does not route them; KyberSwap or LI.FI may still quote them. Uniswap V4 pools whose hooks do not behave reproducibly are also not used.
+
+## Exact output
+
+When you specify the amount to receive:
+
+1. The router finds the smallest input whose verified output reaches the requested amount.
+2. The transaction is an exact-input swap at that input plus your slippage tolerance, with the requested amount as the on-chain minimum.
+3. You spend the quoted input plus the slippage allowance and receive at least the requested amount. If the price holds, the extra input buys extra output, so you receive slightly more than you asked for.
+
+Only AchSwap's router quotes exact output. KyberSwap and LI.FI quotes are exact input.
+
+## Price impact
+
+Price impact compares the route's output, valued at reference prices, with its input, before the AchSwap fee. Each token's reference price comes from its deepest route to USDC, so a small or stale pool cannot distort it.
 
 ## API
 
-Integrators use one endpoint, `POST /api/quote`, which compares AchSwap's router with KyberSwap and LI.FI. Calls from other origins need an API key: `Authorization: Bearer <key>` or `x-quote-token: <key>`.
+Integrators use one endpoint, `POST /api/quote`. It compares AchSwap's router with KyberSwap and LI.FI and returns the best net output. Calls from other origins need an API key, sent as `Authorization: Bearer <key>` or `x-quote-token: <key>`.
 
 ```json
-{ "chainId": 5042, "tokenIn": "0x…", "tokenOut": "0x…", "amountIn": "1000000", "slippageBps": 50,
-  "sources": ["achswap", "kyber", "lifi"], "wallet": "0x…" }
+{
+  "chainId": 5042,
+  "tokenIn": "0x3600000000000000000000000000000000000000",
+  "tokenOut": "0xbEf5f6d51CB62b58e6A8f77868681825C6fe21c1",
+  "amountIn": "1000000",
+  "slippageBps": 50,
+  "sources": ["achswap", "kyber", "lifi"],
+  "wallet": "0x…"
+}
 ```
 
-- `amountIn` is in the input token's base units.
-- `sources` defaults to all three; `wallet` is required when `lifi` is included.
-- The response names the winning `provider`, its `amountOut` (net of every fee), a `quoteId` and the route. An AchSwap route carries its `executionPlan` and a `branches` breakdown.
+| Request field | Notes |
+| --- | --- |
+| `chainId` | `5042` |
+| `tokenIn`, `tokenOut` | ERC-20 addresses. For USDC, use `0x3600…0000`; the API does not accept the native `address(0)`. |
+| `tradeType` | `EXACT_IN` (default) or `EXACT_OUT` |
+| `amountIn` | Exact input in base units, for `EXACT_IN` |
+| `amountOut` | Requested output in base units, for `EXACT_OUT` |
+| `slippageBps` | 0 to 2000 |
+| `sources` | Any of `achswap`, `kyber` and `lifi` (default: all three). `EXACT_OUT` requires `["achswap"]`. |
+| `wallet` | Required when `lifi` is included, because LI.FI calldata is specific to an address |
 
-`POST /api/quote/build` with `{ quoteId, wallet, recipient?, slippageBps }` returns the transaction:
+| Response field | Meaning |
+| --- | --- |
+| `provider` | `AchSwap`, `KyberSwap` or `LiFi`: whichever gives the best net output |
+| `amountOut` | Net output after every fee. For `EXACT_OUT`, the guaranteed minimum, which is the requested amount. |
+| `amountIn` | The input the transaction spends. For `EXACT_OUT`, this is the quoted input plus slippage. |
+| `amountInQuoted` | `EXACT_OUT` only: the smallest input that reaches the target at the quote's block |
+| `expectedAmountOut` | `EXACT_OUT` only: the transaction's expected output |
+| `fees.feeBpsCharged` | The protocol fee in bps |
+| `priceImpact` | AchSwap routes only |
+| `route` | The winning route. An AchSwap route carries its `executionPlan` (the executor call) and a `branches` breakdown of splits and hops. |
+| `quoteId` | Pass this to `/api/quote/build`. It is valid for about 10 seconds. |
+| `noRoute`, `incomplete` | No route was found, or a provider did not answer in time |
+
+`POST /api/quote/build` takes `{ quoteId, wallet, recipient?, slippageBps }` and returns the transaction:
 
 - `to`, `data` and `value`;
-- the `approvalAddress` to approve first, if any;
+- the `approvalAddress` to approve first, if any (there is none for native USDC input);
 - `minAmountOut` and `deadline`;
-- for AchSwap routes, a `simulation` of that exact transaction from the wallet.
+- for AchSwap routes, `expectedAmountOut` and a `simulation` of that exact transaction from the wallet.
 
-Quote IDs expire after about 10 seconds; request a new quote after that.
+For `EXACT_IN`, the AchSwap minimum is the quoted output less `slippageBps`. For `EXACT_OUT`, the minimum is the requested amount.
+
+| Status | Meaning |
+| --- | --- |
+| `400` | Invalid parameters, or the slippage or wallet differs from the quote |
+| `409` | The route no longer executes. Request a new quote. |
+| `410` | The quote expired. Request a new quote. |
+| `429` | Too many requests. Retry after the `Retry-After` delay. |

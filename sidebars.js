@@ -40,6 +40,7 @@ const sidebars = {
       collapsed: true,
       items: [
         'technical/smart-contracts',
+        'technical/swap-execution',
         'technical/routing-engine',
         'technical/gasless',
         'technical/contract-addresses',

@@ -16,4 +16,4 @@ V2 is simpler to maintain. V3 lets you concentrate capital near a chosen price, 
 
 The app supports migration of a V2 position into V3. Migration does not preserve the same risk profile: choose and review the V3 range and fee tier before confirming. See [add liquidity](/achswap/add-liquidity) and [concentrated liquidity](/achswap/concentrated-liquidity).
 
-The aggregator may quote an independent Uniswap V4 source, but AchSwap's own V4 liquidity contracts are not deployed on Arc Mainnet.
+AchSwap's router can trade through Uniswap V4 pools, an independent protocol, but AchSwap's own V4 liquidity contracts are not deployed on Arc Mainnet.
