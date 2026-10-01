@@ -31,12 +31,16 @@ Enter an amount in the **To** field to set exactly how much you want to receive.
 
 Next to the exchange rate, logos show which provider found the route and which DEXs it uses. Open **Trade details** under the quote to see:
 
-- the route: each split, and every hop's DEX, pool fee and pool, with a mark for each pool that was checked;
-- what each provider quoted for the same trade;
+- what AchSwap's router, KyberSwap and LI.FI each quoted for the same trade;
 - the exchange rate, price impact, minimum received and slippage;
 - the network cost, estimated from the route's gas use at Arc's current gas price.
 
-For an interactive map of the route, turn on **Detailed route** in your account menu. You can drag the map, and zoom with the controls, the scroll wheel or a pinch. The setting only affects what is displayed and never changes a quote. See [smart routing](/achswap/smart-routing#route-details).
+To see the route itself, turn on **Detailed route** in your account menu, then choose how it is shown:
+
+- **Text:** each split, and every hop's DEX, pool fee and pool, with a mark for each pool that was checked.
+- **Map:** an interactive map of the same route. Drag it, and zoom with the controls, the scroll wheel or a pinch.
+
+Only one view is shown at a time. These settings only affect what is displayed and never change a quote. See [smart routing](/achswap/smart-routing#route-details).
 
 When you confirm a swap, **Show more** in the confirmation repeats the route and the network cost.
 

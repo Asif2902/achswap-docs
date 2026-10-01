@@ -53,13 +53,17 @@ Next to the exchange rate, the app shows the logo of the provider that found the
 
 Open **Trade details** to see:
 
-- **Route:** each split with its share of your input, and every hop's DEX, pool fee and pool address. A shield marks a pool that was checked:
-  - On AchSwap routes, the executor resolves every pool on chain from a known factory.
-  - On KyberSwap and LI.FI routes, each pool is checked against AchSwap's index of known factories. A warning marks a pool from a factory AchSwap does not track.
-  - LI.FI does not name its pools, so the app finds them by simulating LI.FI's exact transaction.
 - **Quoted by:** what AchSwap's router, KyberSwap and LI.FI each quoted for the same trade, which one is best, and how far behind the others are. If a provider did not quote, it says why (for example, LI.FI needs a connected wallet).
 - **Network cost:** the route's gas estimate at Arc's current gas price.
 
-Turn on **Detailed route** in your account menu for an interactive map of the same route. Routes and amounts can change whenever the quote refreshes, so always review the current quote right before signing.
+Turn on **Detailed route** in your account menu to also see the route, as **Text** or as a **Map** (one at a time):
+
+- Each split with its share of your input, and every hop's DEX, pool fee and pool address.
+- A shield marks a pool that was checked:
+  - On AchSwap routes, the executor resolves every pool on chain from a known factory.
+  - On KyberSwap and LI.FI routes, each pool is checked against AchSwap's index of known factories. A warning marks a pool from a factory AchSwap does not track.
+  - LI.FI does not name its pools, so the app finds them by simulating LI.FI's exact transaction.
+
+Routes and amounts can change whenever the quote refreshes, so always review the current quote right before signing.
 
 Technical details are in [routing engine](/technical/routing-engine).
