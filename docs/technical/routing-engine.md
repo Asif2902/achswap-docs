@@ -10,7 +10,7 @@ AchSwap's router finds the route, and the [route executor](/technical/swap-execu
 
 | Source | Pools | Adapter |
 | --- | --- | ---: |
-| Uniswap V2, AchSwap V2, DyorSwap, Architex and ACTFUN | Constant product, 0.30% | 2 |
+| Uniswap V2, AchSwap V2, DyorSwap and Architex | Constant product, 0.30% | 2 |
 | Uniswap V3, AchSwap V3, Synthra V3 (two factories), UnitFlow V3, SushiSwap V3, Bugle and FlutchPad | Concentrated liquidity, every fee tier | 3 |
 | Slipstream: Aero CL (two factories), Archery and Topaz | Concentrated liquidity with per-pool fees | 3 |
 | Uniswap V4, including launchpad hooks (Aka.fun, o1 Launchpad, Minara.fun, Argus, Long.supply, Foci, Faze, Peach, FlutchPad) | Hookless and hooked pools | 4 |

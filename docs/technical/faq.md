@@ -19,7 +19,7 @@ Arc exposes the same balance in two forms: an 18-decimal gas currency, and a 6-d
 - Synthra V3 and UnitFlow V3;
 - Slipstream pools: Aero CL (two factories), Archery and Topaz;
 - Lunya;
-- DyorSwap, Architex, ACTFUN, SushiSwap V3, Bugle and FlutchPad.
+- DyorSwap, Architex, SushiSwap V3, Bugle and FlutchPad.
 
 A pool still needs usable liquidity for your pair. See [smart routing](/achswap/smart-routing) and the [factory list](/technical/contract-addresses#configured-factories).
 

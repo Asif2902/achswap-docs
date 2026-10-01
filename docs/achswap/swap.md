@@ -15,7 +15,7 @@ Every quote compares three providers: AchSwap's own router, LI.FI same-chain swa
 - Uniswap V2, V3 and V4 (including V4 pools with hooks);
 - AchSwap V2 and V3;
 - Synthra, UnitFlow, Lunya, and the Slipstream DEXs Aero CL, Archery and Topaz;
-- DyorSwap, Architex, ACTFUN, SushiSwap V3, Bugle and FlutchPad.
+- DyorSwap, Architex, SushiSwap V3, Bugle and FlutchPad.
 
 Only pools with usable liquidity contribute. LI.FI and KyberSwap are separate routing providers. The winning route reflects the quotes available at that moment, so it can change on refresh.
 
