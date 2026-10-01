@@ -10,9 +10,9 @@ AchSwap's router finds the route, and the [route executor](/technical/swap-execu
 
 | Source | Pools | Adapter |
 | --- | --- | ---: |
-| Uniswap V2, AchSwap V2 and three V2 forks | Constant product, 0.30% | 2 |
-| Uniswap V3, AchSwap V3, Synthra V3 (two factories), UnitFlow V3 and three V3 forks | Concentrated liquidity, every fee tier | 3 |
-| Slipstream (four factories, including Aero CL) | Concentrated liquidity with per-pool fees | 3 |
+| Uniswap V2, AchSwap V2, DyorSwap, Architex and one Uniswap V2 fork | Constant product, 0.30% | 2 |
+| Uniswap V3, AchSwap V3, Synthra V3 (two factories), UnitFlow V3, SushiSwap V3, Bugle and one Uniswap V3 fork | Concentrated liquidity, every fee tier | 3 |
+| Slipstream: Aero CL, Archery, Topaz and one Slipstream fork | Concentrated liquidity with per-pool fees | 3 |
 | Uniswap V4 | Hookless and hooked pools | 4 |
 | Lunya | Concentrated-liquidity and constant-product pools | 5 |
 | Native USDC ↔ `0x3600` USDC | One balance, two interfaces | 1 |
@@ -55,6 +55,16 @@ When you specify the amount to receive:
 3. You spend the quoted input plus the slippage allowance and receive at least the requested amount. If the price holds, the extra input buys extra output, so you receive slightly more than you asked for.
 
 Only AchSwap's router quotes exact output. KyberSwap and LI.FI quotes are exact input.
+
+## Route transparency
+
+The swap page shows the winning route, whoever found it:
+
+- **AchSwap routes:** every split and hop with its protocol, pool fee and pool address. Each pool is one the executor resolves on chain from a configured factory.
+- **KyberSwap routes:** every path KyberSwap reports, with each pool checked against AchSwap's index of known factories. A pool from an unknown factory is flagged.
+- **LI.FI routes:** LI.FI's quote names only the venue it fills with. The pools are found by simulating LI.FI's exact transaction, then checked the same way. Nothing is signed or sent.
+
+The page also lists what each provider quoted for the same trade, and the network cost from the winning route's own gas estimate at the current gas price.
 
 ## Price impact
 

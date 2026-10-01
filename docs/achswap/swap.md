@@ -14,8 +14,8 @@ Every quote compares three providers: AchSwap's own router, LI.FI same-chain swa
 
 - Uniswap V2, V3 and V4 (including V4 pools with hooks);
 - AchSwap V2 and V3;
-- Synthra, UnitFlow, Slipstream (including Aero CL) and Lunya;
-- several other V2 and V3 forks.
+- Synthra, UnitFlow, Lunya, and the Slipstream DEXs Aero CL, Archery and Topaz;
+- DyorSwap, Architex, SushiSwap V3, Bugle and three unnamed forks.
 
 Only pools with usable liquidity contribute. LI.FI and KyberSwap are separate routing providers. The winning route reflects the quotes available at that moment, so it can change on refresh.
 
@@ -29,7 +29,16 @@ Enter an amount in the **To** field to set exactly how much you want to receive.
 
 ## Route details
 
-Open **Trade details** under the quote for the exchange rate, minimum received, price impact and fees. To see the routing map there, turn on **Detailed route** in your account menu. The map shows each split, its share of your input, and every pool on its path with its DEX. You can drag it, and zoom with the controls, the scroll wheel or a pinch. The setting only affects what is displayed and never changes a quote.
+Next to the exchange rate, logos show which provider found the route and which DEXs it uses. Open **Trade details** under the quote to see:
+
+- the route: each split, and every hop's DEX, pool fee and pool, with a mark for each pool that was checked;
+- what each provider quoted for the same trade;
+- the exchange rate, price impact, minimum received and slippage;
+- the network cost, estimated from the route's gas use at Arc's current gas price.
+
+For an interactive map of the route, turn on **Detailed route** in your account menu. You can drag the map, and zoom with the controls, the scroll wheel or a pinch. The setting only affects what is displayed and never changes a quote. See [smart routing](/achswap/smart-routing#route-details).
+
+When you confirm a swap, **Show more** in the confirmation repeats the route and the network cost.
 
 ## Settings
 

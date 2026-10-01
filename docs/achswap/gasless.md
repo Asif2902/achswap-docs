@@ -23,6 +23,8 @@ With gasless mode on, you sign a swap instead of sending a transaction. An AchSw
 
 Earlier versions asked for two signatures per swap. The current executor needs one.
 
+When a swap will be gasless, a small **Gasless** label appears next to the exchange rate. **Network cost** in the trade details then shows the normal cost struck through, marked "Free · Gasless". The confirmation's **Show more** lists the normal network cost, your saving, and **$0.00** as what you pay.
+
 ## Fees
 
 Gasless mode adds no fee of its own. The route's normal fees still apply, as on a regular swap: AchSwap's 0.25% on AchSwap routes, or the LI.FI and KyberSwap integrator fees, plus pool fees. See [fees](/technical/fee-structure).

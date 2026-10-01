@@ -40,14 +40,26 @@ How the contract executes a route is described in [swap execution](/technical/sw
 | Uniswap V2, V3 and V4, including V4 pools with hooks | Live |
 | AchSwap V2 and V3 | Live |
 | Synthra V3 and UnitFlow V3 | Live |
-| Slipstream pools, including Aero CL (four factories) | Live |
+| Slipstream pools: Aero CL, Archery, Topaz | Live |
 | Lunya concentrated and constant-product pools | Live |
-| Other V2 and V3 forks with liquidity | Live |
+| DyorSwap, Architex, SushiSwap V3, Bugle | Live |
+| Three unnamed Uniswap V2, Uniswap V3 and Slipstream forks | Live |
 
 A source contributes only when it has a pool with usable liquidity for your trade. New sources are added through the route executor's two-day security delay.
 
 ## Route details
 
-In **Trade details**, the routing map shows each split, its share of your input, and the pools on its path. To see it, turn on **Detailed route** in your account menu. Routes and amounts can change whenever the quote refreshes, so always review the current quote right before signing.
+Next to the exchange rate, the app shows the logo of the provider that found the route, followed by the logos of every DEX the route trades on. Protocols without a published logo show their initials.
+
+Open **Trade details** to see:
+
+- **Route:** each split with its share of your input, and every hop's DEX, pool fee and pool address. A shield marks a pool that was checked:
+  - On AchSwap routes, the executor resolves every pool on chain from a known factory.
+  - On KyberSwap and LI.FI routes, each pool is checked against AchSwap's index of known factories. A warning marks a pool from a factory AchSwap does not track.
+  - LI.FI does not name its pools, so the app finds them by simulating LI.FI's exact transaction.
+- **Quoted by:** what AchSwap's router, KyberSwap and LI.FI each quoted for the same trade, which one is best, and how far behind the others are. If a provider did not quote, it says why (for example, LI.FI needs a connected wallet).
+- **Network cost:** the route's gas estimate at Arc's current gas price.
+
+Turn on **Detailed route** in your account menu for an interactive map of the same route. Routes and amounts can change whenever the quote refreshes, so always review the current quote right before signing.
 
 Technical details are in [routing engine](/technical/routing-engine).
