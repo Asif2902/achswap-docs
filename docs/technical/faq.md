@@ -55,9 +55,9 @@ Yes. Every live AchSwap contract is source-verified on [arc.etherscan.io](https:
 
 AchSwap's own V4 liquidity contracts are not deployed on Arc Mainnet. AchSwap routes through Uniswap V4 pools, which belong to Uniswap.
 
-### Why is there no bridge route to Arc?
+### Can I bridge to and from Arc?
 
-The Bridge uses LI.FI, which must return an executable route for the exact chain and token pair. When last checked, LI.FI returned no cross-chain route for Arc in the app. Check the live widget again. Same-chain Arc swaps are separate.
+Yes. The Bridge uses LI.FI, which routes to and from Arc through several bridges. A route has to exist for the exact chains, tokens and amount: if none appears, try another amount or token. Same-chain Arc swaps are separate.
 
 ### Why did my transaction revert?
 
@@ -69,3 +69,11 @@ Common causes:
 - liquidity was insufficient.
 
 Refresh the quote and inspect the wallet transaction before you raise slippage.
+
+### Is there an API for developers?
+
+Yes: the [Developer API](/developers/developer-api) returns AchSwap quotes and ready-to-sign swap transactions on Arc, with an optional fee for your application. Email [support@achswap.app](mailto:support@achswap.app) for a key.
+
+### How do I contact AchSwap?
+
+Email [support@achswap.app](mailto:support@achswap.app), or reach us on [X](https://x.com/AchProtocol) and [Telegram](https://t.me/AchProtocol).

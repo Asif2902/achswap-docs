@@ -91,6 +91,7 @@ const config = {
             {label: 'Introduction', to: '/introduction'},
             {label: 'Quick start', to: '/getting-started/quick-start'},
             {label: 'Smart contracts', to: '/technical/smart-contracts'},
+            {label: 'Developer API', to: '/developers/developer-api'},
           ],
         },
         {
@@ -98,6 +99,7 @@ const config = {
           items: [
             {label: 'X @AchProtocol', href: 'https://x.com/AchProtocol'},
             {label: 'Telegram @AchProtocol', href: 'https://t.me/AchProtocol'},
+            {label: 'support@achswap.app', href: 'mailto:support@achswap.app'},
           ],
         },
       ],

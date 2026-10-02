@@ -36,6 +36,12 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Developers',
+      collapsed: false,
+      items: ['developers/developer-api'],
+    },
+    {
+      type: 'category',
       label: 'Technical reference',
       collapsed: true,
       items: [
