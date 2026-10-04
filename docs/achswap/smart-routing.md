@@ -52,7 +52,7 @@ The three providers do not produce their quotes the same way, so the app does no
 
 1. **Start from the quote.** Each provider's quoted output already has the pool fees and the AchSwap fee (0.25%) taken off.
 2. **Take off the network cost.** On Arc, gas is paid in USDC from the same wallet, so a route that needs more gas leaves you with less. Each route's own gas estimate is priced at Arc's current gas price, converted into the token you receive, and subtracted from its quote.
-3. **Take 0.12 bp off KyberSwap's quote.** AchSwap's quote is exact for the moment it was made: before it is shown, its route is simulated against the live contracts, and the quote is what that simulation paid out. KyberSwap's quote comes from KyberSwap's own model. When AchSwap measured KyberSwap's transactions in October 2026, they delivered 0.10–0.12 bp less than their quotes on every route checked, so 0.12 bp is taken off KyberSwap's quote to compare like with like. LI.FI's quote is used as it is.
+3. **Take 0.12 bp off KyberSwap's quote.** AchSwap's quote is exact for the moment it was made: before it is shown, its route is simulated against the live contracts, and the quote is what that simulation paid out. KyberSwap's quote comes from KyberSwap's own model. When AchSwap simulated KyberSwap's own transactions in October 2026, they delivered a median 0.12 bp less than KyberSwap had quoted (39 trades; most routes 0.10–0.15 bp less, a few exactly the quote), while AchSwap's delivered exactly its quotes, so 0.12 bp is taken off KyberSwap's quote to compare like with like. LI.FI's quote is used as it is.
 4. **The highest wins.** The route expected to deliver the most is used. If another provider comes out ahead of AchSwap's verified quote by 0.3 bp or less, AchSwap's route is used: a difference that small is within the margin of error of an estimated quote, while AchSwap's has already been checked on chain.
 
 A basis point (bp) is 0.01%, so 0.12 bp is 0.0012% and 0.3 bp is 0.003%. Both values are settings and may change as new measurements come in.
@@ -81,7 +81,6 @@ Turn on **Detailed route** in your account menu to also see the route and every 
 
 **You receive, after gas** lists what the routes of AchSwap's router, KyberSwap and LI.FI each leave you for the same trade once their gas is paid: the figure the routes are ranked by.
 
-- Under each amount: the provider's own quote, the route's gas in USDC, and for KyberSwap the 0.12 bp taken off its quote.
 - **Best** marks the route the app uses.
 - The percentage next to another provider is how far behind it is. See [how the best route is chosen](#how-the-best-route-is-chosen).
 - If a provider did not quote, it says why (for example, LI.FI needs a connected wallet).

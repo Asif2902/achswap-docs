@@ -65,7 +65,7 @@ The swap page shows the winning route, whoever found it:
 - **KyberSwap routes:** every path KyberSwap reports, with each pool checked against AchSwap's index of known factories. A pool from an unknown factory is flagged.
 - **LI.FI routes:** LI.FI's quote names only the venue it fills with. The pools are found by simulating LI.FI's exact transaction, then checked the same way. Nothing is signed or sent.
 
-With **Detailed route** on, the page shows the route, as text or as a map, and what each provider's route leaves you for the same trade after its gas, with the provider's quote and the gas under it. The network cost, from the winning route's own gas estimate at the current gas price, is always shown.
+With **Detailed route** on, the page shows the route, as text or as a map, and what each provider's route leaves you for the same trade after its gas. The network cost, from the winning route's own gas estimate at the current gas price, is always shown.
 
 ## Price impact
 
