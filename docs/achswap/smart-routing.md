@@ -79,12 +79,14 @@ Turn on **Detailed route** in your account menu to also see the route and every 
   - On KyberSwap and LI.FI routes, each pool is checked against AchSwap's index of known factories. A warning marks a pool from a factory AchSwap does not track.
   - LI.FI does not name its pools, so the app finds them by simulating LI.FI's exact transaction.
 
-**Output quoted by** lists what AchSwap's router, KyberSwap and LI.FI each quoted for the same trade:
+**You receive, after gas** lists what the routes of AchSwap's router, KyberSwap and LI.FI each leave you for the same trade once their gas is paid: the figure the routes are ranked by.
 
-- The amount is the provider's own quote, before the network cost and the KyberSwap adjustment.
+- Under each amount: the provider's own quote, the route's gas in USDC, and for KyberSwap the 0.12 bp taken off its quote.
 - **Best** marks the route the app uses.
-- The percentage next to another provider is how far behind it is on what it is expected to deliver. See [how the best route is chosen](#how-the-best-route-is-chosen).
+- The percentage next to another provider is how far behind it is. See [how the best route is chosen](#how-the-best-route-is-chosen).
 - If a provider did not quote, it says why (for example, LI.FI needs a connected wallet).
+
+For an exact-output trade, the list shows the input each provider quoted instead.
 
 Routes and amounts can change whenever the quote refreshes, so always review the current quote right before signing.
 

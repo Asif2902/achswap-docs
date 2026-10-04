@@ -39,7 +39,7 @@ Turn on **Detailed route** in your account menu to also see:
 - the route itself, shown as you choose:
   - **Text:** each split, and every hop's DEX, pool fee and pool, with a mark for each pool that was checked.
   - **Map:** an interactive map of the same route. Drag it, and zoom with the controls, the scroll wheel or a pinch.
-- what AchSwap's router, KyberSwap and LI.FI each quoted for the same trade, which one is best, and how far behind the others are. A provider can quote a higher amount and still not be best, once each route's network cost is counted: see [how the best route is chosen](/achswap/smart-routing#how-the-best-route-is-chosen).
+- what the routes of AchSwap's router, KyberSwap and LI.FI each leave you after their gas, with each provider's quote and gas under it, which one is best, and how far behind the others are. A provider can quote a higher amount and still not be best once its gas is paid: see [how the best route is chosen](/achswap/smart-routing#how-the-best-route-is-chosen).
 
 Only one route view is shown at a time. These settings only affect what is displayed and never change a quote. See [smart routing](/achswap/smart-routing#route-details).
 
