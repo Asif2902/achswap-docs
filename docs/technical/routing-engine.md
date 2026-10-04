@@ -30,6 +30,7 @@ The exact factory list is under [configured factories](/technical/contract-addre
   - fees taken by V4 hooks during swaps.
 - **Splits.** The input can be split across up to eight branches, over different pools and DEXs, when the split pays more after gas. When branches share a pool, the router prices it in the order the executor will trade it.
 - **Fee.** The quoted amount is net of the 0.25% AchSwap fee.
+- **Against KyberSwap and LI.FI.** The swap page then compares this quote with KyberSwap's and LI.FI's on what each route is expected to deliver: its quote less its network cost, and KyberSwap's also less the 0.12 bp its transactions were measured to deliver below its quotes. See [how the best route is chosen](/achswap/smart-routing#how-the-best-route-is-chosen).
 
 ## Verification
 
@@ -64,7 +65,7 @@ The swap page shows the winning route, whoever found it:
 - **KyberSwap routes:** every path KyberSwap reports, with each pool checked against AchSwap's index of known factories. A pool from an unknown factory is flagged.
 - **LI.FI routes:** LI.FI's quote names only the venue it fills with. The pools are found by simulating LI.FI's exact transaction, then checked the same way. Nothing is signed or sent.
 
-The route appears when **Detailed route** is on, as text or as a map. The page always lists what each provider quoted for the same trade, and the network cost from the winning route's own gas estimate at the current gas price.
+With **Detailed route** on, the page shows the route, as text or as a map, and what each provider quoted for the same trade. The network cost, from the winning route's own gas estimate at the current gas price, is always shown.
 
 ## Price impact
 

@@ -10,7 +10,7 @@ sidebar_position: 1
 
 Your wallet may ask for an ERC-20 approval for the route's spender. Keep some USDC for gas.
 
-Every quote compares three providers: AchSwap's own router, LI.FI same-chain swaps and KyberSwap. The app shows the one that leaves you the most after all fees. AchSwap's router covers:
+Every quote compares three providers: AchSwap's own router, LI.FI same-chain swaps and KyberSwap. The app shows the one expected to leave you the most, after all fees and the network cost: see [how the best route is chosen](/achswap/smart-routing#how-the-best-route-is-chosen). AchSwap's router covers:
 
 - Uniswap V2, V3 and V4 (including V4 pools with hooks);
 - AchSwap V2 and V3;
@@ -31,16 +31,17 @@ Enter an amount in the **To** field to set exactly how much you want to receive.
 
 Next to the exchange rate, logos show which provider found the route and which DEXs it uses. Open **Trade details** under the quote to see:
 
-- what AchSwap's router, KyberSwap and LI.FI each quoted for the same trade;
 - the exchange rate, price impact, minimum received and slippage;
 - the network cost, estimated from the route's gas use at Arc's current gas price.
 
-To see the route itself, turn on **Detailed route** in your account menu, then choose how it is shown:
+Turn on **Detailed route** in your account menu to also see:
 
-- **Text:** each split, and every hop's DEX, pool fee and pool, with a mark for each pool that was checked.
-- **Map:** an interactive map of the same route. Drag it, and zoom with the controls, the scroll wheel or a pinch.
+- the route itself, shown as you choose:
+  - **Text:** each split, and every hop's DEX, pool fee and pool, with a mark for each pool that was checked.
+  - **Map:** an interactive map of the same route. Drag it, and zoom with the controls, the scroll wheel or a pinch.
+- what AchSwap's router, KyberSwap and LI.FI each quoted for the same trade, which one is best, and how far behind the others are. A provider can quote a higher amount and still not be best, once each route's network cost is counted: see [how the best route is chosen](/achswap/smart-routing#how-the-best-route-is-chosen).
 
-Only one view is shown at a time. These settings only affect what is displayed and never change a quote. See [smart routing](/achswap/smart-routing#route-details).
+Only one route view is shown at a time. These settings only affect what is displayed and never change a quote. See [smart routing](/achswap/smart-routing#route-details).
 
 When you confirm a swap, **Show more** in the confirmation repeats the route and the network cost.
 

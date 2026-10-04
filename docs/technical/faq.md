@@ -31,6 +31,10 @@ Pool reserves, active liquidity and the routes that providers return all change 
 
 An AchSwap quote is shown only after its exact transaction has been simulated against the live contracts and produced the quoted amount to the unit. If pools move before your transaction is mined, you receive the new amount, or the transaction reverts if that falls below your minimum. See [routing engine](/technical/routing-engine#verification).
 
+### Why is AchSwap's route best when another provider quotes more?
+
+The app compares what each route is expected to deliver, not the headline numbers. Each route's network cost is taken off its quote: gas on Arc is paid in USDC from your wallet, so a route that needs more gas leaves you with less. KyberSwap's quote also loses the 0.12 bp its transactions were measured to deliver below it. On small trades the gas difference often decides. The percentage next to each other provider shows how far behind it is after these adjustments. See [how the best route is chosen](/achswap/smart-routing#how-the-best-route-is-chosen).
+
 ### Why does AchSwap not route my token?
 
 The route executor requires every transfer to move exactly the requested amount. Tokens with transfer taxes, rebasing balances or transfer restrictions cannot meet that rule, so AchSwap does not route them. KyberSwap or LI.FI may still offer a quote.

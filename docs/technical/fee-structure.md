@@ -33,7 +33,7 @@ KyberSwap is a separate provider. The app adds an **AchSwap integrator fee of 0.
 
 ## Comparing providers
 
-The swap screen compares every provider by **net output after all fees**, so a route with a lower headline price but a higher fee does not win by mistake.
+The swap screen compares every provider by what its route is expected to deliver: **net output after all fees**, less the route's network cost. A route with a better headline number but a higher fee or more gas does not win by mistake. See [how the best route is chosen](/achswap/smart-routing#how-the-best-route-is-chosen).
 
 ## Gasless swaps
 

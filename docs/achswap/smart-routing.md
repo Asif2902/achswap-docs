@@ -4,7 +4,7 @@ sidebar_position: 3
 
 # Smart routing
 
-Every swap is quoted by AchSwap's own router and by LI.FI and KyberSwap. The app shows and executes whichever route leaves you the most **net output** after all fees. No router can use liquidity it cannot see, so the result is the best of these three, not a guarantee of the best price anywhere.
+Every swap is quoted by AchSwap's own router and by LI.FI and KyberSwap. The app shows and executes the route expected to leave you the most, after all fees and the network cost: see [how the best route is chosen](#how-the-best-route-is-chosen). No router can use liquidity it cannot see, so the result is the best of these three, not a guarantee of the best price anywhere.
 
 ## AchSwap's router
 
@@ -46,22 +46,45 @@ How the contract executes a route is described in [swap execution](/technical/sw
 
 A source contributes only when it has a pool with usable liquidity for your trade. New sources are added through the route executor's two-day security delay.
 
+## How the best route is chosen
+
+The three providers do not produce their quotes the same way, so the app does not simply take the largest number. It compares what each route is **expected to deliver** to your wallet:
+
+1. **Start from the quote.** Each provider's quoted output already has the pool fees and the AchSwap fee (0.25%) taken off.
+2. **Take off the network cost.** On Arc, gas is paid in USDC from the same wallet, so a route that needs more gas leaves you with less. Each route's own gas estimate is priced at Arc's current gas price, converted into the token you receive, and subtracted from its quote.
+3. **Take 0.12 bp off KyberSwap's quote.** AchSwap's quote is exact for the moment it was made: before it is shown, its route is simulated against the live contracts, and the quote is what that simulation paid out. KyberSwap's quote comes from KyberSwap's own model. When AchSwap measured KyberSwap's transactions in October 2026, they delivered 0.10–0.12 bp less than their quotes on every route checked, so 0.12 bp is taken off KyberSwap's quote to compare like with like. LI.FI's quote is used as it is.
+4. **The highest wins.** The route expected to deliver the most is used. If another provider comes out ahead of AchSwap's verified quote by 0.3 bp or less, AchSwap's route is used: a difference that small is within the margin of error of an estimated quote, while AchSwap's has already been checked on chain.
+
+A basis point (bp) is 0.01%, so 0.12 bp is 0.0012% and 0.3 bp is 0.003%. Both values are settings and may change as new measurements come in.
+
+Gas matters most on small trades. On a swap of a dollar or two, a route that needs much more gas can cost more in gas than its better price earns. On a large trade, gas is a tiny share of the amount, and the better price wins.
+
+That is why a provider can quote a higher amount and still not be the best route. For example, on a swap of 1 USDC for EURC, KyberSwap quoted 0.886963 EURC and AchSwap's router 0.886684 EURC: KyberSwap's number was about 0.03% higher. But KyberSwap's route needed more gas, and on a trade this small the extra gas was worth about 0.07% of it. After the network cost, AchSwap's route was expected to deliver about 0.04% more, so it was marked **Best** and KyberSwap showed **−0.04%**.
+
+Some routes are left out before the comparison: a KyberSwap or LI.FI route through a token that takes a fee on transfers, or through a DEX that AchSwap has blocked. If such a route is the only one, it is shown with a warning. Exact-output trades are quoted only by AchSwap's router, so there is nothing to compare.
+
 ## Route details
 
 Next to the exchange rate, the app shows the logo of the provider that found the route, followed by the logos of every DEX the route trades on. Protocols without a published logo show their initials.
 
-Open **Trade details** to see:
+Open **Trade details** to see the exchange rate, price impact, minimum received, slippage and the **network cost**: the route's gas estimate at Arc's current gas price.
 
-- **Quoted by:** what AchSwap's router, KyberSwap and LI.FI each quoted for the same trade, which one is best, and how far behind the others are. If a provider did not quote, it says why (for example, LI.FI needs a connected wallet).
-- **Network cost:** the route's gas estimate at Arc's current gas price.
+Turn on **Detailed route** in your account menu to also see the route and every provider's quote.
 
-Turn on **Detailed route** in your account menu to also see the route, as **Text** or as a **Map** (one at a time):
+**The route** is shown as **Text** or as a **Map** (one at a time):
 
 - Each split with its share of your input, and every hop's DEX, pool fee and pool address.
 - A shield marks a pool that was checked:
   - On AchSwap routes, the executor resolves every pool on chain from a known factory.
   - On KyberSwap and LI.FI routes, each pool is checked against AchSwap's index of known factories. A warning marks a pool from a factory AchSwap does not track.
   - LI.FI does not name its pools, so the app finds them by simulating LI.FI's exact transaction.
+
+**Output quoted by** lists what AchSwap's router, KyberSwap and LI.FI each quoted for the same trade:
+
+- The amount is the provider's own quote, before the network cost and the KyberSwap adjustment.
+- **Best** marks the route the app uses.
+- The percentage next to another provider is how far behind it is on what it is expected to deliver. See [how the best route is chosen](#how-the-best-route-is-chosen).
+- If a provider did not quote, it says why (for example, LI.FI needs a connected wallet).
 
 Routes and amounts can change whenever the quote refreshes, so always review the current quote right before signing.
 
