@@ -24,6 +24,8 @@ sidebar_position: 8
 
 **Gas:** The network fee for executing a transaction, paid in native USDC on Arc.
 
+**GM:** The daily check-in on the Quests page: 1 XP per UTC day, with bonuses on every 7th and 30th day in a row. See [how to earn XP](/quests/earning-xp#daily-gm).
+
 **Hook:** A contract attached to a Uniswap V4 pool that runs code during swaps or liquidity changes.
 
 **Impermanent loss:** How much a liquidity position's value changes compared with simply holding its original tokens, caused by price movement.
@@ -53,3 +55,5 @@ sidebar_position: 8
 **Tick:** A discrete V3 price boundary used to define a position's range.
 
 **Timelock:** A mandatory delay before a contract change takes effect. On the route executor, adding an adapter, raising the fee and changing the fee recipient each wait two days.
+
+**XP:** Points for using AchSwap, shown on the Quests page. They set your level (1 to 20) and your leaderboard rank. See [Quests and XP](/quests/overview).

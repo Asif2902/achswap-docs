@@ -74,6 +74,10 @@ Common causes:
 
 Refresh the quote and inspect the wallet transaction before you raise slippage.
 
+### How do I earn XP?
+
+Swap, bridge, provide liquidity in USDC/EURC, USDC/Circle BTC, USDC/Gold or USDC/WETH pools, say GM daily, complete tasks and invite friends. Task and GM XP is added at once; swaps, bridges and liquidity every day after 00:00 UTC. There is nothing to claim. See [Quests and XP](/quests/overview) and [how to earn XP](/quests/earning-xp).
+
 ### Is there an API for developers?
 
 Yes: the [Developer API](/developers/developer-api) returns AchSwap quotes and ready-to-sign swap transactions on Arc, with an optional fee for your application. Email [support@achswap.app](mailto:support@achswap.app) for a key.

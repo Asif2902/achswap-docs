@@ -27,6 +27,16 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Quests and XP',
+      collapsed: false,
+      items: [
+        'quests/overview',
+        'quests/earning-xp',
+        'quests/distribution',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Liquidity concepts',
       collapsed: true,
       items: [
