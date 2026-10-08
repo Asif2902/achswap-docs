@@ -24,7 +24,7 @@ sidebar_position: 8
 
 **Gas:** The network fee for executing a transaction, paid in native USDC on Arc.
 
-**GM:** The daily check-in on the Quests page: 1 XP per UTC day, with bonuses on every 7th and 30th day in a row. See [how to earn XP](/quests/earning-xp#daily-gm).
+**GM:** The daily check-in on the Quests page: 1 XP per UTC day, and 20 more on every 30th day in a row. See [how to earn XP](/quests/earning-xp#daily-gm).
 
 **Hook:** A contract attached to a Uniswap V4 pool that runs code during swaps or liquidity changes.
 

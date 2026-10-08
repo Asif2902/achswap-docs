@@ -9,7 +9,7 @@ sidebar_position: 2
 | Swaps | 1 per step of the daily ladder | Daily, after 00:00 UTC |
 | Bridges | 1.2 per step, on a ladder of their own | Daily, after 00:00 UTC |
 | Liquidity | 0.5 per step a day, × up to 1.75 for holding | Daily, after 00:00 UTC |
-| Daily GM | 1, plus streak bonuses | At once |
+| Daily GM | 1 a day, +20 on every 30th day in a row | At once |
 | Tasks | The task's reward (25 for most) | At once |
 | First username | 20, once | At once |
 | Referrals | 10% of your friends' swap, bridge and liquidity XP | Daily, after 00:00 UTC |
@@ -60,7 +60,7 @@ Liquidity held for 6 hours and then removed earns nothing. Held for 30 hours, it
 
 ## Daily GM
 
-Say GM once per UTC day on the Tasks page for 1 XP. Every 7th day in a row adds 10 XP, and every 30th day in a row adds 50 XP. Missing a day resets the streak. GM resets at 00:00 UTC.
+Say GM once per UTC day on the Tasks page for 1 XP. Every 30th day in a row adds 20 XP, so 30 days in a row earn 50 XP, and every 30 days after that earn 50 again, for as long as the streak lasts. Missing a day resets the streak. GM resets at 00:00 UTC.
 
 ## Tasks
 
