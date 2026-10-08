@@ -12,7 +12,7 @@ There is nothing to claim. Task and GM XP is added the moment you finish. Swaps,
 
 | Page | What it shows |
 |---|---|
-| **Overview** | Your profile, level, badge and XP, what the next daily distribution will add, the twenty badges, and your XP history award by award |
+| **Overview** | Your profile, level, badge and XP, what the next daily distribution will add, and your XP history award by award |
 | **Activity** | Today's swaps, bridges and liquidity on the daily ladder, and how much each earns |
 | **Tasks** | The daily GM and every task, with its reward |
 | **Leaderboard** | Your rank, and the top wallets by XP, liquidity or volume |
