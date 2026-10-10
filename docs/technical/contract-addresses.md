@@ -1,5 +1,8 @@
 ---
 sidebar_position: 5
+title: Arc Mainnet contract addresses
+sidebar_label: Contract addresses
+description: "Every AchSwap contract address on Arc Mainnet with ArcScan links: tokens, V2 and V3, the route executor and adapters, the gasless executor and factories."
 ---
 
 # Arc Mainnet contract addresses

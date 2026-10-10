@@ -1,5 +1,8 @@
 ---
 sidebar_position: 3
+title: Smart routing and route comparison
+sidebar_label: Smart routing
+description: "How AchSwap's router builds direct, multi-hop and split routes across Arc DEXs, and compares them with KyberSwap and LI.FI after gas and fees."
 ---
 
 # Smart routing

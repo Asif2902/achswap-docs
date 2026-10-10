@@ -1,7 +1,7 @@
 ---
 sidebar_position: 1
 title: Troubleshooting
-description: What to do when a quote, swap, approval, gasless swap, bridge, liquidity position or XP reward doesn't behave as expected.
+description: "Fix common AchSwap problems: no route, failed or reverted transactions, approvals, gasless swaps, delayed bridges, liquidity not earning and missing XP."
 ---
 
 # Troubleshooting

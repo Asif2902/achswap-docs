@@ -1,5 +1,6 @@
 ---
 sidebar_position: 3
+description: "How AchSwap's routing engine finds routes on Arc: liquidity sources, exact pricing, splits, on-chain verification of every quote, exact output and price impact."
 ---
 
 # Routing engine

@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+description: Connect a wallet to AchSwap on Arc, understand token approvals and Permit2, and check what you sign. AchSwap never asks for your seed phrase.
 ---
 
 # Wallet setup

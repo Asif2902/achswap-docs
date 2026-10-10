@@ -1,5 +1,6 @@
 ---
 sidebar_position: 5
+description: "What each figure on an AchSwap pool page means: TVL, volume, fees, fee APR, price, liquidity, depth, order book, trade costs and transactions."
 ---
 
 # Pools

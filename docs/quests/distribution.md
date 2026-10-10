@@ -1,5 +1,6 @@
 ---
 sidebar_position: 3
+description: "When XP is added: instant task and GM XP, the daily distribution after 00:00 UTC, how to look into missing XP, and the rule changelog."
 ---
 
 # When XP is added

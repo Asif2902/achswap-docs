@@ -1,6 +1,7 @@
 ---
 sidebar_position: 4
 title: Errors and limits
+description: AchSwap API error codes, simulation failure reasons, which errors to retry, rate and concurrency limits, and integration troubleshooting.
 ---
 
 # Errors and limits

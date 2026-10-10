@@ -1,5 +1,6 @@
 ---
 sidebar_position: 4
+description: Withdraw liquidity from AchSwap V2 and V3 positions, collect V3 fees, import missing positions, and fix failed withdrawals.
 ---
 
 # Remove liquidity

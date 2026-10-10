@@ -1,5 +1,6 @@
 ---
 sidebar_position: 7
+description: "AchSwap V2 constant-product pools compared with V3 concentrated liquidity: price coverage, fee tiers, ownership, fees and out-of-range behaviour."
 ---
 
 import {V2V3Comparison} from '@site/src/components/LiquidityDiagrams';

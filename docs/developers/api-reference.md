@@ -1,6 +1,7 @@
 ---
 sidebar_position: 2
 title: API reference
+description: "Reference for the AchSwap API endpoints POST /quote and POST /swap: request fields, response schemas, token decimals, fees and execution."
 ---
 
 # API reference

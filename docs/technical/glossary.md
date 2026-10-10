@@ -1,5 +1,6 @@
 ---
 sidebar_position: 8
+description: Definitions of the terms used across the AchSwap documentation, from adapters and allowances to ticks, TVL and XP.
 ---
 
 # Glossary

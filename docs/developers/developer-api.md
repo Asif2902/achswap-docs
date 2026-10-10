@@ -1,6 +1,8 @@
 ---
 sidebar_position: 1
-title: Developer API
+title: AchSwap Developer API
+sidebar_label: Developer API
+description: "Get AchSwap swap quotes and ready-to-sign transactions on Arc Mainnet from a REST API: how it works, API keys, authentication and a first request."
 ---
 
 # Developer API

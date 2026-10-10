@@ -6,6 +6,9 @@ const config = {
   tagline: 'The DEX aggregator on Arc Mainnet',
   url: 'https://docs.achswap.app',
   baseUrl: '/',
+  // Pages are served as /path/ (a directory index on the host). Canonical URLs, the sitemap and every
+  // internal link use that form, so none of them points at a URL that redirects.
+  trailingSlash: true,
   onBrokenLinks: 'throw',
   onBrokenAnchors: 'throw',
   markdown: {
@@ -16,6 +19,7 @@ const config = {
   },
   favicon: 'img/favicon.ico',
   clientModules: [require.resolve('./src/clientModules/diagramScale.js')],
+  plugins: [require.resolve('./src/plugins/llms-txt.js')],
 
   organizationName: 'achswap',
   projectName: 'achswap-docs',
@@ -50,8 +54,11 @@ const config = {
           customCss: './src/css/custom.css',
         },
         sitemap: {
-          changefreq: 'weekly',
-          priority: 0.5,
+          // lastmod from each page's last git commit; changefreq and priority are ignored by search engines.
+          lastmod: 'date',
+          changefreq: null,
+          priority: null,
+          ignorePatterns: ['/search/**'],
           filename: 'sitemap.xml',
         },
       },
@@ -133,6 +140,7 @@ const config = {
             {label: 'Developer API', to: '/developers/developer-api'},
             {label: 'Contract addresses', to: '/technical/contract-addresses'},
             {label: 'Security', to: '/technical/security'},
+            {label: 'llms.txt (for AI agents)', href: 'https://docs.achswap.app/llms.txt'},
           ],
         },
         {
@@ -155,6 +163,8 @@ const config = {
     },
     metadata: [
       {name: 'theme-color', content: '#003579'},
+      {name: 'twitter:card', content: 'summary_large_image'},
+      {name: 'twitter:site', content: '@AchProtocol'},
     ],
   },
 
@@ -165,6 +175,42 @@ const config = {
         rel: 'apple-touch-icon',
         href: '/img/apple-touch-icon.png',
       },
+    },
+    {
+      // The Markdown index for LLMs and coding agents (https://llmstxt.org).
+      tagName: 'link',
+      attributes: {rel: 'alternate', type: 'text/plain', title: 'llms.txt', href: '/llms.txt'},
+    },
+    {
+      // Who publishes the docs, and the site's search, for search engines. Facts only.
+      tagName: 'script',
+      attributes: {type: 'application/ld+json'},
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'Organization',
+            '@id': 'https://trade.achswap.app/#organization',
+            name: 'AchSwap',
+            url: 'https://trade.achswap.app',
+            logo: 'https://docs.achswap.app/img/achswap-logo.png',
+            sameAs: ['https://x.com/AchProtocol', 'https://t.me/AchProtocol'],
+          },
+          {
+            '@type': 'WebSite',
+            '@id': 'https://docs.achswap.app/#website',
+            name: 'AchSwap Documentation',
+            url: 'https://docs.achswap.app/',
+            inLanguage: 'en',
+            publisher: {'@id': 'https://trade.achswap.app/#organization'},
+            potentialAction: {
+              '@type': 'SearchAction',
+              target: 'https://docs.achswap.app/search/?q={search_term_string}',
+              'query-input': 'required name=search_term_string',
+            },
+          },
+        ],
+      }),
     },
   ],
 };

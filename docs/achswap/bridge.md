@@ -1,5 +1,8 @@
 ---
 sidebar_position: 6
+title: Bridge to and from Arc
+sidebar_label: Bridge
+description: "Bridge tokens between Arc and other chains through LI.FI on AchSwap: steps, fees, the 0.05 USDC gas reserve, and what to do if a transfer is delayed."
 ---
 
 # Bridge

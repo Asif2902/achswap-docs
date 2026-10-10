@@ -1,5 +1,6 @@
 ---
 sidebar_position: 8
+description: "How an AchSwap V3 position works: ticks and fee tiers, what it holds as the price moves through or out of its range, and how to choose a range."
 ---
 
 import {RangeStates} from '@site/src/components/LiquidityDiagrams';

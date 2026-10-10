@@ -1,6 +1,8 @@
 ---
 sidebar_position: 3
-title: Code examples
+title: API code examples
+sidebar_label: Code examples
+description: "Complete AchSwap API swap examples in TypeScript (viem) and Python: quote, build, check the allowance, approve, send and confirm on Arc."
 ---
 
 # Code examples

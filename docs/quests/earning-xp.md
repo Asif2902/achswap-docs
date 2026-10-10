@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+description: "The XP rules: the daily doubling ladder for swaps, bridges and liquidity, eligible pools, holding boosts, daily GM, tasks and referrals."
 ---
 
 # How to earn XP

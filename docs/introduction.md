@@ -1,5 +1,8 @@
 ---
 sidebar_position: 1
+title: "AchSwap: DEX aggregator on Arc"
+sidebar_label: AchSwap on Arc
+description: AchSwap is a DEX aggregator on Arc Mainnet. It compares its own router with KyberSwap and LI.FI, and offers V2 and V3 liquidity, a LI.FI bridge and a developer API.
 ---
 
 # AchSwap on Arc

@@ -1,5 +1,7 @@
 ---
 sidebar_position: 6
+title: Fees
+description: "Every fee on AchSwap: the 0.25% route executor fee, LI.FI and KyberSwap integrator fees, partner fees, pool fees and gas paid in USDC."
 ---
 
 # Fees

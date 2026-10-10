@@ -1,7 +1,7 @@
 ---
 sidebar_position: 7
 title: Liquidity earnings and risks
-description: How liquidity providers earn, how price movement and range affect a position, and why past APR isn't a promise.
+description: How AchSwap liquidity providers earn trading fees, how price movement and V3 ranges affect a position, and why historical APR is not a forecast.
 ---
 
 # Liquidity earnings and risks

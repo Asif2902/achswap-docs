@@ -1,5 +1,6 @@
 ---
 sidebar_position: 8
+description: Browse and search tokens trading on Arc, with price, volume, market cap and liquidity from DEX Screener, and open them on the swap page.
 ---
 
 # Explore tokens

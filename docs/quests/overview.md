@@ -1,5 +1,7 @@
 ---
 sidebar_position: 1
+title: Quests and XP
+description: "AchSwap's XP program: levels and badges, profiles, the leaderboard and the current status of the Quests page. XP is not a token."
 ---
 
 # Quests and XP

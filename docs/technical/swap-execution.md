@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+description: "AchRouteExecutor reference: the execute() interface, route encoding, limits, validation, execution sequence, adapters, errors and administration."
 ---
 
 # Swap execution

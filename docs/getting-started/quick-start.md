@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+description: "Make your first swap on AchSwap: connect a wallet on Arc Mainnet, read a quote, approve a token and confirm, with fixes for common problems."
 ---
 
 # Quick start

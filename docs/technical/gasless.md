@@ -1,5 +1,6 @@
 ---
 sidebar_position: 4
+description: "Gasless swap architecture: the Permit2 witness signature, relay checks, AchSponsoredExecutorV3 execution, security properties and configuration."
 ---
 
 # Gasless architecture

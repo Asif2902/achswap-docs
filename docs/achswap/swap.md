@@ -1,5 +1,8 @@
 ---
 sidebar_position: 1
+title: Swap tokens on Arc
+sidebar_label: Swap tokens
+description: "How swaps work on AchSwap: quotes from three providers, approvals, settings, slippage, price impact warnings, and what happens when you confirm."
 ---
 
 # Swap tokens

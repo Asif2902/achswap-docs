@@ -1,5 +1,6 @@
 ---
 sidebar_position: 9
+description: How AchSwap counts swap and bridge volume, trades and wallets on its Analytics page, from on-chain records and LI.FI transfer data.
 ---
 
 # Analytics

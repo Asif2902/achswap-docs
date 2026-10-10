@@ -61,8 +61,8 @@ const audiences: Audience[] = [
 export default function Home(): JSX.Element {
   return (
     <Layout
-      title="Documentation"
-      description="AchSwap is a DEX aggregator on Arc Mainnet: guides for swaps, liquidity, bridging and XP, a developer API, and contract reference.">
+      title="DEX aggregator and swap API on Arc"
+      description="Documentation for AchSwap, a DEX aggregator on Arc Mainnet: guides for swaps, liquidity, bridging and XP, the developer API, and contract reference.">
       <main>
         <section className="homeHero">
           <div className="container homeHero__inner">

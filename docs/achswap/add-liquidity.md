@@ -1,5 +1,6 @@
 ---
 sidebar_position: 3
+description: "Add liquidity to AchSwap V2 or V3 pools on Arc: fee tiers, price ranges, one-sided deposits, pool health checks, migration and the risks."
 ---
 
 # Add liquidity

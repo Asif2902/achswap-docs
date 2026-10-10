@@ -1,5 +1,8 @@
 ---
 sidebar_position: 3
+title: Arc Mainnet network setup
+sidebar_label: Network setup
+description: "Add Arc Mainnet (chain ID 5042) to your wallet: RPC URL, block explorers, and how USDC works as both an ERC-20 token and the gas currency."
 ---
 
 # Network setup

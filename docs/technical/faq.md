@@ -1,5 +1,6 @@
 ---
 sidebar_position: 7
+description: "Answers to common questions about AchSwap on Arc: USDC, routing, quotes, fees, gasless swaps, contracts, bridging, liquidity and XP."
 ---
 
 # Frequently asked questions
