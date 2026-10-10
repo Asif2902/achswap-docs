@@ -56,7 +56,7 @@ AchSwap shows two kinds of APR, both **historical**:
 | Where | What it is |
 | --- | --- |
 | **Est. APR** when adding V3 liquidity | The pool's last 7 days of fees, annualised, for liquidity in range. |
-| **Fee APR** on a pool page | The pool's last 24 hours of fees, annualised, over its current TVL. |
+| **Fee APR** on a pool page (not live yet) | The pool's last 24 hours of fees, annualised, over its current TVL. |
 
 Neither is a forecast. Both:
 
@@ -83,4 +83,4 @@ No APR shown by AchSwap is a promise of income. Providing liquidity can lose mon
 | Est. APR when adding liquidity | Historical, last 7 days |
 | Cost by trade size | Live calculation on the current state |
 
-The pool pages that show these figures are described in [pools](/achswap/pools).
+The pool pages that will show these figures are described in [pools](/achswap/pools); they are built but not live yet.

@@ -20,7 +20,7 @@ AchSwap has two kinds of pool. Which one to use depends on how hands-on you want
 
 ## Before you start
 
-- Open the pool's page from the Liquidity list and check its [TVL, volume and price](/achswap/pools#before-adding-liquidity).
+- In the Liquidity list, check the pool's volume and number of swaps: a pool nobody trades through earns nothing. The checks worth making before depositing are listed under [before adding liquidity](/achswap/pools#before-adding-liquidity). (The detailed pool page described there is built but not live yet.)
 - Make sure both token addresses are the ones you mean to use.
 - Keep some USDC for gas. If one of your tokens is USDC, **MAX** leaves 0.05 USDC behind for fees.
 

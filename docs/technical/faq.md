@@ -41,7 +41,7 @@ The app compares what each route is expected to deliver, not the headline number
 
 ### What does Fee APR on a pool page mean?
 
-It's the pool's trading fees from the last 24 hours, multiplied by 365 and divided by the pool's current TVL. It shows what liquidity has earned recently, not what it will earn: one busy day makes it high, a quiet day low. It also leaves out price movement between the two tokens, which can outweigh fees. See [pools](/achswap/pools#stats).
+The pool page is built but not live yet. Once it is, Fee APR is the pool's trading fees from the last 24 hours, multiplied by 365 and divided by the pool's current TVL. It shows what liquidity has earned recently, not what it will earn: one busy day makes it high, a quiet day low. It also leaves out price movement between the two tokens, which can outweigh fees. See [pools](/achswap/pools#stats).
 
 ### My V3 position doesn't show up. How do I find it?
 
@@ -49,7 +49,7 @@ Make sure the wallet that created it is connected. If it still doesn't appear, o
 
 ### Why don't the Analytics figures match a pool's volume?
 
-They count different things. A pool page counts every swap through that pool, including trades routed into it from other apps. The Analytics page counts trades made through AchSwap, across every pool and provider they used. See [analytics](/achswap/analytics#how-this-differs-from-pool-figures).
+They count different things. (The pool page and the new Analytics page are built but not live yet.) A pool page counts every swap through that pool, including trades routed into it from other apps. The Analytics page counts trades made through AchSwap, across every pool and provider they used. See [analytics](/achswap/analytics#how-this-differs-from-pool-figures).
 
 ### Why does AchSwap not route my token?
 
