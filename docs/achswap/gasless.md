@@ -52,4 +52,4 @@ A signed swap is valid only until the deadline in your swap settings, and the re
 - **Price moved:** the output would be below your minimum, so the transaction reverts. Refresh the quote and try again, or raise slippage.
 - **Below the minimum, or an unsupported route:** turn gasless mode off and swap normally.
 
-Technical details are in [gasless architecture](/technical/gasless).
+Technical details, including exactly what your signature authorizes, are in [gasless architecture](/technical/gasless#what-your-signature-authorizes). The trust model is summarised under [security](/technical/security#gasless-authorization). Gasless swaps are an app feature; the [Developer API](/developers/developer-api) doesn't offer them. If something goes wrong, see [troubleshooting](/help/troubleshooting#why-did-a-gasless-swap-fail).

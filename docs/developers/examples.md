@@ -5,17 +5,38 @@ title: Code examples
 
 # Code examples
 
-These examples run a complete swap: build the transaction, approve if needed, send it, and wait for it. They are written for a server that holds a wallet. In a web app the same steps apply, with the user's wallet doing the signing and your server making the API calls.
+This page has a complete, copyable swap for each language. Each one walks through the same steps:
 
-Keep your API key on the server. Never ship it in browser code.
+1. use your API key (from [support@achswap.app](mailto:support@achswap.app));
+2. request a quote;
+3. read the response;
+4. prepare the swap transaction;
+5. check the token allowance;
+6. approve, if the allowance is short;
+7. send the transaction;
+8. wait for the receipt;
+9. handle errors.
+
+They are written for a server that holds a wallet. In a web app the steps are the same, with the user's wallet signing and your server making the API calls. Keep your API key on the server; never ship it in browser code.
+
+:::tip Checked against the implementation
+The TypeScript example was type-checked with viem 2.47 and run against the v1 handler on 10 October 2026, up to the point where it would send a transaction: quote, build, simulation and allowance check all behaved as shown.
+:::
 
 ## TypeScript (viem)
 
+Install `viem`, save this as `swap.ts`, and run it with your key and a funded wallet's private key in the environment. It swaps 10 USDC for EURC.
+
 ```ts
-import { createPublicClient, createWalletClient, defineChain, erc20Abi, http } from "viem";
+// swap.ts: a complete AchSwap Developer API swap with viem.
+// Run: ACHSWAP_KEY=ach_dev_… PRIVATE_KEY=0x… npx tsx swap.ts
+import {
+  createPublicClient, createWalletClient, defineChain, erc20Abi, formatUnits, http, type Hex,
+} from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
-const API = "https://trade.achswap.app/api/v1";
+// 1. Your API key, from support@achswap.app. Keep it on the server.
+const API = process.env.ACHSWAP_API ?? "https://trade.achswap.app/api/v1";
 const API_KEY = process.env.ACHSWAP_KEY!;
 
 const arc = defineChain({
@@ -23,13 +44,32 @@ const arc = defineChain({
   name: "Arc Mainnet",
   nativeCurrency: { name: "USDC", symbol: "USDC", decimals: 18 },
   rpcUrls: { default: { http: ["https://rpc.mainnet.arc.io"] } },
+  blockExplorers: { default: { name: "ArcScan", url: "https://arc.etherscan.io" } },
 });
 
-const account = privateKeyToAccount(process.env.PRIVATE_KEY as `0x${string}`);
+const account = privateKeyToAccount(process.env.PRIVATE_KEY as Hex);
 const publicClient = createPublicClient({ chain: arc, transport: http() });
 const wallet = createWalletClient({ account, chain: arc, transport: http() });
 
-type ApiError = { error: { code: string; message: string; reason?: string }; requestId: string };
+const USDC = "0x3600000000000000000000000000000000000000"; // 6 decimals
+const EURC = "0xbEf5f6d51CB62b58e6A8f77868681825C6fe21c1"; // 6 decimals
+
+type Quote = {
+  amountIn: string; amountOut: string; minAmountOut: string; grossAmountOut: string;
+  fees: { protocolBps: number; protocolAmount: string; partnerBps: number; partnerAmount: string };
+  priceImpactBps: number | null;
+  route: { shareBps: number; hops: { dex: string; pool: string | null }[] }[];
+  requestId: string;
+};
+type Swap = Quote & {
+  tx: { to: Hex; data: Hex; value: string; gas: string | null };
+  approval: { token: Hex; spender: Hex; amount: string } | null;
+  simulated: boolean;
+};
+class ApiError extends Error {
+  constructor(public status: number, public code: string, message: string, public reason?: string,
+    public requestId?: string, public retryAfter?: number) { super(`${status} ${code}: ${message}`); }
+}
 
 async function call<T>(path: "quote" | "swap", body: object): Promise<T> {
   const res = await fetch(`${API}/${path}`, {
@@ -39,63 +79,82 @@ async function call<T>(path: "quote" | "swap", body: object): Promise<T> {
   });
   const json = await res.json();
   if (!res.ok) {
-    const { error, requestId } = json as ApiError;
-    throw Object.assign(new Error(`${error.code}: ${error.message} (${requestId})`), {
-      status: res.status, code: error.code, reason: error.reason, retryAfter: res.headers.get("retry-after"),
-    });
+    const retry = res.headers.get("retry-after");
+    throw new ApiError(res.status, json.error?.code, json.error?.message, json.error?.reason, json.requestId,
+      retry ? Number(retry) : undefined);
   }
   return json as T;
 }
 
-type Swap = {
-  amountOut: string;
-  minAmountOut: string;
-  tx: { to: `0x${string}`; data: `0x${string}`; value: string; gas: string | null };
-  approval: { token: `0x${string}`; spender: `0x${string}`; amount: string } | null;
-  simulated: boolean;
+const trade = {
+  tokenIn: USDC,
+  tokenOut: EURC,
+  amountIn: "10000000", // 10 USDC: amounts are integer strings in the token's smallest unit
+  slippageBps: 50,      // 0.5%
 };
 
-export async function swap() {
-  // 10 USDC (6 decimals) to EURC, 0.5% slippage, a 0.30% fee for you.
-  const swap = await call<Swap>("swap", {
-    tokenIn: "0x3600000000000000000000000000000000000000",
-    tokenOut: "0xbEf5f6d51CB62b58e6A8f77868681825C6fe21c1",
-    amountIn: "10000000",
-    slippageBps: 50,
-    feeBps: 30,
-    feeRecipient: "0xYourFeeAddress",
-    sender: account.address,
-  });
-  console.log(`expect ${swap.amountOut}, at least ${swap.minAmountOut}`);
+async function main() {
+  // 2. Request a quote, and 3. read it.
+  const quote = await call<Quote>("quote", trade);
+  console.log(`About ${formatUnits(BigInt(quote.amountOut), 6)} EURC, at least ${formatUnits(BigInt(quote.minAmountOut), 6)}`);
+  console.log(`Route: ${quote.route.map((b) => `${b.shareBps / 100}% via ${b.hops.map((h) => h.dex).join(" → ")}`).join(", ")}`);
+  if (quote.priceImpactBps != null && quote.priceImpactBps > 200) throw new Error("Price impact above 2%: stopping");
 
-  // 1. Approve the executor if the allowance is short (ERC-20 input only).
+  // 4. Prepare the transaction, right before sending. It is priced again and simulated from the sender.
+  const swap = await call<Swap>("swap", { ...trade, sender: account.address });
+
+  // 5. Check the allowance, and 6. approve if it is short (ERC-20 input only).
   if (swap.approval) {
     const { token, spender, amount } = swap.approval;
     const allowance = await publicClient.readContract({
       address: token, abi: erc20Abi, functionName: "allowance", args: [account.address, spender],
     });
     if (allowance < BigInt(amount)) {
-      const hash = await wallet.writeContract({
+      const approveHash = await wallet.writeContract({
         address: token, abi: erc20Abi, functionName: "approve", args: [spender, BigInt(amount)],
       });
-      await publicClient.waitForTransactionReceipt({ hash });
+      const approved = await publicClient.waitForTransactionReceipt({ hash: approveHash });
+      if (approved.status !== "success") throw new Error(`approval reverted: ${approveHash}`);
+      // The approval took a block or more: build a fresh transaction so it is priced now.
+      return main();
     }
   }
 
-  // 2. Send the swap exactly as returned.
+  // 7. Send the transaction exactly as returned. Send it once: never resend the same swap after a timeout
+  //    without first checking whether the first one was mined.
   const hash = await wallet.sendTransaction({
     to: swap.tx.to,
     data: swap.tx.data,
     value: BigInt(swap.tx.value),
     gas: swap.tx.gas ? BigInt(swap.tx.gas) : undefined, // undefined: viem estimates it
   });
+  console.log(`Sent: https://arc.etherscan.io/tx/${hash}`);
+
+  // 8. Wait for the receipt.
   const receipt = await publicClient.waitForTransactionReceipt({ hash });
-  if (receipt.status !== "success") throw new Error(`swap reverted: ${hash}`);
-  return hash;
+  if (receipt.status !== "success") throw new Error(`Swap reverted, nothing was swapped: ${hash}`);
+  console.log(`Swapped in block ${receipt.blockNumber}`);
 }
+
+// 9. Handle errors.
+main().catch((error) => {
+  if (error instanceof ApiError) {
+    if (error.status === 429 || error.status === 503) console.error(`Busy: retry after ${error.retryAfter ?? 1}s`);
+    else if (error.code === "NO_ROUTE") console.error("No route for this pair and amount");
+    else if (error.code === "SIMULATION_FAILED") console.error(`Would revert (${error.reason}): request a new /swap`);
+    else console.error(`${error.message} (requestId ${error.requestId})`);
+  } else {
+    console.error(error);
+  }
+  process.exitCode = 1;
+});
 ```
 
-If the approval takes a while to confirm, call `/swap` again after it, so the transaction you send is freshly priced.
+A few things it does on purpose:
+
+- **Quote first, build later.** `/quote` is cheap and shows the price; `/swap` is called only when you are about to send, so the transaction is freshly priced and simulated.
+- **Rebuild after an approval.** An approval takes at least a block. The script builds a new transaction afterwards rather than sending one priced before the approval.
+- **One send per build.** If sending times out, check the chain for the transaction before trying again, so the swap is never sent twice.
 
 ### Paying with native USDC
 
@@ -155,13 +214,18 @@ def send(tx):
     return tx_hash.hex()
 
 
-swap = api("swap", {
+trade = {
     "tokenIn": "0x3600000000000000000000000000000000000000",   # USDC, 6 decimals
     "tokenOut": "0xbEf5f6d51CB62b58e6A8f77868681825C6fe21c1",  # EURC
-    "amountIn": "10000000",                                     # 10 USDC
+    "amountIn": "10000000",                                     # 10 USDC, smallest units
     "slippageBps": 50,
-    "sender": account.address,
-})
+}
+
+quote = api("quote", trade)
+print(f"About {int(quote['amountOut']) / 10**6} EURC, at least {int(quote['minAmountOut']) / 10**6}")
+
+# Build right before sending: priced again and simulated from the sender.
+swap = api("swap", {**trade, "sender": account.address})
 
 approval = swap["approval"]
 if approval:

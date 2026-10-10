@@ -99,16 +99,25 @@ Prices a trade. Nothing is built or simulated for a particular sender.
 }
 ```
 
-| Field | Meaning |
-| --- | --- |
-| `amountOut` | What the recipient receives at the quoted price, after both fees. |
-| `minAmountOut` | The least the recipient will receive: `amountOut` less `slippageBps`. The transaction reverts below this. |
-| `grossAmountOut` | The route's output before fees. |
-| `fees` | Both fees, in `tokenOut`'s smallest unit. `partnerRecipient` is `null` with no fee. |
-| `priceImpactBps` | The route's output against market reference prices, before fees, in basis points. Negative when the route beats the reference. `null` when a token has no reference price. |
-| `gasEstimate` | Estimated gas units. Treat it as a guide. `/swap` returns the simulated figure. |
-| `route` | One entry per split. `shareBps` is that split's share of the input; `hops` lists each pool in order, with its DEX. A Uniswap V4 pool's `pool` is its 32-byte pool ID. |
-| `requestId` | Quote it to support. Also in the `X-Request-Id` header. |
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `chainId` | integer | Always `5042`. |
+| `tokenIn`, `tokenOut` | address | As requested, checksummed. |
+| `amountIn` | string (integer) | As requested, in `tokenIn`'s smallest unit. |
+| `amountOut` | string (integer) | What the recipient receives at the quoted price, **after** the AchSwap fee and your fee. In `tokenOut`'s smallest unit. |
+| `minAmountOut` | string (integer) | The least the recipient will receive: `amountOut` less `slippageBps`. The transaction reverts below this. |
+| `slippageBps` | integer | The slippage used, as requested or the default 50. |
+| `grossAmountOut` | string (integer) | The route's output **before** fees. |
+| `fees.token` | address | The token fees are paid in: always `tokenOut`. |
+| `fees.protocolBps`, `fees.protocolAmount` | integer, string | AchSwap's fee rate and amount. |
+| `fees.partnerBps`, `fees.partnerAmount` | integer, string | Your fee rate and amount; `0` and `"0"` without a fee. |
+| `fees.partnerRecipient` | address or `null` | Your `feeRecipient`; `null` without a fee. |
+| `priceImpactBps` | integer or `null` | The route's output against market reference prices, before fees, in basis points. Negative when the route beats the reference. `null` when a token has no reference price. |
+| `gasEstimate` | string (integer) or `null` | Estimated gas units. Treat it as a guide; `/swap` returns the simulated figure. |
+| `route` | array | One entry per split: `shareBps` (integer, that split's share of the input, all adding up to 10000) and `hops` (array of `{ dex, pool, tokenIn, tokenOut }`, in order). `pool` is the pool address, a Uniswap V4 pool's 32-byte pool ID, or `null` if unknown. |
+| `requestId` | string | Quote it to support. Also in the `X-Request-Id` header. |
+
+To show amounts to a person, divide by 10 to the power of the token's decimals: `"884689432"` EURC (6 decimals) is 884.689432 EURC. Never do this conversion with floating-point numbers for amounts you send back to the API or to a contract; keep them as integers (`BigInt`).
 
 Quotes are indicative: prices move. `/swap` prices the trade again.
 
@@ -150,14 +159,16 @@ The `/quote` fields, plus:
 }
 ```
 
-| Field | Meaning |
-| --- | --- |
-| `tx.to` | Always the AchRouteExecutor. |
-| `tx.data` | The encoded `execute(...)` call, with `minAmountOut`, the deadline and your fee built in. |
-| `tx.value` | The native USDC to send, in 18-decimal units. `"0"` unless the input is native USDC. |
-| `tx.gas` | A gas limit: the simulated gas plus headroom. `null` when `simulated` is false. |
-| `approval` | For ERC-20 input: the allowance the sender needs on `token` for `spender`. `null` for native input. |
-| `simulated` | `true` when the exact transaction was simulated from the sender and succeeded. |
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `sender`, `recipient` | address | As requested; `recipient` defaults to `sender`. |
+| `deadline` | integer | Unix seconds after which the transaction reverts. |
+| `tx.to` | address | Always the AchRouteExecutor. |
+| `tx.data` | hex string | The encoded `execute(...)` call, with `minAmountOut`, the deadline and your fee built in. |
+| `tx.value` | string (integer) | Native USDC to send, in 18-decimal units. `"0"` unless the input is native USDC. |
+| `tx.gas` | string (integer) or `null` | A gas limit: the simulated gas plus headroom. `null` when `simulated` is false. |
+| `approval` | object or `null` | For ERC-20 input: `{ token, spender, amount }`, the allowance the sender needs. `null` for native input. |
+| `simulated` | boolean | `true` when the exact transaction was simulated from the sender and succeeded. |
 
 ### Executing it
 

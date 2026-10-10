@@ -20,6 +20,43 @@ Every quote compares three providers: AchSwap's own router, LI.FI same-chain swa
 
 Only pools with usable liquidity contribute. LI.FI and KyberSwap are separate routing providers. The winning route reflects the quotes available at that moment, so it can change on refresh.
 
+## What happens when you swap
+
+```mermaid
+sequenceDiagram
+  actor You
+  participant App as App
+  participant API as AchSwap API
+  participant W as Wallet
+  participant Arc as Arc
+  You->>App: Tokens and amount
+  App->>API: Get quotes
+  Note over API: AchSwap router, KyberSwap, LI.FI
+  API-->>App: Quotes
+  App->>App: Rank by delivery after gas
+  App-->>You: Best route, minimum, cost
+  You->>App: Confirm
+  App->>Arc: Read allowance
+  opt Allowance too low
+    App->>W: Approval request
+    W->>Arc: approve
+  end
+  App->>API: Build transaction
+  API-->>App: Transaction
+  App->>W: Sign request
+  W->>Arc: Send
+  Note over Arc: Execute route, enforce minimum
+  Arc-->>App: Receipt
+  App-->>You: Done
+```
+
+Two things are worth knowing about this flow:
+
+- **Nothing is sent until you confirm in your wallet.** Quotes and transaction building happen off chain. The approval and the swap are the only transactions, and you sign both.
+- **The route's contract depends on the provider.** An AchSwap route executes on AchSwap's route executor; a KyberSwap or LI.FI route on that provider's contract. Each needs its own approval. See [architecture](/technical/architecture).
+
+With [gasless mode](/achswap/gasless) on, you sign a message instead of sending the swap, and a relayer submits it.
+
 ## Paying with USDC
 
 USDC on Arc is both the gas currency and an ERC-20 token. AchSwap routes can take USDC straight from your balance, so a swap from USDC needs no approval transaction.

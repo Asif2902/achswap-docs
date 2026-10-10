@@ -47,33 +47,105 @@ How the contract executes a route is described in [swap execution](/technical/sw
 
 A source contributes only when it has a pool with usable liquidity for your trade. New sources are added through the route executor's two-day security delay.
 
-## How the best route is chosen
+## Route shapes
 
-The three providers do not produce their quotes the same way, so the app does not simply take the largest number. It compares what each route is **expected to deliver** to your wallet:
+AchSwap's router can build four kinds of route. The same shapes appear in KyberSwap's and LI.FI's routes, which use their own sources.
 
 ```mermaid
-flowchart LR
-  A[AchSwap quote<br/>simulated on chain] --> G[minus network cost]
-  K[KyberSwap quote] --> KA[minus 0.12 bp] --> G2[minus network cost]
-  L[LI.FI quote] --> G3[minus network cost]
-  G --> C{Highest<br/>expected delivery}
-  G2 --> C
-  G3 --> C
-  C --> R[Route you see and sign]
+flowchart TD
+  subgraph direct["Direct: one pool"]
+    direction LR
+    D1["USDC"] --> D2["EURC"]
+  end
+  subgraph multi["Multi-hop: through a liquid token"]
+    direction LR
+    M1["Token A"] --> M2["USDC"] --> M3["Token B"]
+  end
+  subgraph split["Split: one trade, several pools"]
+    direction LR
+    S1["1,000 USDC"] -->|"67% Aero CL"| S3["EURC"]
+    S1 -->|"33% Topaz"| S3
+  end
+  subgraph mixed["Mixed: splits and hops"]
+    direction LR
+    X1["Token A"] -->|"60% Uniswap V3"| X2["USDC"]
+    X1 -->|"40% Lunya"| X2
+    X2 -->|"AchSwap V2"| X3["Token B"]
+  end
+  direct ~~~ multi ~~~ split ~~~ mixed
+```
+
+- **Direct**: one pool between your two tokens.
+- **Multi-hop**: through one or two intermediate tokens, up to three hops, when there is no good direct pool.
+- **Split**: the input is divided across several pools, up to eight branches, when one pool would move its price too far. Each branch can use a different DEX.
+- **Mixed**: splits and hops together. The whole route still executes in one transaction.
+
+The multi-hop and mixed examples are illustrative; the split is the route AchSwap's router chose in the [worked example](#a-worked-example) below.
+
+## How the best route is chosen
+
+The three providers don't produce their quotes the same way, so the app doesn't simply take the largest number. It compares what each route is **expected to deliver** to your wallet:
+
+```mermaid
+flowchart TD
+  A["AchSwap quote<br/>(already simulated on chain)"] --> GA["− network cost"]
+  K["KyberSwap quote"] --> KX["− 0.12 bp"] --> GK["− network cost"]
+  L["LI.FI quote"] --> GL["− network cost"]
+  GA --> C{"Highest expected delivery"}
+  GK --> C
+  GL --> C
+  C --> R["Route you see and sign,<br/>with its minimum received"]
 ```
 
 1. **Start from the quote.** Each provider's quoted output already has the pool fees and the AchSwap fee (0.25%) taken off.
 2. **Take off the network cost.** On Arc, gas is paid in USDC from the same wallet, so a route that needs more gas leaves you with less. Each route's own gas estimate is priced at Arc's current gas price, converted into the token you receive, and subtracted from its quote.
 3. **Take 0.12 bp off KyberSwap's quote.** AchSwap's quote is exact for the moment it was made: before it is shown, its route is simulated against the live contracts, and the quote is what that simulation paid out. KyberSwap's quote comes from KyberSwap's own model. When AchSwap simulated KyberSwap's own transactions in October 2026, they delivered a median 0.12 bp less than KyberSwap had quoted (39 trades; most routes 0.10–0.15 bp less, a few exactly the quote), while AchSwap's delivered exactly its quotes, so 0.12 bp is taken off KyberSwap's quote to compare like with like. LI.FI's quote is used as it is.
-4. **The highest wins.** The route expected to deliver the most is used. If another provider comes out ahead of AchSwap's verified quote by 0.3 bp or less, AchSwap's route is used: a difference that small is within the margin of error of an estimated quote, while AchSwap's has already been checked on chain.
+4. **The highest wins.** The route expected to deliver the most is used.
 
-A basis point (bp) is 0.01%, so 0.12 bp is 0.0012% and 0.3 bp is 0.003%. Both values are settings and may change as new measurements come in.
+A basis point (bp) is 0.01%, so 0.12 bp is 0.0012%. The app also has a setting to prefer AchSwap's verified route when another provider is ahead by less than a small margin; it is currently set to **0**, so the highest expected delivery wins outright. These values are settings and may change as new measurements come in.
 
-Gas matters most on small trades. On a swap of a dollar or two, a route that needs much more gas can cost more in gas than its better price earns. On a large trade, gas is a tiny share of the amount, and the better price wins.
-
-That is why a provider can quote a higher amount and still not be the best route. For example, on a swap of 1 USDC for EURC, KyberSwap quoted 0.886963 EURC and AchSwap's router 0.886684 EURC: KyberSwap's number was about 0.03% higher. But KyberSwap's route needed more gas, and on a trade this small the extra gas was worth about 0.07% of it. After the network cost, AchSwap's route was expected to deliver about 0.04% more, so it was marked **Best** and KyberSwap showed **−0.04%**.
+Gas matters most on small trades. On a swap of a dollar or two, a route that needs more gas can cost more in gas than its better price earns. On a large trade, gas is a tiny share of the amount, and the better price wins.
 
 Some routes are left out before the comparison: a KyberSwap or LI.FI route through a token that takes a fee on transfers, or through a DEX that AchSwap has blocked. If such a route is the only one, it is shown with a warning. Exact-output trades are quoted only by AchSwap's router, so there is nothing to compare.
+
+### A worked example
+
+USDC to EURC at two sizes, quoted by AchSwap's router and by KyberSwap's public API (with AchSwap's integrator fee) at the same moment: 10 October 2026, 16:42:51 UTC, Arc block 25,271,330, gas price 20 gwei. Amounts are in EURC.
+
+| 1 USDC → EURC | AchSwap | KyberSwap |
+| --- | --- | --- |
+| Route | Uniswap V3, one pool | Aero CL, one pool |
+| Quoted output (fees included) | 0.890705 | 0.890898 |
+| Gas estimate | 291,150 | 330,498 |
+| Network cost, in EURC | 0.005199 | 0.005902 |
+| KyberSwap adjustment (0.12 bp) | — | 0.000011 |
+| **Expected delivery** | **0.885506** | **0.884986** |
+
+KyberSwap's quote was 0.022% higher, but its route needed 39,348 more gas, worth more than that difference on a $1 trade. AchSwap's route was expected to deliver 0.059% more, so the app would mark it **Best**.
+
+| 1,000 USDC → EURC | AchSwap | KyberSwap |
+| --- | --- | --- |
+| Route | Split: 66.6% Aero CL, 33.4% Topaz | Aero CL, one pool |
+| Quoted output (fees included) | 890.925289 | 890.896029 |
+| Gas estimate | 776,549 | 330,498 |
+| Network cost, in EURC | 0.013871 | 0.005903 |
+| KyberSwap adjustment (0.12 bp) | — | 0.010690 |
+| **Expected delivery** | **890.911418** | **890.879436** |
+
+At this size the split route's extra gas (about one cent) is worth paying: it delivers about 0.032 EURC more. Prices change every block, so the same request a minute later can rank the other way.
+
+## Quoted output, minimum and what you receive
+
+| Figure | What it is |
+| --- | --- |
+| **Quoted output** | What the route pays if the pools don't move before your transaction. For AchSwap routes it was simulated at the quote's block. |
+| **Minimum received** | Quoted output less your slippage tolerance. Enforced on chain: below it, the transaction reverts. |
+| **What you receive** | Whatever the route pays when your transaction is mined: usually close to the quote, never below the minimum. |
+| **Network cost** | Paid in USDC from your wallet, separately from the output. Not included in the quoted output. |
+
+**Freshness.** Quotes refresh every 30 seconds by default, and every time you change the amount or tokens. The app's servers may reuse a quote for the same request for a few seconds. A quote is a snapshot: the longer you wait before confirming, the more the price can move. The [swap settings](/achswap/swap#settings) control the refresh interval, slippage and deadline.
+
+**Why another aggregator can show a different route.** Every aggregator sees a different set of pools, prices gas differently, and charges different fees. A route that looks better elsewhere may be a quote from a model rather than a simulation, may need more gas, or may use a source AchSwap doesn't index. AchSwap compares the three providers it queries, after gas and fees; it doesn't claim the best price across every venue.
 
 ## Route details
 

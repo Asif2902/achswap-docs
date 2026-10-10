@@ -682,6 +682,15 @@ tr:nth-child(even) td {
   .markdown table {
     display: block;
     overflow-x: auto;
+  }
+
+  /* Wrap prose in cells, but keep each cell wide enough to read; addresses and code stay whole. */
+  .markdown table th,
+  .markdown table td {
+    min-width: 7.5rem;
+  }
+
+  .markdown table td code {
     white-space: nowrap;
   }
 }
@@ -691,4 +700,160 @@ tr:nth-child(even) td {
 .docusaurus-mermaid-container .nodeLabel {
   margin: 0;
   line-height: 1.5;
+}
+
+/* Diagrams: a diagram scrolls sideways on a narrow screen instead of shrinking its labels
+   below reading size. Sequence diagrams keep a minimum width; flowcharts are drawn top-down. */
+.docusaurus-mermaid-container {
+  margin: 1.25rem 0 1.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+
+.diagram {
+  border: 1px solid var(--site-border);
+  border-radius: 12px;
+  background: var(--site-surface-raised);
+  margin: 1.25rem 0 1.5rem;
+  padding: 1rem;
+}
+
+.diagram__grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 720px) {
+  .diagram__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.diagram__panel h4 {
+  font-size: 0.95rem;
+  margin: 0 0 0.25rem;
+}
+
+.diagram__panel p {
+  color: var(--site-muted);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  margin: 0.5rem 0 0;
+}
+
+.diagram svg {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+.diagram__caption {
+  color: var(--site-muted);
+  font-size: 0.82rem;
+  margin: 0.75rem 0 0;
+}
+
+.diagram svg text {
+  fill: var(--site-muted);
+  font-family: var(--ifm-font-family-base);
+  font-size: 12px;
+}
+
+.diagram svg .d-axis {
+  stroke: var(--site-border-strong);
+  stroke-width: 1.5;
+}
+
+.diagram svg .d-liquidity {
+  fill: var(--ifm-color-primary);
+  fill-opacity: 0.28;
+  stroke: var(--ifm-color-primary);
+  stroke-width: 1.5;
+}
+
+.diagram svg .d-out {
+  fill: var(--site-soft);
+}
+
+.diagram svg .d-price {
+  stroke: #d9453b;
+  stroke-dasharray: 4 3;
+  stroke-width: 2;
+}
+
+[data-theme='dark'] .diagram svg .d-price {
+  stroke: #ef5a4f;
+}
+
+.diagram svg .d-strong {
+  fill: var(--site-text);
+  font-weight: 600;
+}
+
+/* Homepage audience sections */
+.audienceGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.audienceCard {
+  background: var(--site-surface-raised);
+  border: 1px solid var(--site-border);
+  border-radius: 12px;
+  padding: 1.35rem;
+}
+
+.audienceCard h2 {
+  font-size: 1.25rem;
+  margin: 0.35rem 0 0.4rem;
+}
+
+.audienceCard > p {
+  color: var(--site-muted);
+  line-height: 1.55;
+  margin: 0 0 0.9rem;
+}
+
+.audienceCard ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.audienceCard li + li {
+  border-top: 1px solid var(--site-border);
+}
+
+.audienceCard li a {
+  color: var(--site-text);
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem 0;
+  text-decoration: none;
+}
+
+.audienceCard li a:hover {
+  color: var(--ifm-color-primary);
+}
+
+.audienceCard li a span:last-child {
+  color: var(--site-muted);
+}
+
+.homeIntro {
+  color: var(--site-muted);
+  line-height: 1.7;
+  margin: 0 auto 2rem;
+  max-width: 760px;
+  text-align: center;
+}
+
+@media (max-width: 996px) {
+  .audienceGrid {
+    grid-template-columns: 1fr;
+  }
 }

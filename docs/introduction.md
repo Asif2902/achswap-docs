@@ -4,21 +4,23 @@ sidebar_position: 1
 
 # AchSwap on Arc
 
-AchSwap is a decentralized exchange on **Arc Mainnet** (chain ID 5042). You can swap tokens, provide liquidity, bridge assets to and from Arc, and earn XP for using it. You keep custody the whole time: every action is a transaction or a signature from your own wallet.
+AchSwap is a **DEX aggregator on Arc Mainnet** (chain ID 5042). For every swap it compares its own router, which reads the pools of every supported DEX on Arc, with the KyberSwap and LI.FI aggregators, and uses the route expected to leave you the most after fees and gas. It also runs its own V2 and V3 liquidity pools, a bridge powered by LI.FI, and an XP program. You keep custody the whole time: every action is a transaction or a signature from your own wallet.
 
 ## What you can do
 
-| | |
-| --- | --- |
-| [Swap](/achswap/swap) | Trade any two tokens on Arc. Each quote compares AchSwap's own router with KyberSwap and LI.FI and uses whichever leaves you the most. |
-| [Gasless swaps](/achswap/gasless) | Pay with USDC, EURC or cirBTC by signing once. A relayer pays the network fee. |
-| [Liquidity](/achswap/add-liquidity) | Deposit into AchSwap V2 or V3 pools and earn a share of every swap's fee. |
-| [Pools](/achswap/pools) | Look up any AchSwap pool: price history, volume, liquidity, depth and recent trades. |
-| [Bridge](/achswap/bridge) | Move tokens between Arc and other chains, Solana included, through LI.FI. |
-| [Explore](/achswap/explore) | Browse and search Arc tokens by price, volume and liquidity. |
-| [Quests and XP](/quests/overview) | Earn XP for swaps, bridges, liquidity and a daily GM, level up, and climb the leaderboard. |
-| [Analytics](/achswap/analytics) | See how much has been traded through AchSwap, day by day. |
-| [Developer API](/developers/developer-api) | Get AchSwap quotes and ready-to-sign swap transactions in your own app. |
+| | | Status |
+| --- | --- | --- |
+| [Swap](/achswap/swap) | Trade any two tokens on Arc, with routes compared across AchSwap's router, KyberSwap and LI.FI. | Live |
+| [Gasless swaps](/achswap/gasless) | Pay with USDC, EURC or cirBTC by signing once. A relayer pays the network fee. | Live |
+| [Liquidity](/achswap/add-liquidity) | Deposit into AchSwap V2 or V3 pools and earn a share of every swap's fee. | Live |
+| [Bridge](/achswap/bridge) | Move tokens between Arc and about two dozen chains, Solana included. | Live, through LI.FI (external) |
+| [Explore](/achswap/explore) | Browse and search Arc tokens by price, volume and liquidity. | Live, data from DEX Screener (external) |
+| [Developer API](/developers/developer-api) | AchSwap quotes and ready-to-sign swap transactions for your own app. | Live, by API key |
+| [Quests and XP](/quests/overview) | Earn XP for swaps, bridges and liquidity; levels and a leaderboard. | XP counted daily; Quests page not public yet |
+| [Pools](/achswap/pools) | A page per pool: price history, volume, liquidity, depth and trades. | Built, not yet live |
+| [Analytics](/achswap/analytics) | Swap and bridge volume through AchSwap, day by day. | New version built, not yet live |
+
+AchSwap's own V4 liquidity contracts are not deployed on Arc Mainnet; AchSwap routes through Uniswap V4 pools instead.
 
 ## How a swap finds its price
 

@@ -3,22 +3,37 @@
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'AchSwap Documentation',
-  tagline: 'Swaps and liquidity on Arc Mainnet',
+  tagline: 'The DEX aggregator on Arc Mainnet',
   url: 'https://docs.achswap.app',
   baseUrl: '/',
   onBrokenLinks: 'throw',
+  onBrokenAnchors: 'throw',
   markdown: {
     mermaid: true,
     hooks: {
-      onBrokenMarkdownLinks: 'warn',
+      onBrokenMarkdownLinks: 'throw',
     },
   },
   favicon: 'img/favicon.ico',
+  clientModules: [require.resolve('./src/clientModules/diagramScale.js')],
 
   organizationName: 'achswap',
   projectName: 'achswap-docs',
 
-  themes: ["@docusaurus/theme-mermaid"],
+  themes: [
+    "@docusaurus/theme-mermaid",
+    [
+      require.resolve("@easyops-cn/docusaurus-search-local"),
+      /** @type {import("@easyops-cn/docusaurus-search-local").PluginOptions} */
+      ({
+        hashed: true,
+        indexBlog: false,
+        docsRouteBasePath: "/",
+        highlightSearchTermsOnTargetPage: true,
+        explicitSearchResultPath: true,
+      }),
+    ],
+  ],
 
   presets: [
     [
@@ -52,6 +67,7 @@ const config = {
         fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
         htmlLabels: false,
         flowchart: { htmlLabels: false },
+        sequence: { wrap: true, width: 120, actorMargin: 30, messageMargin: 30, boxMargin: 6, noteMargin: 8 },
       },
     },
     colorMode: {
@@ -67,22 +83,33 @@ const config = {
       },
       items: [
         {
-          to: '/achswap/swap',
-          label: 'AchSwap',
+          to: '/getting-started/quick-start',
+          label: 'Guides',
           position: 'left',
-          activeBasePath: 'achswap',
+          activeBaseRegex: '^/(introduction|getting-started|achswap|quests|help)',
         },
         {
-          to: '/achswap/add-liquidity',
-          label: 'Liquidity',
+          to: '/developers/developer-api',
+          label: 'Developers',
           position: 'left',
-          activeBasePath: 'achswap',
+          activeBasePath: 'developers',
         },
         {
-          to: '/technical/contract-addresses',
-          label: 'Contracts',
+          to: '/technical/architecture',
+          label: 'Reference',
           position: 'left',
           activeBasePath: 'technical',
+        },
+        {
+          to: '/help/troubleshooting',
+          label: 'Help',
+          position: 'left',
+          activeBasePath: 'help',
+        },
+        {
+          href: 'https://trade.achswap.app',
+          label: 'Open app',
+          position: 'right',
         },
       ],
     },
@@ -90,11 +117,12 @@ const config = {
       style: 'dark',
       links: [
         {
-          title: 'Products',
+          title: 'Guides',
           items: [
-            {label: 'AchSwap', to: '/achswap/swap'},
+            {label: 'Swap', to: '/achswap/swap'},
             {label: 'Liquidity', to: '/achswap/add-liquidity'},
             {label: 'Bridge', to: '/achswap/bridge'},
+            {label: 'Troubleshooting', to: '/help/troubleshooting'},
           ],
         },
         {
@@ -102,8 +130,9 @@ const config = {
           items: [
             {label: 'Introduction', to: '/introduction'},
             {label: 'Quick start', to: '/getting-started/quick-start'},
-            {label: 'Smart contracts', to: '/technical/smart-contracts'},
             {label: 'Developer API', to: '/developers/developer-api'},
+            {label: 'Contract addresses', to: '/technical/contract-addresses'},
+            {label: 'Security', to: '/technical/security'},
           ],
         },
         {

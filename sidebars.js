@@ -1,3 +1,5 @@
+// Navigation by task: guides for users first, then liquidity concepts, XP, help, developers and the
+// technical reference. Every page in docs/ appears exactly once, so none is orphaned.
 const sidebars = {
   achswapSidebar: [
     'introduction',
@@ -13,15 +15,12 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Using AchSwap',
+      label: 'Swaps and bridging',
       collapsed: false,
       items: [
         'achswap/swap',
-        'achswap/gasless',
         'achswap/smart-routing',
-        'achswap/add-liquidity',
-        'achswap/remove-liquidity',
-        'achswap/pools',
+        'achswap/gasless',
         'achswap/bridge',
         'achswap/explore',
         'achswap/analytics',
@@ -29,8 +28,21 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Quests and XP',
+      label: 'Liquidity',
       collapsed: false,
+      items: [
+        'achswap/add-liquidity',
+        'achswap/remove-liquidity',
+        'achswap/pools',
+        'achswap/v2-vs-v3',
+        'achswap/concentrated-liquidity',
+        'achswap/liquidity-earnings',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Quests and XP',
+      collapsed: true,
       items: [
         'quests/overview',
         'quests/earning-xp',
@@ -39,22 +51,24 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Liquidity concepts',
-      collapsed: true,
+      label: 'Help',
+      collapsed: false,
       items: [
-        'achswap/v2-vs-v3',
-        'achswap/concentrated-liquidity',
+        'help/troubleshooting',
+        'technical/faq',
+        'technical/glossary',
       ],
     },
     {
       type: 'category',
       label: 'Developers',
-      collapsed: false,
+      collapsed: true,
       items: [
         'developers/developer-api',
         'developers/api-reference',
         'developers/examples',
         'developers/errors-and-limits',
+        'developers/changelog',
       ],
     },
     {
@@ -62,14 +76,14 @@ const sidebars = {
       label: 'Technical reference',
       collapsed: true,
       items: [
+        'technical/architecture',
         'technical/smart-contracts',
+        'technical/contract-addresses',
         'technical/swap-execution',
         'technical/routing-engine',
         'technical/gasless',
-        'technical/contract-addresses',
         'technical/fee-structure',
-        'technical/faq',
-        'technical/glossary',
+        'technical/security',
       ],
     },
   ],

@@ -16,6 +16,8 @@ AchSwap runs on **Arc Mainnet**. Most wallets add it automatically when the app 
 
 Check the chain ID before you transact. A network with the right name but a different chain ID is not Arc Mainnet.
 
+Arc has two block explorers: [explorer.arc.io](https://explorer.arc.io) (Blockscout) and [ArcScan](https://arc.etherscan.io). Both show transactions and balances. AchSwap's contract sources are verified on ArcScan, which is why these docs link there.
+
 ## How USDC works on Arc
 
 Arc uses USDC to pay network fees. That makes USDC special in two ways.

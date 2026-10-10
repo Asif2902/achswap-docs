@@ -11,13 +11,13 @@ AchSwap on Arc Mainnet has four groups of contracts:
 - the gasless executor;
 - a helper for paying with native USDC.
 
-Each one is source-verified on [arc.etherscan.io](https://arc.etherscan.io). Addresses are in the [address reference](/technical/contract-addresses).
+Every live AchSwap contract is source-verified on [ArcScan](https://arc.etherscan.io) except the Virtuals adapter (adapter 6), which is live but not yet verified (checked 10 October 2026). Source verification is not an audit: see [security](/technical/security#audit-and-verification-status). Addresses are in the [address reference](/technical/contract-addresses).
 
 ## AchSwap V2 and V3
 
 The **V2 factory** creates constant-product pairs, and the **V2 router** handles swaps and liquidity. LP shares are fungible tokens.
 
-The **V3 factory** creates concentrated-liquidity pools with fee tiers of 0.01%, 0.05%, 0.3% and 1%. The other V3 contracts:
+The **V3 factory** creates concentrated-liquidity pools with fee tiers of 0.01%, 0.05%, 0.3%, 1% and 10%. The other V3 contracts:
 
 - The **SwapRouter** executes swaps. It is a legacy SwapRouter that requires a deadline, not SwapRouter02.
 - The **QuoterV2** returns quotes through calls.
@@ -31,12 +31,13 @@ AchSwap's own V4 contracts are not deployed on Arc Mainnet. Uniswap V4 is an ind
 **AchRouteExecutor** executes every AchSwap route in one transaction:
 
 - It takes an exact-input plan of up to 8 branches and 32 steps, with up to 8 steps per branch. Each step names an adapter and a pool.
-- It moves tokens straight between pools through five **execution adapters**, without any third-party router:
+- It moves tokens straight between pools through six **execution adapters**, without any third-party router:
   - native USDC conversion;
   - V2 pairs;
   - V3 and Slipstream pools;
   - Uniswap V4 pools, including hooked pools;
-  - Lunya pools.
+  - Lunya pools;
+  - Virtuals launch curves.
 - It measures what every step actually produced and charges **0.25%** once, on the final output. The fee goes straight to the AchSwap treasury Safe; there is no fee vault.
 - It pays the recipient and requires the recipient's real balance increase to reach their minimum. Otherwise the whole transaction reverts.
 - It refunds this call's residuals and holds nothing between transactions.
@@ -72,6 +73,6 @@ The ERC-20 USDC at `0x3600000000000000000000000000000000000000` has 6 decimals. 
 
 ## Verification
 
-All live contracts are verified on [arc.etherscan.io](https://arc.etherscan.io) with exact source matches and constructor arguments. The executor and its adapters were compiled with solc 0.8.24 (via-IR, optimizer 200 runs, EVM cancun). Their deployed runtime bytecode matches the verified sources.
+All live contracts except the Virtuals adapter (adapter 6) are verified on [ArcScan](https://arc.etherscan.io) with exact source matches and constructor arguments; adapter 6 is live but its source is not yet verified (checked 10 October 2026). The executor and its adapters were compiled with solc 0.8.24 (via-IR, optimizer 200 runs, EVM cancun). Their deployed runtime bytecode matches the verified sources.
 
 See [fees](/technical/fee-structure) and [smart routing](/achswap/smart-routing).

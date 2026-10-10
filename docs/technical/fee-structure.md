@@ -49,4 +49,4 @@ Each pool charges its own trading fee, which goes to its liquidity providers (on
 
 Every quote already includes these fees. Gas is paid in USDC on Arc Mainnet and varies with the transaction and network conditions. A failed transaction can still consume gas.
 
-See [swap execution](/technical/swap-execution) and [contract addresses](/technical/contract-addresses#swap-execution).
+See [swap execution](/technical/swap-execution), [contract addresses](/technical/contract-addresses#swap-execution), [security](/technical/security) for what the fee limits guarantee, and the [API reference](/developers/api-reference#fees) for how partner fees are calculated.

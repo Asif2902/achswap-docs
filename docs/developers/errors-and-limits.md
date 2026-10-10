@@ -63,12 +63,15 @@ A `409 SIMULATION_FAILED` comes with a `reason` from the executor when there is 
 
 ```mermaid
 flowchart TD
-  E[Error response] --> S{HTTP status}
-  S -->|400, 401, 404, 405, 413| F[Fix the request.<br/>Don't retry unchanged.]
-  S -->|422| N[No route.<br/>Change amount or pair.]
-  S -->|409| Q[Build a fresh /swap]
-  S -->|429, 503| W[Wait Retry-After, then retry]
-  S -->|502, 504| B[Retry with backoff,<br/>at most 2 to 3 times]
+  E["Error response"] --> A{"400, 401, 404, 405 or 413?"}
+  A -->|"Yes"| A2["Fix the request.<br/>Don't retry unchanged."]
+  A -->|"No"| B{"422 NO_ROUTE?"}
+  B -->|"Yes"| B2["Change the amount or pair"]
+  B -->|"No"| C{"409 SIMULATION_FAILED?"}
+  C -->|"Yes"| C2["Build a fresh /swap"]
+  C -->|"No"| D{"429 or 503?"}
+  D -->|"Yes"| D2["Wait Retry-After, retry"]
+  D -->|"No"| F2["502 or 504: retry with backoff,<br/>at most 2 to 3 times"]
 ```
 
 Retry with exponential backoff (for example 0.5 s, 1 s, 2 s) and give up after a few attempts. When `Retry-After` is present, wait at least that long.
@@ -98,6 +101,8 @@ To stay within limits:
 Need more? Email [support@achswap.app](mailto:support@achswap.app) with your expected volume.
 
 ## Troubleshooting
+
+For problems your users may report from the app itself (failed swaps, approvals, gasless), see the user [troubleshooting guide](/help/troubleshooting).
 
 | Symptom | Likely cause |
 | --- | --- |

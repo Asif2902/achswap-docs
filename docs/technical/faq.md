@@ -4,6 +4,8 @@ sidebar_position: 7
 
 # Frequently asked questions
 
+For step-by-step help with a failed swap, approval, gasless swap, bridge, liquidity position or missing XP, see [troubleshooting](/help/troubleshooting).
+
 ### Which network does this documentation cover?
 
 **Arc Mainnet**, chain ID **5042**. See [network setup](/getting-started/network-setup).
@@ -66,7 +68,7 @@ Yes. With gasless mode on, swaps from USDC, EURC or cirBTC through KyberSwap, LI
 
 ### Are the contracts verified?
 
-Yes. Every live AchSwap contract is source-verified on [arc.etherscan.io](https://arc.etherscan.io), constructor arguments included. See [contract addresses](/technical/contract-addresses).
+Almost all. Every live AchSwap contract is source-verified on [ArcScan](https://arc.etherscan.io) except the Virtuals adapter (adapter 6), which is live but not yet verified (checked 10 October 2026). Source verification is not an audit: see [security](/technical/security#audit-and-verification-status). See [contract addresses](/technical/contract-addresses).
 
 ### Does AchSwap have V4 liquidity on Arc Mainnet?
 
@@ -89,7 +91,7 @@ Refresh the quote and inspect the wallet transaction before you raise slippage.
 
 ### How do I earn XP?
 
-Swap, bridge, provide liquidity in USDC/EURC, USDC/Circle BTC, USDC/Gold or USDC/WETH pools, say GM daily, complete tasks and invite friends. Task and GM XP is added at once; swaps, bridges and liquidity every day after 00:00 UTC. There is nothing to claim. See [Quests and XP](/quests/overview) and [how to earn XP](/quests/earning-xp).
+Swap, bridge, provide liquidity in USDC/EURC, USDC/Circle BTC, USDC/Gold or USDC/WETH pools, say GM daily, complete tasks and invite friends. Task and GM XP is added at once; swaps, bridges and liquidity every day after 00:00 UTC. There is nothing to claim. XP is counted and added daily already; the Quests page where you see it is not public yet. XP is not a token and has no monetary value. See [Quests and XP](/quests/overview) and [how to earn XP](/quests/earning-xp).
 
 ### Is there an API for developers?
 

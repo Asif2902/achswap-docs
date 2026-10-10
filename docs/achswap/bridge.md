@@ -15,16 +15,31 @@ The **Bridge** page moves tokens between chains: onto Arc, off Arc, or between t
 5. Confirm. Depending on the route, your wallet may ask for an approval first, then the transfer itself.
 6. Keep the page open until the transfer completes. The widget follows it across both chains.
 
+AchSwap doesn't run a bridge. The Bridge page is LI.FI's widget: LI.FI picks a route through a third-party bridge (and DEXs where a swap is needed), and those services move the funds.
+
 ```mermaid
 sequenceDiagram
-  participant W as Your wallet
+  actor You
+  participant LF as LI.FI
   participant S as Source chain
   participant B as Bridge
-  participant D as Destination chain
-  W->>S: Approve (first time) and send
-  S->>B: Tokens locked or burned
-  B->>D: Tokens released or minted
-  D-->>W: Tokens arrive
+  participant D as Destination
+  You->>LF: Chains, tokens, amount
+  LF-->>You: Route, fees, time, minimum
+  opt First time with this token
+    You->>S: Approve or sign permit
+  end
+  You->>S: Send transfer
+  S->>B: Funds handed to bridge
+  Note over B: Seconds to minutes, or longer
+  alt Delivered
+    B->>D: Released or minted
+    D-->>You: Tokens arrive
+  else Delayed
+    LF-->>You: Still pending
+  else Failed
+    B-->>S: Refund on source chain
+  end
 ```
 
 Most transfers take between a few seconds and a few minutes. The estimate in the widget is the bridge's own; congestion on either chain can make it longer.

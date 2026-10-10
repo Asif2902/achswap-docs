@@ -17,6 +17,21 @@ If a position is missing:
 
 Imported positions are remembered in this browser.
 
+```mermaid
+flowchart TD
+  A["My Positions"] --> B{"V2 or V3?"}
+  B -->|V2| C["Choose a percentage"]
+  C --> D["Approve LP tokens if asked"]
+  D --> E["Confirm: LP tokens burned,<br/>both tokens returned,<br/>fees included"]
+  B -->|V3| F{"Withdraw or<br/>collect fees only?"}
+  F -->|Collect Fees| G["Fees sent to your wallet;<br/>position keeps earning"]
+  F -->|Withdraw| H["Choose a percentage"]
+  H --> I["Confirm: one transaction<br/>withdraws and collects fees"]
+  I --> J{"100%?"}
+  J -->|Yes| K["Position NFT burned"]
+  J -->|No| L["Position stays open<br/>with the rest"]
+```
+
 ## Withdraw from V2
 
 1. Pick the position and choose how much to withdraw, up to 100%.

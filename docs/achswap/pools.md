@@ -4,6 +4,10 @@ sidebar_position: 5
 
 # Pools
 
+:::info Status, 10 October 2026
+The **pool page** described below (charts, depth, order book and trade costs for each pool) is built but **not yet live** on trade.achswap.app. The pool list on the Liquidity page is live. This page will describe the live behaviour once the pool page is released.
+:::
+
 A pool holds two tokens that traders swap against. Liquidity providers deposit those tokens and earn a fee from every swap. AchSwap has its own **V2** and **V3** pools on Arc. AchSwap's router also trades through other DEXs' pools, but this page is about AchSwap's own.
 
 ## The pool list

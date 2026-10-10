@@ -8,7 +8,7 @@ This walks you through your first swap on AchSwap. It takes a few minutes if you
 
 ## What you need
 
-- An EVM wallet such as MetaMask, Bitget Wallet, a WalletConnect wallet, or a Circle wallet. See [wallet setup](/getting-started/wallet-setup).
+- An EVM wallet such as MetaMask, Bitget Wallet, or any wallet that supports WalletConnect. See [wallet setup](/getting-started/wallet-setup).
 - Some **USDC on Arc**. USDC pays Arc's network fees, so you need a little even if you plan to trade something else. If your funds are on another chain, use the [Bridge](/achswap/bridge) first.
 
 ## Your first swap
@@ -21,16 +21,18 @@ This walks you through your first swap on AchSwap. It takes a few minutes if you
    - **Minimum received**: the least you will get. If the price moves further than your slippage setting, the swap cancels itself instead of paying less.
    - **Price impact**: how much your trade moves the price. Under 1% is normal for liquid pairs. The figure turns amber above 2% and red from 15%, where the app asks you to confirm the trade before it lets you swap.
    - **Network cost**: the gas, paid in USDC.
-6. **Approve, if asked.** The first time you sell a token other than USDC, your wallet asks for an approval so the swap contract can take that token. USDC needs no approval on AchSwap routes.
+6. **Approve, if asked.** When you sell a token other than USDC, your wallet asks for an approval so the swap contract can take that token. By default the approval is for exactly this swap, so each swap asks again; the **Enable unlimited approval** switch on the swap page avoids that. USDC needs no approval on AchSwap routes.
 7. **Confirm the swap** in your wallet. The app shows progress and a link to the transaction on the explorer.
 
 ```mermaid
-flowchart LR
-  A[Enter amount] --> B[Quote from AchSwap, KyberSwap and LI.FI]
-  B --> C{Best after fees and gas}
-  C --> D[Approve token<br/>first time only]
-  D --> E[Confirm in wallet]
-  E --> F[Tokens arrive<br/>in the same transaction]
+flowchart TD
+  A["Enter an amount"] --> B["Quotes from AchSwap, KyberSwap and LI.FI"]
+  B --> C{"Best expected delivery<br/>after fees and gas"}
+  C --> D{"Allowance high enough?"}
+  D -->|No| E["Approve the token"]
+  D -->|"Yes, or paying USDC"| F["Confirm the swap in your wallet"]
+  E --> F
+  F --> G["Tokens arrive in the same transaction,<br/>never below the minimum"]
 ```
 
 ## If something goes wrong

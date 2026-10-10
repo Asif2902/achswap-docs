@@ -15,7 +15,6 @@ Click **Connect Wallet** in the app. You can use:
 | **Browser wallet** (MetaMask, or any wallet that injects into the browser) | Desktop, if you already use one. |
 | **WalletConnect** | Mobile wallets: scan the QR code with your wallet app. |
 | **Bitget Wallet** | Bitget users, desktop or mobile. |
-| **Continue with Google** | Getting started without installing anything. Creates a Circle wallet linked to your Google account. |
 
 For the Bridge, you can also connect a Solana wallet (Phantom, Backpack or Solflare) when Solana is the source or destination.
 
@@ -25,7 +24,7 @@ Once connected, check that your wallet is on **Arc Mainnet, chain ID 5042**. [Ne
 
 Before a contract can move a token out of your wallet, you have to give it permission. That permission is an **approval**: a transaction that says "this contract may spend up to this much of this token".
 
-- The first time you sell a token on AchSwap, your wallet asks for an approval. After that, swaps with the same token skip this step until the allowance runs out.
+- When you sell a token on AchSwap, your wallet asks for an approval if the swap contract's allowance is too low. By default the app approves exactly the amount of the swap, so the next swap asks again. Turn on **Enable unlimited approval** on the swap page to approve once per token and spender instead; the trade-off is a standing approval. See [approvals](/technical/security#approvals).
 - **USDC needs no approval** on AchSwap routes. The router takes it straight from your balance.
 - KyberSwap and LI.FI routes need their own approvals, to their own contracts.
 - [Gasless swaps](/achswap/gasless) use a one-time approval to Permit2 per token, then a signature for each swap.

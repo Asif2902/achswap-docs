@@ -4,6 +4,14 @@ sidebar_position: 1
 
 # Quests and XP
 
+:::info Status, 10 October 2026
+**XP is live; the Quests page is not public yet.** Swaps, bridges and liquidity on Arc Mainnet are already counted and added to wallets every day, so XP you earn now is kept. The Quests page described below, where you see your XP, level, tasks, invite link and the leaderboard, opens to everyone when AchSwap announces it. Until then, tasks, GM and referrals can't be used.
+:::
+
+:::note XP is not a token
+XP measures your activity on AchSwap. It is not a token, has no monetary value, and can't be transferred or sold. Earning XP does not, by itself, entitle you to any token allocation, airdrop or other reward. Only an official announcement from AchSwap that says so explicitly could create such a commitment; nothing on this page does.
+:::
+
 Using AchSwap earns **XP**. Swaps, bridges, liquidity, a daily GM, tasks and inviting friends all add to one total, which sets your **level** (1 to 20), its **badge**, and your place on the **leaderboard**. Everything happens on the Quests page at [trade.achswap.app/quests](https://trade.achswap.app/quests). Your wallet is your account: connect it and you are in.
 
 There is nothing to claim. Task and GM XP is added the moment you finish. Swaps, bridges, liquidity and referrals are added every day shortly after 00:00 UTC, for the day that just ended. See [when XP is added](/quests/distribution).

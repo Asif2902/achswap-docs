@@ -25,6 +25,18 @@ AchSwap has two kinds of pool. Which one to use depends on how hands-on you want
 
 ## V2: deposit both tokens
 
+```mermaid
+flowchart TD
+  A["Pick the two tokens (V2)"] --> B["Enter one amount;<br/>the app fills the other at the pool ratio"]
+  B --> C{"Tokens approved<br/>for the V2 router?"}
+  C -->|No| D["Approve each token"]
+  C -->|Yes| E["Confirm the deposit"]
+  D --> E
+  E --> F["Receive LP tokens:<br/>your share of the pool"]
+  F --> G["Every swap's 0.30% fee<br/>is added to the pool"]
+  G --> H["Withdraw: burn LP tokens,<br/>get your share of both balances"]
+```
+
 1. On the **Liquidity** page, choose **V2**, then pick the two tokens.
 2. Enter an amount for one token. The app fills in the other at the pool's current ratio.
 3. Approve each token if your wallet asks.
@@ -35,6 +47,21 @@ Your share earns 0.30% of every swap through the pool. The fees are added to the
 **Creating a new V2 pool.** If the pair has no pool yet, you'll be the first depositor, and the ratio you deposit becomes the starting price. Match the market price. Deposit 1 EURC and 1 USDC, for example, while EURC trades at 1.12 USDC, and arbitrage traders will buy your EURC cheaply the moment the pool exists.
 
 ## V3: choose a price range
+
+```mermaid
+flowchart TD
+  A["Pick the two tokens (V3)"] --> B["Choose a fee tier"]
+  B --> E["Pool health check"]
+  E --> C["Choose a range:<br/>full, preset or custom"]
+  C --> D["Enter amounts<br/>(one token if the range is one-sided)"]
+  D --> F["Approve tokens if asked,<br/>confirm"]
+  F --> G["Receive a position NFT"]
+  G --> H{"Price inside your range?"}
+  H -->|Yes| I["Earns fees; collect any time"]
+  H -->|No| J["Earns nothing until<br/>the price returns"]
+  I --> K["Withdraw part or all;<br/>fees are collected with it"]
+  J --> K
+```
 
 A V3 position only earns fees while the price is inside the range you choose. A narrower range earns more per dollar while the price stays inside it, and nothing once it leaves.
 
@@ -65,12 +92,7 @@ A V3 position only earns fees while the price is inside the range you choose. A 
 
 ### What happens as the price moves
 
-Take a EURC/USDC position with a range of 1.10 to 1.15 USDC per EURC:
-
-```mermaid
-flowchart LR
-  A["Price below 1.10<br/>All EURC<br/>No fees"] <--> B["Price 1.10 to 1.15<br/>EURC and USDC<br/>Earning fees"] <--> C["Price above 1.15<br/>All USDC<br/>No fees"]
-```
+Take a EURC/USDC position with a range of 1.10 to 1.15 USDC per EURC. Below 1.10 it holds only EURC; between 1.10 and 1.15 it holds both and earns fees; above 1.15 it holds only USDC. [Concentrated liquidity](/achswap/concentrated-liquidity#what-the-position-holds-as-the-price-moves) shows this as a diagram.
 
 - **Inside the range**, your position holds both tokens and earns fees. As the price moves, it slowly sells the rising token for the falling one.
 - **Outside the range**, it holds only one token and earns nothing until the price comes back.
@@ -103,7 +125,7 @@ A V3 position has different risks from a V2 one. Choose the range with the same 
 
 - **Price movement.** If one token falls against the other, your position ends up holding more of the falling token. This is often called impermanent loss. Fees can make up for it, or not.
 - **Out of range.** A V3 position outside its range earns nothing.
-- **No guaranteed return.** APR figures look back at past fees. Future volume can be higher or lower.
+- **No guaranteed return.** APR figures look back at past fees. Future volume can be higher or lower. See [liquidity earnings and risks](/achswap/liquidity-earnings).
 - **Token risk.** Liquidity paired with a token that loses its value loses value with it.
 
 When you're done, see [remove liquidity](/achswap/remove-liquidity).

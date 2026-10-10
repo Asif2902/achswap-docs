@@ -29,6 +29,26 @@ Your **XP history** on the Overview lists every award: its date, its source and 
 
 XP replaced the earlier Points program. Task and GM points from it were carried over as XP. Its liquidity and volume points came from the test network and were not; swaps and bridges on Arc Mainnet are counted again from the volume record instead, from 16 September 2026, once.
 
+## If XP is missing
+
+1. **Check the timing.** Swaps, bridges, liquidity and referrals are added after the UTC day ends, by the distribution that runs shortly after 00:00 UTC. Tasks and GM are added at once.
+2. **Check the activity counts.** It must be made through AchSwap, with the same wallet, and (for swaps and bridges) pay AchSwap's fee. Liquidity must be in an [eligible pool](/quests/earning-xp#liquidity), held 24 hours, and in range for V3.
+3. **Check the ladder.** XP comes per doubling step, so $1.50 of swaps earns the same as $1, and the next step comes at $2.
+4. **Check the history.** The Overview's XP history lists every award by day and source, once the Quests page is open to you.
+
+Still missing after the next distribution? Email [support@achswap.app](mailto:support@achswap.app) with your wallet address, the transaction hash, and the UTC date. Never send a seed phrase or private key, or sign a message for anyone who says they need it to "check" your XP. See [troubleshooting](/help/troubleshooting#why-hasnt-my-xp-appeared).
+
+## Rule changes
+
+| Date | Change |
+| --- | --- |
+| 2026-10-08 | Seven badge tiers, one badge per level. Daily GM pays 1 XP, plus 20 on every 30th day in a row. |
+| 2026-10-06 | XP tiers on profiles; invite links can use your username. |
+| 2026-10-05 | Liquidity earns in full whether or not the wallet also swaps. Liquidity must be held a strict 24 hours before it earns. XP is distributed by the daily distribution only; there is nothing to claim. Profile pictures. |
+| 2026-10-04 | XP program V2: one doubling ladder for swaps, bridges and liquidity; 20 levels; task and GM XP added at once. Replaced the earlier Points program. |
+
+The bridge multiplier, the liquidity rate and holding boosts, and the referral share and weekly limit are settings AchSwap can change. A change applies from the next distribution and is listed here.
+
 ## Questions
 
 ### I did a task. When do I get the XP?

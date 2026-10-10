@@ -1,41 +1,68 @@
 import React from 'react';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import ThemedImage from '@theme/ThemedImage';
 
-const products = [
+type Entry = {label: string; to: string};
+type Audience = {id: string; eyebrow: string; title: string; description: string; entries: Entry[]};
+
+// Every link here points at a page that exists; the build fails on a broken one.
+const audiences: Audience[] = [
   {
-    title: 'Swap',
-    description:
-      'Compare AchSwap, LI.FI and KyberSwap quotes, inspect the route, and swap on Arc Mainnet.',
-    href: '/achswap/swap',
-    items: ['Token swaps', 'Split and mixed-DEX routes', 'Route map'],
+    id: 'users',
+    eyebrow: 'For users',
+    title: 'Trade and earn on Arc',
+    description: 'Swap, provide liquidity, bridge and earn XP, with every step explained.',
+    entries: [
+      {label: 'Getting started', to: '/getting-started/quick-start'},
+      {label: 'How swaps work', to: '/achswap/swap#what-happens-when-you-swap'},
+      {label: 'Comparing swap routes', to: '/achswap/smart-routing#how-the-best-route-is-chosen'},
+      {label: 'Gasless swaps', to: '/achswap/gasless'},
+      {label: 'Providing liquidity', to: '/achswap/add-liquidity'},
+      {label: 'Bridging assets', to: '/achswap/bridge'},
+      {label: 'XP and quests', to: '/quests/overview'},
+      {label: 'Troubleshooting', to: '/help/troubleshooting'},
+    ],
   },
   {
-    title: 'Liquidity',
-    description:
-      'Provide liquidity in AchSwap V2 pools or manage concentrated V3 positions.',
-    href: '/achswap/add-liquidity',
-    items: ['V2 pools', 'V3 positions', 'Fees and ranges'],
+    id: 'developers',
+    eyebrow: 'For developers',
+    title: 'Integrate the API',
+    description: 'Quotes and ready-to-sign swap transactions on Arc, with an optional fee for your app.',
+    entries: [
+      {label: 'API quick start', to: '/developers/examples'},
+      {label: 'Authentication and API keys', to: '/developers/developer-api#authentication'},
+      {label: 'Requesting quotes', to: '/developers/api-reference#post-quote'},
+      {label: 'Preparing and executing swaps', to: '/developers/api-reference#post-swap'},
+      {label: 'Fees and partner integrations', to: '/developers/api-reference#fees'},
+      {label: 'Error handling', to: '/developers/errors-and-limits'},
+      {label: 'API reference', to: '/developers/api-reference'},
+      {label: 'Changelog', to: '/developers/changelog'},
+    ],
   },
   {
-    title: 'Contracts',
-    description:
-      'Find every deployed Arc Mainnet contract and see how routes settle on chain.',
-    href: '/technical/contract-addresses',
-    items: ['AchSwap V2 and V3', 'Route executor and adapters', 'Gasless executor'],
+    id: 'reference',
+    eyebrow: 'Technical reference',
+    title: 'How it works on chain',
+    description: 'Contracts, routing, gasless execution and the trust assumptions behind them.',
+    entries: [
+      {label: 'Smart contracts', to: '/technical/smart-contracts'},
+      {label: 'Contract addresses', to: '/technical/contract-addresses'},
+      {label: 'Supported protocols', to: '/achswap/smart-routing#liquidity-sources'},
+      {label: 'Network configuration', to: '/getting-started/network-setup'},
+      {label: 'Routing architecture', to: '/technical/architecture'},
+      {label: 'Gasless architecture', to: '/technical/gasless'},
+      {label: 'Security considerations', to: '/technical/security'},
+    ],
   },
 ];
 
 export default function Home(): JSX.Element {
-  const {siteConfig} = useDocusaurusContext();
-
   return (
     <Layout
       title="Documentation"
-      description="AchSwap swaps, liquidity, routing, and contract addresses on Arc Mainnet">
+      description="AchSwap is a DEX aggregator on Arc Mainnet: guides for swaps, liquidity, bridging and XP, a developer API, and contract reference.">
       <main>
         <section className="homeHero">
           <div className="container homeHero__inner">
@@ -48,21 +75,20 @@ export default function Home(): JSX.Element {
                 dark: useBaseUrl('/img/achswap-lockup-white.svg'),
               }}
             />
-            <h1 className="homeHero__title">{siteConfig.title}</h1>
-            <p className="homeHero__subtitle">{siteConfig.tagline}</p>
-
+            <h1 className="homeHero__title">The DEX aggregator on Arc</h1>
+            <p className="homeHero__subtitle">
+              AchSwap compares its own router, which reads every supported DEX on Arc, with KyberSwap and LI.FI, and
+              uses the route expected to leave you the most after fees and gas.
+            </p>
             <div className="homeActions">
-              <Link className="button button--primary button--lg" to="/introduction">
-                Start reading
+              <Link className="button button--primary button--lg" to="/getting-started/quick-start">
+                Get started
               </Link>
-              <Link className="button button--secondary button--lg" to="/achswap/swap">
-                AchSwap
+              <Link className="button button--secondary button--lg" to="/developers/developer-api">
+                Developer API
               </Link>
-              <Link className="button button--secondary button--lg" to="/achswap/add-liquidity">
-                Liquidity
-              </Link>
-              <Link className="button button--secondary button--lg" to="/technical/contract-addresses">
-                Contracts
+              <Link className="button button--secondary button--lg" to="/introduction">
+                What AchSwap does
               </Link>
             </div>
           </div>
@@ -70,18 +96,23 @@ export default function Home(): JSX.Element {
 
         <section className="homeSection">
           <div className="container">
-            <div className="featureGrid">
-              {products.map((product) => (
-                <Link className="featureCard" to={product.href} key={product.title}>
-                  <span className="featureCard__label">Docs</span>
-                  <h2>{product.title}</h2>
-                  <p>{product.description}</p>
-                  <ul className="featureList">
-                    {product.items.map((item) => (
-                      <li key={item}>{item}</li>
+            <div className="audienceGrid">
+              {audiences.map((audience) => (
+                <section className="audienceCard" key={audience.id} aria-labelledby={`aud-${audience.id}`}>
+                  <span className="featureCard__label">{audience.eyebrow}</span>
+                  <h2 id={`aud-${audience.id}`}>{audience.title}</h2>
+                  <p>{audience.description}</p>
+                  <ul>
+                    {audience.entries.map((entry) => (
+                      <li key={entry.to}>
+                        <Link to={entry.to}>
+                          <span>{entry.label}</span>
+                          <span aria-hidden="true">→</span>
+                        </Link>
+                      </li>
                     ))}
                   </ul>
-                </Link>
+                </section>
               ))}
             </div>
 

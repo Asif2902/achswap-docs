@@ -4,6 +4,25 @@ sidebar_position: 2
 
 # How to earn XP
 
+These are the rules the daily distribution applies, as of **10 October 2026**. Rule changes are listed in the [changelog](/quests/distribution#rule-changes).
+
+```mermaid
+flowchart TD
+  A["Your activity on AchSwap"] --> B{"Which kind?"}
+  B -->|"Swap or bridge<br/>paid AchSwap's fee"| C["Add up the UTC day's<br/>swap total and bridge total"]
+  B -->|"Liquidity in an<br/>eligible USDC pool"| L["Held 24 h? V3 in range?<br/>Checked every 30 min"]
+  B -->|"GM, task,<br/>first username"| I["Added at once"]
+  C --> D["Count ladder steps:<br/>$1, $2, $4 … $524,288"]
+  L --> LD["Count ladder steps on the<br/>liquidity value × holding boost"]
+  D --> M["× 1 for swaps, × 1.2 for bridges<br/>(× 1.5 more on genesis days)"]
+  LD --> N["0.5 XP per step a day"]
+  M --> R["Your referrer gets 10% of this,<br/>up to 2,500 XP a week"]
+  N --> R
+  R --> S["Daily distribution after 00:00 UTC<br/>adds the day to your total"]
+  I --> T["Your total sets your level and rank"]
+  S --> T
+```
+
 | Source | XP | When it is added |
 |---|---|---|
 | Swaps | 1 per step of the daily ladder | Daily, after 00:00 UTC |
