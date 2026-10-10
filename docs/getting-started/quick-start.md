@@ -18,7 +18,7 @@ This walks you through your first swap on AchSwap. It takes a few minutes if you
 3. **Pick your tokens.** Choose what you pay in the top field and what you receive in the bottom one. Search by name, symbol or contract address.
 4. **Enter an amount.** A quote appears within a second or so. It refreshes on its own every 30 seconds while you decide.
 5. **Read the quote.** Before you confirm, look at:
-   - **Minimum received**: the least you will get. If the price moves further than your slippage setting, the swap cancels itself instead of paying less.
+   - **Minimum received**: the least you will get. If the price moves further than your slippage setting, the swap reverts instead of paying less, and you keep your tokens.
    - **Price impact**: how much your trade moves the price. Under 1% is normal for liquid pairs. The figure turns amber above 2% and red from 15%, where the app asks you to confirm the trade before it lets you swap.
    - **Network cost**: the gas, paid in USDC.
 6. **Approve, if asked.** When you sell a token other than USDC, your wallet asks for an approval so the swap contract can take that token. By default the approval is for exactly this swap, so each swap asks again; the **Enable unlimited approval** switch on the swap page avoids that. USDC needs no approval on AchSwap routes.
@@ -48,4 +48,4 @@ flowchart TD
 
 - Turn on [gasless swaps](/achswap/gasless) if you'd rather sign than pay gas.
 - [Add liquidity](/achswap/add-liquidity) to earn trading fees.
-- Visit [Quests](/quests/overview): your swaps already earn XP.
+- Read about [Quests and XP](/quests/overview): swaps made on AchSwap already count towards XP.

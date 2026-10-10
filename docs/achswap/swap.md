@@ -4,21 +4,15 @@ sidebar_position: 1
 
 # Swap tokens
 
-1. Open the Arc Mainnet version of AchSwap and connect your wallet on [Arc Mainnet](/getting-started/network-setup). Check that the chain ID is 5042.
+1. Open [trade.achswap.app](https://trade.achswap.app) and connect your wallet on [Arc Mainnet](/getting-started/network-setup). Check that the chain ID is 5042.
 2. Choose the input and output tokens, and enter an amount.
 3. Review the estimated output, minimum received, price impact and route before confirming.
 
 Your wallet may ask for an ERC-20 approval for the route's spender. Keep some USDC for gas.
 
-Every quote compares three providers: AchSwap's own router, LI.FI same-chain swaps and KyberSwap. The app shows the one expected to leave you the most, after all fees and the network cost: see [how the best route is chosen](/achswap/smart-routing#how-the-best-route-is-chosen). AchSwap's router covers:
+Every quote compares three providers: AchSwap's own router, LI.FI same-chain swaps and KyberSwap. The app shows the one expected to leave you the most, after all fees and the network cost: see [how the best route is chosen](/achswap/smart-routing#how-the-best-route-is-chosen). The DEXs AchSwap's router covers are listed under [liquidity sources](/achswap/smart-routing#liquidity-sources).
 
-- Uniswap V2, V3 and V4 (including V4 pools with hooks);
-- AchSwap V2 and V3;
-- Synthra, UnitFlow, Lunya, and the Slipstream DEXs Aero CL, Archery and Topaz;
-- DyorSwap, Architex, SushiSwap V3, Bugle and FlutchPad;
-- Virtuals launch curves, for tokens still on their launch curve.
-
-Only pools with usable liquidity contribute. LI.FI and KyberSwap are separate routing providers. The winning route reflects the quotes available at that moment, so it can change on refresh.
+Only pools with usable liquidity contribute. LI.FI and KyberSwap are independent, third-party routing providers. The winning route reflects the quotes available at that moment, so it can change on refresh.
 
 ## What happens when you swap
 
@@ -67,19 +61,7 @@ Enter an amount in the **To** field to set exactly how much you want to receive.
 
 ## Route details
 
-Next to the exchange rate, logos show which provider found the route and which DEXs it uses. Open **Trade details** under the quote to see:
-
-- the exchange rate, price impact, minimum received and slippage;
-- the network cost, estimated from the route's gas use at Arc's current gas price.
-
-Turn on **Detailed route** in your account menu to also see:
-
-- the route itself, shown as you choose:
-  - **Text:** each split, and every hop's DEX, pool fee and pool, with a mark for each pool that was checked.
-  - **Map:** an interactive map of the same route. Drag it, and zoom with the controls, the scroll wheel or a pinch.
-- what the routes of AchSwap's router, KyberSwap and LI.FI each leave you after their gas, which one is best, and how far behind the others are. A provider can quote a higher amount and still not be best once its gas is paid: see [how the best route is chosen](/achswap/smart-routing#how-the-best-route-is-chosen).
-
-Only one route view is shown at a time. These settings only affect what is displayed and never change a quote. See [smart routing](/achswap/smart-routing#route-details).
+Next to the exchange rate, logos show which provider found the route and which DEXs it uses. Open **Trade details** under the quote for the exchange rate, price impact, minimum received, slippage and network cost. Turn on **Detailed route** in your account menu to see the route itself, as text or as an interactive map, and what each provider's route would leave you after gas. These settings only change what is displayed, never the quote. Everything shown is explained under [route details](/achswap/smart-routing#route-details).
 
 When you confirm a swap, **Show more** in the confirmation repeats the route and the network cost.
 
@@ -89,7 +71,7 @@ Open the gear icon to change:
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| Slippage tolerance | 0.5% | How far the price may move against you before the swap cancels itself. Presets 0.1%, 0.5% and 1%, or type your own. |
+| Slippage tolerance | 0.5% | How far the price may move against you before the swap reverts. Presets 0.1%, 0.5% and 1%, or type your own. |
 | Transaction deadline | 20 minutes | A swap still pending after this long reverts instead of executing at an old price. |
 | Auto-refresh | 30 seconds | How often the quote reprices while you look at it. Click the timer to reprice now. |
 | Recipient | Your wallet | Send the output to another address. Not available with gasless swaps. |

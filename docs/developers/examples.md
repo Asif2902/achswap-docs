@@ -27,6 +27,8 @@ The TypeScript example was type-checked with viem 2.47 and run against the v1 ha
 
 Install `viem`, save this as `swap.ts`, and run it with your key and a funded wallet's private key in the environment. It swaps 10 USDC for EURC.
 
+Use a dedicated wallet that holds only what it needs to trade, keep its private key in a secrets manager or environment variable, and never commit it. In a web app, there is no private key on your side at all: the user's wallet signs.
+
 ```ts
 // swap.ts: a complete AchSwap Developer API swap with viem.
 // Run: ACHSWAP_KEY=ach_dev_… PRIVATE_KEY=0x… npx tsx swap.ts

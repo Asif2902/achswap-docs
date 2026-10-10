@@ -32,7 +32,7 @@ function PriceLine({ x, label = 'Current price' }: { x: number; label?: string }
 function Panel({ title, text, children, label }: { title: string; text: string; label: string; children: React.ReactNode }) {
   return (
     <div className="diagram__panel">
-      <h4>{title}</h4>
+      <p className="diagram__title">{title}</p>
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label}>
         <title>{label}</title>
         {children}

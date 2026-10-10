@@ -8,7 +8,7 @@ Every AchSwap route executes in one transaction on **AchRouteExecutor** (`0x1B84
 
 The executor does not look for routes. It holds no funds between transactions, makes no arbitrary calls and uses no `delegatecall`. Plans come from AchSwap's [routing engine](/technical/routing-engine), or from any integrator who encodes one by hand.
 
-Every contract on this page is source-verified on [arc.etherscan.io](https://arc.etherscan.io). Addresses are listed under [contract addresses](/technical/contract-addresses#swap-execution).
+Every contract on this page except adapter 6 is source-verified on [ArcScan](https://arc.etherscan.io); adapter 6 is live but not yet verified (checked 10 October 2026). Addresses are listed under [contract addresses](/technical/contract-addresses#swap-execution).
 
 ## Interface
 
@@ -131,6 +131,7 @@ Rules that apply to every adapter:
 | 3 | AchV3PoolExecutionAdapter | `abi.encode(address factory, int24 key)` | Concentrated-liquidity pools from eight V3 factories and four Slipstream factories |
 | 4 | AchV4HookExecutionAdapter | `abi.encode(PoolKey key, bool zeroForOne, uint160 priceLimit, bytes hookData)` | Uniswap V4 pools, with or without hooks |
 | 5 | AchLunyaPoolExecutionAdapter | `abi.encode(address factory, uint8 poolType)` | Lunya pools |
+| 6 | AchVirtualsBondingAdapter | `abi.encode(address bonding)` | Virtuals launch curves, against VIRTUAL |
 
 The factories each adapter accepts are listed under [contract addresses](/technical/contract-addresses#configured-factories).
 

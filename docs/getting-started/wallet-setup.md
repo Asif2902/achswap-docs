@@ -29,7 +29,7 @@ Before a contract can move a token out of your wallet, you have to give it permi
 - KyberSwap and LI.FI routes need their own approvals, to their own contracts.
 - [Gasless swaps](/achswap/gasless) use a one-time approval to Permit2 per token, then a signature for each swap.
 
-Your wallet shows the token, the spender's address and the amount. Check the spender against the [contract reference](/technical/contract-addresses) if you're unsure. You can review or revoke old approvals at any time with a tool such as the explorer's token approval page.
+Your wallet shows the token, the spender's address and the amount. Check the spender against the [contract reference](/technical/contract-addresses) if you're unsure. You can review and revoke old approvals at any time with an approval-management tool that supports Arc, or by sending an `approve(spender, 0)` transaction for the token.
 
 ### Smart-contract wallets
 

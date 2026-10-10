@@ -153,9 +153,9 @@ Next to the exchange rate, the app shows the logo of the provider that found the
 
 Open **Trade details** to see the exchange rate, price impact, minimum received, slippage and the **network cost**: the route's gas estimate at Arc's current gas price.
 
-Turn on **Detailed route** in your account menu to also see the route and every provider's quote.
+Turn on **Detailed route** in your account menu to also see the route and every provider's quote. These settings only change what is displayed, never the quote.
 
-**The route** is shown as **Text** or as a **Map** (one at a time):
+**The route** is shown as **Text** or as a **Map** (one at a time). The map can be dragged and zoomed with its controls, the scroll wheel or a pinch:
 
 - Each split with its share of your input, and every hop's DEX, pool fee and pool address.
 - A shield marks a pool that was checked:

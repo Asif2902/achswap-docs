@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # AchSwap on Arc
 
-AchSwap is a **DEX aggregator on Arc Mainnet** (chain ID 5042). For every swap it compares its own router, which reads the pools of every supported DEX on Arc, with the KyberSwap and LI.FI aggregators, and uses the route expected to leave you the most after fees and gas. It also runs its own V2 and V3 liquidity pools, a bridge powered by LI.FI, and an XP program. You keep custody the whole time: every action is a transaction or a signature from your own wallet.
+AchSwap is a **DEX aggregator on Arc Mainnet** (chain ID 5042). For every swap it compares its own router, which reads the pools of every supported DEX on Arc, with the KyberSwap and LI.FI aggregators, and uses the route expected to leave you the most after fees and gas. It also has its own V2 and V3 liquidity pools and an XP program, and offers a bridge interface powered by LI.FI, a third-party service. You keep custody the whole time: every action is a transaction or a signature from your own wallet.
 
 ## What you can do
 
@@ -24,7 +24,7 @@ AchSwap's own V4 liquidity contracts are not deployed on Arc Mainnet; AchSwap ro
 
 ## How a swap finds its price
 
-AchSwap's router reads the pools of every supported DEX on Arc and looks for the route that pays the most. It can split one trade across several pools and chain up to three hops. Before a quote is shown, the exact transaction is simulated against the live contracts, so the amount you see is what the contract would pay at that moment.
+AchSwap's own router reads the pools of every supported DEX on Arc and looks for the route that pays the most. It can split one trade across several pools and chain up to three hops. Before one of its quotes is shown, the exact transaction is simulated against the live contracts, so the amount you see is what the contract would pay at that moment. KyberSwap and LI.FI are independent aggregators with their own sources; AchSwap asks them for quotes and compares.
 
 It covers:
 
