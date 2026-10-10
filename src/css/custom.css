@@ -685,3 +685,10 @@ tr:nth-child(even) td {
     white-space: nowrap;
   }
 }
+
+/* Mermaid diagrams: keep the labels' line height to what the diagram measured them at, not the prose's. */
+.docusaurus-mermaid-container foreignObject p,
+.docusaurus-mermaid-container .nodeLabel {
+  margin: 0;
+  line-height: 1.5;
+}

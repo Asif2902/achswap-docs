@@ -79,7 +79,7 @@ These functions are owner-only on chain: `addInputToken` / `removeInputToken`, `
 | Relayers | `0x8bbB0990B9Ba9DeFDb10389e59955886F79B19cC`, `0x6e0df2d65d309b55B217B5237657302386E75584` |
 | Relayer enforcement | On |
 
-As of 1 October 2026 the target list also still contains the retired AchExecutionRouter and the first AchRouteExecutor. AchSwap no longer uses them, and they are removed when the retired contracts are paused.
+The retired AchExecutionRouter and first AchRouteExecutor were removed from both lists on 3 October 2026.
 
 Each input token has a minimum swap size in USD, which the app shows on the swap screen. Smaller swaps go through a normal swap where you pay the gas.
 
@@ -95,6 +95,6 @@ Each input token has a minimum swap size in USD, which the app shows on the swap
 
 The deployment transaction's input matches the compiled creation bytecode byte for byte. The live runtime code matches the compiled runtime once the Permit2 immutable is filled in.
 
-The app no longer uses the superseded executors: v2 `0x114FFB915eF00173D1c986c6FF5d445175622442` (two signatures) and v1 `0x1bC5c96ce21bc721e97DcBeABe787B9d83Dc8b1d`.
+The superseded executors, v2 `0x114FFB915eF00173D1c986c6FF5d445175622442` (two signatures) and v1 `0x1bC5c96ce21bc721e97DcBeABe787B9d83Dc8b1d`, were paused on 3 October 2026.
 
 See the [user guide](/achswap/gasless) and [contract addresses](/technical/contract-addresses#gasless).

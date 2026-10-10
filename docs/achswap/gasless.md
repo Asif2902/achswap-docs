@@ -21,7 +21,20 @@ With gasless mode on, you sign a swap instead of sending a transaction. An AchSw
 3. **Relay.** AchSwap's relayer checks the request, simulates it and submits it. You see the transaction hash as soon as it is broadcast.
 4. **Settlement.** On chain, the executor pulls exactly the signed amount through Permit2 and runs the signed route. It then checks that your wallet received at least the minimum. If not, the whole transaction reverts and nothing leaves your wallet.
 
-Earlier versions asked for two signatures per swap. The current executor needs one.
+```mermaid
+sequenceDiagram
+  participant W as Your wallet
+  participant App as AchSwap app
+  participant R as Relayer
+  participant E as Gasless executor
+  W->>App: Sign one Permit2 message (no gas)
+  App->>R: Signed swap
+  R->>R: Check and simulate
+  R->>E: Submit, paying the gas
+  E->>W: Pull the signed amount via Permit2
+  E->>E: Run the signed route
+  E-->>W: Output, at least your minimum
+```
 
 When a swap will be gasless, a small **Gasless** label appears next to the exchange rate. **Network cost** in the trade details then shows the normal cost struck through, marked "Free · Gasless". The confirmation's **Show more** lists the normal network cost, your saving, and **$0.00** as what you pay.
 

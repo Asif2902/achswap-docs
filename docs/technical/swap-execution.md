@@ -112,7 +112,7 @@ event Executed(address indexed payer, address indexed recipient, address indexed
     uint256 protocolFee, address partnerRecipient, uint256 partnerFee, bytes32 routeHash);
 ```
 
-`routeHash` is `keccak256(route)`. The executor and adapters 2–5 use a reentrancy lock held in transient storage. Adapter 1 only accepts calls from the executor.
+`routeHash` is `keccak256(route)`. The executor and adapters 2–6 use a reentrancy lock held in transient storage. Adapter 1 only accepts calls from the executor.
 
 ## Adapters
 
@@ -181,6 +181,14 @@ The step runs inside `PoolManager.unlock`. The adapter accepts the callback only
 
 The pool is the Lunya factory's own `getPool(token0, token1, poolType)`. Pool type `0` is concentrated liquidity, `1` is constant product and `2` is stable. Lunya pools use the V3 swap shape under their own callback name (`0xd9c40d3a`), and the adapter applies the same single-callback rules as adapter 3. AchSwap's router currently uses concentrated and constant-product Lunya pools.
 
+### 6 · Virtuals launch curves
+
+A Virtuals launch token trades against the asset token, VIRTUAL, on a bonding curve until it graduates to a Uniswap V2 pair. The adapter trades one of those curves in either direction: buying the launch token with VIRTUAL, or selling it back. One side of the step must be VIRTUAL and the other a token with a curve in the configured FFactory (`getPair(token, VIRTUAL)`); anything else is refused before any call.
+
+The trade goes through the Virtuals Bonding contract (`buy` or `sell`), whose FRouter pulls the input from the adapter. The FRouter is the only spender ever approved, for exactly the input, and the approval is reset to zero in the same step. The payload is `abi.encode(bonding)` and must name the configured Bonding contract.
+
+Launch status and taxes belong to the Bonding contract: 1% on each side, and a decaying anti-sniper tax in a launch's first minutes. A token that is not trading reverts there. AchSwap's router does not route launches still in their anti-sniper period, and the executor's minimum on the final output covers the rest.
+
 ## Native USDC
 
 - **Paying native USDC.** Set `tokenIn = address(0)` and `msg.value = amountIn` in 18-decimal wei. Typically each branch starts with a step on adapter 1 to `0x3600`, and no approval is needed. Before any step that spends native USDC, the executor rounds the branch amount down to a whole multiple of 10¹² wei. The remainder is refunded at the end.
@@ -223,7 +231,7 @@ Adapters revert with short reasons:
 | Transfer ownership | Owner | Two steps (`transferOwnership`, then `acceptOwnership`). Renouncing is disabled. |
 
 - Every fee or recipient change increments `feeConfig().version`, which invalidates plans built before the change.
-- The five adapters were registered before the executor was first activated. That registration path closed permanently on activation.
+- Adapters 1 to 5 were registered before the executor was first activated. That registration path closed permanently on activation. Adapter 6 was added later through the two-day delay.
 - Adapter ids are never reused, so replacing an adapter means a new id and the two-day delay.
 
 The owner cannot move user funds. The executor pulls only from `msg.sender`, only the `amountIn` of the call being executed, and keeps nothing afterwards.

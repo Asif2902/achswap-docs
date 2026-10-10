@@ -43,12 +43,24 @@ How the contract executes a route is described in [swap execution](/technical/sw
 | Slipstream pools: Aero CL (two factories), Archery, Topaz | Live |
 | Lunya concentrated and constant-product pools | Live |
 | DyorSwap, Architex, SushiSwap V3, Bugle, FlutchPad | Live |
+| Virtuals launch curves (tokens that have not yet graduated to a regular pool) | Live |
 
 A source contributes only when it has a pool with usable liquidity for your trade. New sources are added through the route executor's two-day security delay.
 
 ## How the best route is chosen
 
 The three providers do not produce their quotes the same way, so the app does not simply take the largest number. It compares what each route is **expected to deliver** to your wallet:
+
+```mermaid
+flowchart LR
+  A[AchSwap quote<br/>simulated on chain] --> G[minus network cost]
+  K[KyberSwap quote] --> KA[minus 0.12 bp] --> G2[minus network cost]
+  L[LI.FI quote] --> G3[minus network cost]
+  G --> C{Highest<br/>expected delivery}
+  G2 --> C
+  G3 --> C
+  C --> R[Route you see and sign]
+```
 
 1. **Start from the quote.** Each provider's quoted output already has the pool fees and the AchSwap fee (0.25%) taken off.
 2. **Take off the network cost.** On Arc, gas is paid in USDC from the same wallet, so a route that needs more gas leaves you with less. Each route's own gas estimate is priced at Arc's current gas price, converted into the token you receive, and subtracted from its quote.

@@ -4,7 +4,9 @@ sidebar_position: 8
 
 # Glossary
 
-**Adapter:** A contract that the route executor calls to trade on one kind of pool. Each adapter has a numeric id (1–5), and its configuration is fixed at deployment. See [swap execution](/technical/swap-execution#adapters).
+**Adapter:** A contract that the route executor calls to trade on one kind of pool. Each adapter has a numeric id (1–6), and its configuration is fixed at deployment. See [swap execution](/technical/swap-execution#adapters).
+
+**Ask / bid:** On a pool page's depth chart and order book, asks are what the pool sells as the price rises (you buying the base token), and bids are what it buys as the price falls (you selling it). A pool has no real orders; both come from its liquidity curve. See [pools](/achswap/pools#charts).
 
 **Allowance:** An ERC-20 holder's permission for a spender to transfer up to an approved amount.
 
@@ -16,9 +18,13 @@ sidebar_position: 8
 
 **Concentrated liquidity:** V3-style liquidity restricted to a chosen price range.
 
+**Depth:** How much of a token a pool can trade before its price moves by a given amount. A deeper pool absorbs larger trades with less price impact.
+
 **Exact input / exact output:** For exact input, you fix the amount you pay. For exact output, you fix the amount you receive, and the input is computed.
 
 **Fee configuration version:** A counter on the route executor that increases with every fee or fee-recipient change. Each swap carries the version it was quoted under and reverts if the version has changed.
+
+**Fee APR:** A pool's trading fees from the last 24 hours, annualised and divided by its TVL. A rough guide to recent earnings, not a forecast.
 
 **Fee tier:** A V3 pool's swap fee rate. Pools for the same pair can have different tiers.
 
@@ -31,6 +37,8 @@ sidebar_position: 8
 **Impermanent loss:** How much a liquidity position's value changes compared with simply holding its original tokens, caused by price movement.
 
 **LP token:** A fungible token representing a share of an AchSwap V2 pool.
+
+**In range / out of range:** Whether the current price is inside a V3 position's price range. Only an in-range position earns fees.
 
 **Minimum received:** The least output a swap will accept under its slippage setting. The swap reverts below it.
 
@@ -48,12 +56,20 @@ sidebar_position: 8
 
 **Route:** The sequence of pools and tokens a swap trades through, including any splits.
 
+**Spread:** The gap between the best price to buy and the best price to sell at a tiny size. For an AMM pool it's about one fee each way.
+
 **Slippage tolerance:** How far below the quote the output may fall before the swap reverts.
 
 **Step:** One swap within a branch: an adapter id, the token it outputs, and the data that identifies the pool.
 
+**TVL:** Total value locked: the value of the tokens a pool holds, at current market prices.
+
 **Tick:** A discrete V3 price boundary used to define a position's range.
 
 **Timelock:** A mandatory delay before a contract change takes effect. On the route executor, adding an adapter, raising the fee and changing the fee recipient each wait two days.
+
+**Virtuals launch curve:** The bonding curve a Virtuals launch token trades on against VIRTUAL before it graduates to a Uniswap V2 pair. AchSwap's router can trade on it.
+
+**Volume:** The value of swaps over a period, in USD at the time of each trade.
 
 **XP:** Points for using AchSwap, shown on the Quests page. They set your level (1 to 20) and your leaderboard rank. See [Quests and XP](/quests/overview).

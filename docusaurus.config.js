@@ -8,6 +8,7 @@ const config = {
   baseUrl: '/',
   onBrokenLinks: 'throw',
   markdown: {
+    mermaid: true,
     hooks: {
       onBrokenMarkdownLinks: 'warn',
     },
@@ -16,6 +17,8 @@ const config = {
 
   organizationName: 'achswap',
   projectName: 'achswap-docs',
+
+  themes: ["@docusaurus/theme-mermaid"],
 
   presets: [
     [
@@ -42,6 +45,15 @@ const config = {
 
   themeConfig: {
     image: 'img/og-image.png',
+    // Labels drawn as SVG text are measured in the font they render in, so multi-line
+    // flowchart labels are never clipped when the site font loads after the diagram.
+    mermaid: {
+      options: {
+        fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
+        htmlLabels: false,
+        flowchart: { htmlLabels: false },
+      },
+    },
     colorMode: {
       defaultMode: 'dark',
       disableSwitch: false,

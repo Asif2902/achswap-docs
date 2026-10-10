@@ -15,7 +15,8 @@ Every quote compares three providers: AchSwap's own router, LI.FI same-chain swa
 - Uniswap V2, V3 and V4 (including V4 pools with hooks);
 - AchSwap V2 and V3;
 - Synthra, UnitFlow, Lunya, and the Slipstream DEXs Aero CL, Archery and Topaz;
-- DyorSwap, Architex, SushiSwap V3, Bugle and FlutchPad.
+- DyorSwap, Architex, SushiSwap V3, Bugle and FlutchPad;
+- Virtuals launch curves, for tokens still on their launch curve.
 
 Only pools with usable liquidity contribute. LI.FI and KyberSwap are separate routing providers. The winning route reflects the quotes available at that moment, so it can change on refresh.
 
@@ -47,12 +48,29 @@ When you confirm a swap, **Show more** in the confirmation repeats the route and
 
 ## Settings
 
-The swap settings panel controls:
+Open the gear icon to change:
 
-- slippage tolerance;
-- transaction deadline;
-- quote refresh interval;
-- an optional recipient address.
+| Setting | Default | What it does |
+| --- | --- | --- |
+| Slippage tolerance | 0.5% | How far the price may move against you before the swap cancels itself. Presets 0.1%, 0.5% and 1%, or type your own. |
+| Transaction deadline | 20 minutes | A swap still pending after this long reverts instead of executing at an old price. |
+| Auto-refresh | 30 seconds | How often the quote reprices while you look at it. Click the timer to reprice now. |
+| Recipient | Your wallet | Send the output to another address. Not available with gasless swaps. |
+
+**Choosing slippage.** With 0.5% on a quote of 100 EURC, the minimum received is 99.5 EURC: you get at least that, or the swap reverts and you keep your tokens. Stable pairs rarely need more than 0.5%. Volatile or thinly traded tokens may need 1% or more. Higher slippage never improves your price. It only lets the trade go through at a worse one.
+
+## Warnings you may see
+
+| Warning | What it means |
+| --- | --- |
+| **Price impact** in amber (above 2%) or orange (above 5%) | Your trade is large for the available liquidity. Consider a smaller amount. |
+| **High price impact** (15% or more) | You'll get far fewer tokens than the market price suggests. The app asks you to confirm before it lets you swap. |
+| **Price impact unknown** | The impact couldn't be measured, which usually means very thin liquidity. Treated like high impact: you must confirm. |
+| **Unverified token** | The token isn't on AchSwap's list. Check its contract address before you trade it. |
+| **No provider can sell this back** | Neither AchSwap nor KyberSwap can find a route to sell the token. You may only be able to sell it where it launched. |
+| **V4 pool with custom hooks** | The route uses a Uniswap V4 pool whose hook can change fees. Your minimum is still protected, but you may need to retry. |
+
+## Price impact
 
 Price impact is what the route pays against market reference prices, before the AchSwap fee, and it is measured the same way for every provider. High price impact means the trade is large relative to the available liquidity, or the route goes through high-fee pools. Check the route and the minimum received: a higher slippage tolerance does not create liquidity or improve the quoted price.
 

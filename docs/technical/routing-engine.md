@@ -15,6 +15,7 @@ AchSwap's router finds the route, and the [route executor](/technical/swap-execu
 | Slipstream: Aero CL (two factories), Archery and Topaz | Concentrated liquidity with per-pool fees | 3 |
 | Uniswap V4, including launchpad hooks (Aka.fun, o1 Launchpad, Minara.fun, Argus, Long.supply, Foci, Faze, Peach, FlutchPad) | Hookless and hooked pools | 4 |
 | Lunya | Concentrated-liquidity and constant-product pools | 5 |
+| Virtuals launch curves, for tokens that have not yet graduated to a Uniswap V2 pair | Bonding curve against VIRTUAL | 6 |
 | Native USDC ↔ `0x3600` USDC | One balance, two interfaces | 1 |
 
 The exact factory list is under [configured factories](/technical/contract-addresses#configured-factories). A source only contributes when it has a pool for the pair with usable liquidity.

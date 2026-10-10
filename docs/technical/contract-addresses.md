@@ -35,7 +35,7 @@ V3 fee tiers: 100, 500, 3000 and 10000.
 
 ## Swap execution
 
-Every AchSwap route executes on **AchRouteExecutor**, which uses five execution adapters. How they work is described in [swap execution](/technical/swap-execution).
+Every AchSwap route executes on **AchRouteExecutor**, which uses six execution adapters. How they work is described in [swap execution](/technical/swap-execution).
 
 | Contract | Adapter id | Address | Deployment tx (block) |
 | --- | ---: | --- | --- |
@@ -45,6 +45,7 @@ Every AchSwap route executes on **AchRouteExecutor**, which uses five execution 
 | AchV3PoolExecutionAdapter | 3 | `0xb9b9Ab2daee19b4DD2aB3194ae578605A5F4bffD` | [`0x904d…b1be`](https://arc.etherscan.io/tx/0x904ddcf03dc012b85d6c39eeda47533afd56c90a7f4439b8ea4ac269aa13b1be) (23596896) |
 | AchV4HookExecutionAdapter | 4 | `0x74A60d5aAA7515b199Ce4aAd4E6D2eB7f25F0E16` | [`0x58d0…7cba`](https://arc.etherscan.io/tx/0x58d0b0ed683eec2923e58212e803b5bd6206521439f9931a4280646e5b917cba) (23596902) |
 | AchLunyaPoolExecutionAdapter | 5 | `0x4383d30E2EFb44aDB8Af8f05754963df93388c88` | [`0x3163…d924`](https://arc.etherscan.io/tx/0x3163201b699bd39b10f0f3cb18c9cc8310b062fd37064355deae87d5dc14d924) (23596908) |
+| AchVirtualsBondingAdapter | 6 | `0x416660F95772Eb502E1B3E18025477EAF551c106` | [`0x89b9…8936`](https://arc.etherscan.io/tx/0x89b9479e7f4d1efef7a26a5d882fe23c5fd3bee3d1c347b6d0d545b4dce38936) (23997536) |
 
 | Setting | Value |
 | --- | --- |
@@ -52,7 +53,7 @@ Every AchSwap route executes on **AchRouteExecutor**, which uses five execution 
 | Fee recipient | AchSwap treasury Safe `0x0dbd33291b0bc85e75465d0d7F261b4cF758BCf0`, paid directly on every swap |
 | Fee configuration version | 1 |
 | Owner | `0x5820cdcEE868F395eB26fA9b00123f4b7530DC11` |
-| Activation | `0x26001dac844c56eb59fba7b21ae46fa02d99c5779a1e66a99a3ca509a9f5d427` (block 23596946). All five adapters were active from the first block. |
+| Activation | `0x26001dac844c56eb59fba7b21ae46fa02d99c5779a1e66a99a3ca509a9f5d427` (block 23596946). Adapters 1 to 5 were active from the first block. Adapter 6 was scheduled in [`0x5961…096b`](https://arc.etherscan.io/tx/0x59618ab6d9b6275ce47699cb67593d5ff52ea82f3e255cf6afbc83a9207b096b) (block 23997539) and, after the two-day delay, activated in [`0x852e…9780`](https://arc.etherscan.io/tx/0x852e0d5a1526a2471bdccda6d62966d9955983327b42365ebc3fbfdd0e6c9780) (block 24349221). |
 | Compiler | solc 0.8.24, via-IR, optimizer 200 runs, EVM cancun |
 
 There is no fee vault and nothing to claim: each swap pays the fee to the Safe in the same transaction.
@@ -94,6 +95,8 @@ Protocol names are taken from on-chain evidence. For V2 factories that is the LP
 
 **Adapter 5 (Lunya).** Factory `0x711492DF23F320745de6fD7f0ab9564FDBfeA016`, callback selector `0xd9c40d3a`.
 
+**Adapter 6 (Virtuals launch curves).** Bonding `0xe026b7F0faC92F611495fC482C6493b9955EcafA`, FRouter `0xB0CAe8fE86Ad8B852bf93825BB878Ea5c5AF1c89`, FFactory `0x7841C01489bE445DC038201f8D5D21b6052A955E`, asset (VIRTUAL) `0x8C4252c87081c88c6Ad57d6dD97E1cAFebF842B7`. Trades launch tokens against VIRTUAL while they are still on their bonding curve. The curve charges its own 1% trading tax on buys and sells, which quotes include, and launches still in their opening anti-sniper period are not routed. Once a token graduates, it trades on a Uniswap V2 pair through adapter 2.
+
 ## Gasless
 
 | Contract | Address | Notes |
@@ -109,7 +112,7 @@ The gasless executor can call, and approve as spender, these targets:
 - LI.FI diamond `0xA4072583658Fae592A3506A42431cb6316a8d40b`
 - AchRouteExecutor `0x1B844738455b8060D12839331b35893526E9d314`, added 1 October 2026 in txs `0xfd8ae0a855770c0b4cf787070f3ebe1ae91c0e5a300cb55313d6af2dec698dfd` and `0x5b86485070a62513f0b8ddee984d3ae2c0d2c2780b9a958f958dd55bb0f7b009`
 
-The list also still contains two retired targets, the AchExecutionRouter and the first AchRouteExecutor. They are removed when the retired contracts are paused. See [gasless architecture](/technical/gasless).
+The retired AchExecutionRouter and first AchRouteExecutor were removed from both lists on 3 October 2026 (blocks 23997599 to 23997608). See [gasless architecture](/technical/gasless).
 
 ## Periphery
 
@@ -151,7 +154,7 @@ These belong to other protocols. AchSwap routes through their pools, but does no
 
 ## Retired contracts
 
-AchSwap no longer uses these contracts. They are listed only so that older transactions can be decoded. Do not use them for new transactions.
+AchSwap no longer uses these contracts. They are listed only so that older transactions can be decoded. On 3 October 2026 the first AchRouteExecutor, the AchExecutionRouter and both earlier gasless executors were paused (blocks 23997611 to 23997620), so they no longer execute swaps.
 
 | Contract | Address | Role |
 | --- | --- | --- |

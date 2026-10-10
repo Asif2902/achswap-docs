@@ -23,6 +23,8 @@ const sidebars = {
         'achswap/remove-liquidity',
         'achswap/pools',
         'achswap/bridge',
+        'achswap/explore',
+        'achswap/analytics',
       ],
     },
     {
@@ -48,7 +50,12 @@ const sidebars = {
       type: 'category',
       label: 'Developers',
       collapsed: false,
-      items: ['developers/developer-api'],
+      items: [
+        'developers/developer-api',
+        'developers/api-reference',
+        'developers/examples',
+        'developers/errors-and-limits',
+      ],
     },
     {
       type: 'category',
