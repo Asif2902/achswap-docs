@@ -23,6 +23,13 @@ If you depend on the API in production, email [support@achswap.app](mailto:suppo
 
 ## API
 
+### 2026-10-20: new route executor
+
+- `/swap` transactions now go to AchRouteExecutorV2 `0xF69036De0e32566CfF7C79c29229D441cdE3e48E`: `tx.to` and `approval.spender` changed. The same routes and output cost about 22% less gas. Request and response fields are unchanged.
+- **Approve again:** an allowance given to the earlier AchRouteExecutor `0x1B844738455b8060D12839331b35893526E9d314` does not carry over. Use the `approval` object in each `/swap` response, as before.
+- **Native USDC output:** both fees are now taken in whole 6-decimal units (`floor(gross / 10^12 × bps / 10000) × 10^12`). `fees` and `amountOut` in the response already reflect this.
+- The `route` inside `tx.data` uses the executor's new packed encoding (see [swap execution](/technical/swap-execution#route-encoding)). Treat `tx.data` as opaque.
+
 ### 2026-10-02: v1 released
 
 - `POST /api/v1/quote` and `POST /api/v1/swap` on Arc Mainnet (chain `5042`), exact input, AchSwap routes executed on AchRouteExecutor `0x1B844738455b8060D12839331b35893526E9d314`.

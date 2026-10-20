@@ -38,7 +38,31 @@ V3 fee tiers (fee in hundredths of a basis point, tick spacing): 100 (0.01%, 1),
 
 ## Swap execution
 
-Every AchSwap route executes on **AchRouteExecutor**, which uses six execution adapters. How they work is described in [swap execution](/technical/swap-execution).
+Every AchSwap route executes on **AchRouteExecutorV2**, which uses five execution adapters. How they work is described in [swap execution](/technical/swap-execution). It replaced AchRouteExecutor on 20 October 2026: the same routes and output for about 22% less gas.
+
+| Contract | Adapter id | Address | Deployment tx (block) |
+| --- | ---: | --- | --- |
+| AchRouteExecutorV2 | — | [`0xF69036De0e32566CfF7C79c29229D441cdE3e48E`](https://arc.etherscan.io/address/0xF69036De0e32566CfF7C79c29229D441cdE3e48E) | [`0x22d5…559f`](https://arc.etherscan.io/tx/0x22d59c12754de3c06f7869ff28d9d67c636fcb7ceb805ee3b2bde9c76a5e559f) (26934048) |
+| AchV2PairAdapterV2 | 2 | [`0x7cd4a7379A818e7Cd3C1EBf268C61F2b1CB95036`](https://arc.etherscan.io/address/0x7cd4a7379A818e7Cd3C1EBf268C61F2b1CB95036) | [`0xfb72…2983`](https://arc.etherscan.io/tx/0xfb72d7927d5a44a5b1d5db99499251c9f96b77d1d2511357aa2a1f1ab9f22983) (26934052) |
+| AchV3PoolAdapterV2 | 3 | [`0x0a32f1222B1142fEEBEda1AD3576F062f68b701c`](https://arc.etherscan.io/address/0x0a32f1222B1142fEEBEda1AD3576F062f68b701c) | [`0x13db…d3cb`](https://arc.etherscan.io/tx/0x13db63b95e9403dd007c27824a2425146f0e1e0f9f0aa04aef0c4a8b65a5d3cb) (26934055) |
+| AchV4HookAdapterV2 | 4 | [`0x3401A0c7E6F24fA48E8F531EB2172C08e4D7B89C`](https://arc.etherscan.io/address/0x3401A0c7E6F24fA48E8F531EB2172C08e4D7B89C) | [`0x4b1e…38a5`](https://arc.etherscan.io/tx/0x4b1eef2490b383eb4f53a1d43165240c672eb90def95bce4c1bd0aaed18538a5) (26934058) |
+| AchLunyaPoolAdapterV2 | 5 | [`0xa358fcde6b34Bb3f3a35F4da3f74C9a096D171B9`](https://arc.etherscan.io/address/0xa358fcde6b34Bb3f3a35F4da3f74C9a096D171B9) | [`0xf3f8…1322`](https://arc.etherscan.io/tx/0xf3f80bd4099181ef8ca4af677c604fc342bdfcc5cffe0361be30a5dc031a1322) (26934061) |
+| AchVirtualsBondingAdapterV2 | 6 | [`0x20d8058bC76093582aAc7D0315381AEB5F6Fa3DE`](https://arc.etherscan.io/address/0x20d8058bC76093582aAc7D0315381AEB5F6Fa3DE) | [`0x50f4…0370`](https://arc.etherscan.io/tx/0x50f4291bcc5b2b72f2ed7a0240a397fef955fb85ce82f821c15b8bf9fc3b0370) (26934064) |
+
+| Setting | Value |
+| --- | --- |
+| Protocol fee | 25 bps (0.25%) of the output, charged once per swap |
+| Fee recipient | AchSwap treasury Safe [`0x0dbd33291b0bc85e75465d0d7F261b4cF758BCf0`](https://arc.etherscan.io/address/0x0dbd33291b0bc85e75465d0d7F261b4cF758BCf0), paid directly on every swap |
+| Fee configuration version | 1 |
+| Owner | [`0x5820cdcEE868F395eB26fA9b00123f4b7530DC11`](https://arc.etherscan.io/address/0x5820cdcEE868F395eB26fA9b00123f4b7530DC11) |
+| Activation | [`0x5cdd…67f7`](https://arc.etherscan.io/tx/0x5cdd639e012b30265273c91763e010b7056ab3dbe6610245928d0151856c67f7) (block 26934087). Adapters 2 to 6 were registered before it, so all five were active from the first block. |
+| Compiler | solc 0.8.24, via-IR, optimizer 200 runs, EVM cancun |
+
+Each adapter is configured exactly like the AchRouteExecutor adapter with the same id, so both executors reach the same pools.
+
+### Previous executor (AchRouteExecutor, until 20 October 2026)
+
+AchRouteExecutor executed every AchSwap route from 1 to 20 October 2026. It still answers, so older transactions decode as before, but AchSwap no longer routes through it.
 
 | Contract | Adapter id | Address | Deployment tx (block) |
 | --- | ---: | --- | --- |
@@ -113,7 +137,8 @@ The gasless executor can call, and approve as spender, these targets:
 
 - KyberSwap router [`0x6131B5fae19EA4f9D964eAc0408E4408b66337b5`](https://arc.etherscan.io/address/0x6131B5fae19EA4f9D964eAc0408E4408b66337b5)
 - LI.FI diamond [`0xA4072583658Fae592A3506A42431cb6316a8d40b`](https://arc.etherscan.io/address/0xA4072583658Fae592A3506A42431cb6316a8d40b)
-- AchRouteExecutor [`0x1B844738455b8060D12839331b35893526E9d314`](https://arc.etherscan.io/address/0x1B844738455b8060D12839331b35893526E9d314), added 1 October 2026 in txs `0xfd8ae0a855770c0b4cf787070f3ebe1ae91c0e5a300cb55313d6af2dec698dfd` and `0x5b86485070a62513f0b8ddee984d3ae2c0d2c2780b9a958f958dd55bb0f7b009`
+- AchRouteExecutorV2 [`0xF69036De0e32566CfF7C79c29229D441cdE3e48E`](https://arc.etherscan.io/address/0xF69036De0e32566CfF7C79c29229D441cdE3e48E), added 20 October 2026 in txs `0x1f3e45016a1c48f075206eb2c39f71fbd6c2082e13c722e4e20ff67110af9aab` and `0xa6f40ad3b4754257e8438ae61ada0ad4e77474f861448b0422197226bac59002`
+- AchRouteExecutor [`0x1B844738455b8060D12839331b35893526E9d314`](https://arc.etherscan.io/address/0x1B844738455b8060D12839331b35893526E9d314), added 1 October 2026 in txs `0xfd8ae0a855770c0b4cf787070f3ebe1ae91c0e5a300cb55313d6af2dec698dfd` and `0x5b86485070a62513f0b8ddee984d3ae2c0d2c2780b9a958f958dd55bb0f7b009`; AchSwap no longer routes through it
 
 The retired AchExecutionRouter and first AchRouteExecutor were removed from both lists on 3 October 2026 (blocks 23997599 to 23997608). See [gasless architecture](/technical/gasless).
 

@@ -26,7 +26,7 @@ Quotes normally take a fraction of a second. The first quote for a token the rou
 
 ## What executes
 
-An AchSwap route executes in **one transaction** on the `AchRouteExecutor` contract:
+An AchSwap route executes in **one transaction** on the `AchRouteExecutorV2` contract:
 
 - Every split and hop runs atomically. If any part fails, the whole swap reverts and you keep your tokens.
 - The AchSwap fee is **0.25% of the final output, charged once**, not per hop or per split. It goes straight to the AchSwap treasury Safe in the same transaction.

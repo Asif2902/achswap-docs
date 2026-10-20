@@ -12,11 +12,11 @@ Gasless swaps let you trade without holding gas. You sign once, an allowlisted r
 | Component | Role |
 | --- | --- |
 | Wallet | Signs one Permit2 `PermitWitnessTransferFrom`, with the swap as its witness. |
-| AchSwap app | Builds the route calldata (a KyberSwap build, a LI.FI transaction or an AchRouteExecutor call), the order and the signature request. |
+| AchSwap app | Builds the route calldata (a KyberSwap build, a LI.FI transaction or an AchRouteExecutorV2 call), the order and the signature request. |
 | Relay | Validates the order and signature off chain, simulates the swap, and broadcasts it from an allowlisted relayer wallet. |
 | `AchSponsoredExecutorV3` | Pulls the input through Permit2, calls the allowlisted target, and checks the minimum output against the recipient's balance. |
 | Permit2 | Verifies the signature (token, amount, spender, nonce, deadline, chain and witness) and moves the input. |
-| Targets | KyberSwap router, LI.FI diamond and AchRouteExecutor. |
+| Targets | KyberSwap router, LI.FI diamond and AchRouteExecutorV2. |
 
 ## Flow
 
@@ -62,7 +62,7 @@ Who does what: **you** sign once (and pay for the one-time approval); **the rela
    - resets the approval and refunds any unused input to you;
    - forwards any output left on the executor, then requires the recipient's balance to have increased by at least `minAmountOut`.
 
-For an AchSwap route, the target is AchRouteExecutor. Its `execute()` call names you as the recipient, so the route executor pays you directly and the gasless executor checks your balance increase.
+For an AchSwap route, the target is AchRouteExecutorV2. Its `execute()` call names you as the recipient, so the route executor pays you directly and the gasless executor checks your balance increase.
 
 ## The signature
 
@@ -122,7 +122,7 @@ These functions are owner-only on chain: `addInputToken` / `removeInputToken`, `
 | List | Entries |
 | --- | --- |
 | Input tokens | EURC [`0xbEf5f6d51CB62b58e6A8f77868681825C6fe21c1`](https://arc.etherscan.io/address/0xbEf5f6d51CB62b58e6A8f77868681825C6fe21c1), cirBTC [`0x171A4217b86A807A64eB94757Db6849fb4bDbAA0`](https://arc.etherscan.io/address/0x171A4217b86A807A64eB94757Db6849fb4bDbAA0), USDC [`0x3600000000000000000000000000000000000000`](https://arc.etherscan.io/address/0x3600000000000000000000000000000000000000) |
-| Targets and approval spenders | KyberSwap [`0x6131B5fae19EA4f9D964eAc0408E4408b66337b5`](https://arc.etherscan.io/address/0x6131B5fae19EA4f9D964eAc0408E4408b66337b5), LI.FI [`0xA4072583658Fae592A3506A42431cb6316a8d40b`](https://arc.etherscan.io/address/0xA4072583658Fae592A3506A42431cb6316a8d40b), AchRouteExecutor [`0x1B844738455b8060D12839331b35893526E9d314`](https://arc.etherscan.io/address/0x1B844738455b8060D12839331b35893526E9d314) |
+| Targets and approval spenders | KyberSwap [`0x6131B5fae19EA4f9D964eAc0408E4408b66337b5`](https://arc.etherscan.io/address/0x6131B5fae19EA4f9D964eAc0408E4408b66337b5), LI.FI [`0xA4072583658Fae592A3506A42431cb6316a8d40b`](https://arc.etherscan.io/address/0xA4072583658Fae592A3506A42431cb6316a8d40b), AchRouteExecutorV2 [`0xF69036De0e32566CfF7C79c29229D441cdE3e48E`](https://arc.etherscan.io/address/0xF69036De0e32566CfF7C79c29229D441cdE3e48E) (added 20 October 2026), AchRouteExecutor [`0x1B844738455b8060D12839331b35893526E9d314`](https://arc.etherscan.io/address/0x1B844738455b8060D12839331b35893526E9d314) (no longer used by AchSwap) |
 | Relayers | [`0x8bbB0990B9Ba9DeFDb10389e59955886F79B19cC`](https://arc.etherscan.io/address/0x8bbB0990B9Ba9DeFDb10389e59955886F79B19cC), [`0x6e0df2d65d309b55B217B5237657302386E75584`](https://arc.etherscan.io/address/0x6e0df2d65d309b55B217B5237657302386E75584) |
 | Relayer enforcement | On |
 

@@ -24,14 +24,14 @@ flowchart TD
   end
   subgraph onchain["On chain: Arc Mainnet"]
     W["Your wallet signs and sends"] --> X{"Which route?"}
-    X -->|AchSwap| E["AchRouteExecutor<br/>+ adapters → pools"]
+    X -->|AchSwap| E["AchRouteExecutorV2<br/>+ adapters → pools"]
     X -->|KyberSwap| KR["KyberSwap router"]
     X -->|LI.FI| LD["LI.FI diamond"]
   end
   B --> W
 ```
 
-The partner [Developer API](/developers/developer-api) uses the left-hand path with AchSwap's router only: it returns AchRouteExecutor transactions and does not include KyberSwap or LI.FI routes.
+The partner [Developer API](/developers/developer-api) uses the left-hand path with AchSwap's router only: it returns AchRouteExecutorV2 transactions and does not include KyberSwap or LI.FI routes.
 
 ## The pieces
 
@@ -43,7 +43,7 @@ The partner [Developer API](/developers/developer-api) uses the left-hand path w
 | **KyberSwap and LI.FI** | External services | Independent aggregators. AchSwap asks them for exact-input quotes and uses their transactions as they build them. |
 | **Route comparison** | The swap page | Ranks the providers' quotes by what each is expected to deliver after gas. See [how the best route is chosen](/achswap/smart-routing#how-the-best-route-is-chosen). |
 | **Gasless relay** | AchSwap servers | For [gasless swaps](/technical/gasless): checks a signed order, simulates it and submits it, paying the gas. |
-| **AchRouteExecutor** | Arc Mainnet | Executes an AchSwap route atomically through its [execution adapters](/technical/swap-execution#adapters), takes the 0.25% fee, and enforces your minimum. |
+| **AchRouteExecutorV2** | Arc Mainnet | Executes an AchSwap route atomically through its [execution adapters](/technical/swap-execution#adapters), takes the 0.25% fee, and enforces your minimum. |
 | **AchSponsoredExecutorV3** | Arc Mainnet | Executes a gasless swap exactly as signed, through Permit2. |
 
 ## Off chain versus on chain

@@ -146,14 +146,14 @@ The `/quote` fields, plus:
   "recipient": "0x…",
   "deadline": 1790000000,
   "tx": {
-    "to": "0x1B844738455b8060D12839331b35893526E9d314",
+    "to": "0xF69036De0e32566CfF7C79c29229D441cdE3e48E",
     "data": "0x…",
     "value": "0",
     "gas": "645291"
   },
   "approval": {
     "token": "0x3600000000000000000000000000000000000000",
-    "spender": "0x1B844738455b8060D12839331b35893526E9d314",
+    "spender": "0xF69036De0e32566CfF7C79c29229D441cdE3e48E",
     "amount": "100000000"
   },
   "simulated": true
@@ -164,7 +164,7 @@ The `/quote` fields, plus:
 | --- | --- | --- |
 | `sender`, `recipient` | address | As requested; `recipient` defaults to `sender`. |
 | `deadline` | integer | Unix seconds after which the transaction reverts. |
-| `tx.to` | address | Always the AchRouteExecutor. |
+| `tx.to` | address | Always the route executor, AchRouteExecutorV2. |
 | `tx.data` | hex string | The encoded `execute(...)` call, with `minAmountOut`, the deadline and your fee built in. |
 | `tx.value` | string (integer) | Native USDC to send, in 18-decimal units. `"0"` unless the input is native USDC. |
 | `tx.gas` | string (integer) or `null` | A gas limit: the simulated gas plus headroom. `null` when `simulated` is false. |
@@ -187,7 +187,7 @@ Call `/swap` right before your user signs, not when you first show a price. A tr
 
 | Contract | Address |
 | --- | --- |
-| AchRouteExecutor (spender and `tx.to`) | `0x1B844738455b8060D12839331b35893526E9d314` |
+| AchRouteExecutorV2 (spender and `tx.to`) | `0xF69036De0e32566CfF7C79c29229D441cdE3e48E` (since 20 October 2026; an approval given to the earlier AchRouteExecutor `0x1B844738455b8060D12839331b35893526E9d314` does not carry over) |
 | USDC (ERC-20) | `0x3600000000000000000000000000000000000000` |
 
 The executor is source-verified. See [swap execution](/technical/swap-execution) for what `execute` does on chain, and the [contract reference](/technical/contract-addresses) for everything else.

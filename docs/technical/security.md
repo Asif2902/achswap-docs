@@ -35,7 +35,7 @@ An approval lets a contract move a token from your wallet, up to an amount. On A
 
 | Action | Spender you approve | Amount the app asks for |
 | --- | --- | --- |
-| Swap on an AchSwap route | AchRouteExecutor `0x1B84…d314` | The swap's input |
+| Swap on an AchSwap route | AchRouteExecutorV2 `0xF690…e48E` | The swap's input |
 | Swap on a KyberSwap route | KyberSwap's router | The swap's input |
 | Swap on a LI.FI route | LI.FI's contract | The swap's input |
 | First gasless swap with a token | Permit2 `0x0000…8BA3` | Unlimited (the largest amount Permit2 accepts), once per token |
@@ -54,7 +54,7 @@ A gasless swap is authorized by one Permit2 signature that covers the whole swap
 - **The relayer cannot change the trade.** The executor rebuilds the signed data from the order it receives. A changed field makes Permit2 reject the signature.
 - **One use only.** Each signature carries a Permit2 nonce that can be used once.
 - **Expiry.** The signature carries a deadline. The contract refuses an expired order, and AchSwap's relay refuses deadlines more than three hours ahead.
-- **Restricted reach.** The executor only pulls allowlisted input tokens and only calls allowlisted targets (KyberSwap, LI.FI, AchRouteExecutor) through allowlisted relayers.
+- **Restricted reach.** The executor only pulls allowlisted input tokens and only calls allowlisted targets (KyberSwap, LI.FI, AchRouteExecutorV2) through allowlisted relayers.
 - **Your minimum on your balance.** The executor checks your actual balance increase against the signed minimum.
 
 The relayer can choose **not** to submit a signed order. Until the deadline passes, a signed order could still be submitted. To cancel one, invalidate its nonce on Permit2 (`invalidateUnorderedNonces`), or wait for it to expire.
@@ -63,7 +63,7 @@ The relayer can choose **not** to submit a signed order. Until the deadline pass
 
 | Contract | The owner can | The owner cannot |
 | --- | --- | --- |
-| AchRouteExecutor | Pause. Disable an adapter. Add an adapter after a 2-day delay. Lower the fee at once, or raise it after a 2-day delay, up to 1%. Change the fee recipient after a 2-day delay, with the new recipient's acceptance. | Move user funds. Apply a new fee to a transaction built under the old one. Point an existing adapter id at different code. Renounce ownership. |
+| AchRouteExecutorV2 | Pause. Disable an adapter. Add an adapter after a 2-day delay. Lower the fee at once, or raise it after a 2-day delay, up to 1%. Change the fee recipient after a 2-day delay, with the new recipient's acceptance. | Move user funds. Apply a new fee to a transaction built under the old one. Point an existing adapter id at different code. Renounce ownership. |
 | Execution adapters | Deny a Uniswap V4 hook (adapter 4). | Change factories, fees or callback settings. Call an adapter directly: only the executor can. |
 | AchSponsoredExecutorV3 | Curate input tokens, targets, spenders and relayers. Pause. Recover tokens or native USDC left in the contract. | Change a signed swap, or pull more than the signed amount. |
 

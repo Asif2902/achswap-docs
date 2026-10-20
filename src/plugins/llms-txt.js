@@ -95,7 +95,7 @@ module.exports = function llmsTxtPlugin(context) {
         '',
         '- Network: Arc Mainnet, chain ID 5042. Gas is paid in USDC; USDC is one balance seen as an 18-decimal native currency and a 6-decimal ERC-20 at 0x3600000000000000000000000000000000000000.',
         '- App: https://trade.achswap.app. Developer API base URL: https://trade.achswap.app/api/v1 (POST /quote, POST /swap; API key required).',
-        '- AchSwap routes execute on AchRouteExecutor 0x1B844738455b8060D12839331b35893526E9d314, which takes a 0.25% fee from the output.',
+        '- AchSwap routes execute on AchRouteExecutorV2 0xF69036De0e32566CfF7C79c29229D441cdE3e48E, which takes a 0.25% fee from the output.',
         '- Each page below is also available as Markdown at the linked .md URL. All pages in one file: ' + SITE + '/llms-full.txt',
         '',
       ];

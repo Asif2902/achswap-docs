@@ -15,7 +15,7 @@ The AchSwap Developer API gives your application AchSwap's best route on Arc Mai
 | Endpoints | [`POST /quote`](/developers/api-reference#post-quote) and [`POST /swap`](/developers/api-reference#post-swap) |
 | Format | JSON in, JSON out |
 | Network | Arc Mainnet, chain ID `5042` |
-| Executes on | AchRouteExecutor `0x1B844738455b8060D12839331b35893526E9d314` |
+| Executes on | AchRouteExecutorV2 `0xF69036De0e32566CfF7C79c29229D441cdE3e48E` (since 20 October 2026) |
 | Trades | Exact input. The API doesn't offer exact-output or gasless swaps. |
 
 ## How a swap works

@@ -37,7 +37,7 @@ It covers:
 - DyorSwap, Architex, SushiSwap V3, Bugle and FlutchPad;
 - Virtuals launch curves, for tokens that have not yet moved to a regular pool.
 
-An AchSwap route settles in one transaction on the `AchRouteExecutor` contract, which takes a single 0.25% fee from the output. See [smart routing](/achswap/smart-routing) for how routes are compared and [fees](/technical/fee-structure) for every fee in one place.
+An AchSwap route settles in one transaction on the `AchRouteExecutorV2` contract, which takes a single 0.25% fee from the output. See [smart routing](/achswap/smart-routing) for how routes are compared and [fees](/technical/fee-structure) for every fee in one place.
 
 ## USDC is also gas
 

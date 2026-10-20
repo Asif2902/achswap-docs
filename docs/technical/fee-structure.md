@@ -8,7 +8,7 @@ description: "Every fee on AchSwap: the 0.25% route executor fee, LI.FI and Kybe
 
 ## AchSwap routes
 
-A route from AchSwap's router executes on `AchRouteExecutor`, which charges **0.25% of the final output, once per swap**, however many splits and hops the route uses. The fee is paid in the same transaction to the AchSwap treasury Safe `0x0dbd33291b0bc85e75465d0d7F261b4cF758BCf0`. There is no fee vault and nothing accrues in the contract.
+A route from AchSwap's router executes on `AchRouteExecutorV2`, which charges **0.25% of the final output, once per swap**, however many splits and hops the route uses. The fee is paid in the same transaction to the AchSwap treasury Safe `0x0dbd33291b0bc85e75465d0d7F261b4cF758BCf0`. There is no fee vault and nothing accrues in the contract.
 
 ```text
 protocolFee = grossOut × 25 / 10000      (rounded down)
