@@ -41,6 +41,13 @@ No changes to the API since release.
 
 ## Documentation
 
+### 2026-10-20
+
+- AchSwap routes execute on AchRouteExecutorV2; every AchSwap contract is source-verified (see [contract addresses](/technical/contract-addresses)).
+- The Quests page, the pool page and the new Analytics page are live; their status notes are removed.
+- [Gasless swaps](/achswap/gasless): only a swap that qualifies is gasless; any other swap goes through normally and you pay the gas, with no Permit2 request.
+- [Verification](/technical/routing-engine#verification): the quote shown is what the simulated transaction paid, including when it pays up to 0.01% less than the router's estimate.
+
 ### 2026-10-10
 
 - New pages: [API reference](/developers/api-reference), [code examples](/developers/examples), [errors and limits](/developers/errors-and-limits), this changelog.

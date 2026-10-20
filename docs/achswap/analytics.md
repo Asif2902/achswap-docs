@@ -5,10 +5,6 @@ description: How AchSwap counts swap and bridge volume, trades and wallets on it
 
 # Analytics
 
-:::info Status, 10 October 2026
-The Analytics page described below is built but **not yet live**. trade.achswap.app/analytics currently shows an earlier version of the page. The counting rules on this page apply to the new version.
-:::
-
 The **Analytics** page at [trade.achswap.app/analytics](https://trade.achswap.app/analytics) shows how much has been traded through AchSwap. Every figure is counted from records you can check yourself. Nothing is estimated or projected: a day without trades shows zero.
 
 ## What's on the page

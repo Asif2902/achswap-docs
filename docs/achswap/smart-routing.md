@@ -16,7 +16,7 @@ AchSwap's router covers the pools of every supported DEX on Arc. When you ask fo
 - checks direct pools and routes through deep intermediate tokens such as USDC, EURC and cirBTC, up to three hops;
 - splits a trade across several pools and routes when the split pays more, including different DEXs in one trade;
 - prices every candidate with the same integer math the pools themselves use;
-- simulates the finished route as the real transaction before showing it, and shows it only if the result matches the quote to the unit.
+- simulates the finished route as the real transaction before showing it, and shows what that simulation paid out.
 
 The amount you see is what the contract pays out if the pools do not move before you sign.
 

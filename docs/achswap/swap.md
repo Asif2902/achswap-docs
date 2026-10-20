@@ -77,7 +77,7 @@ Open the gear icon to change:
 | Slippage tolerance | 0.5% | How far the price may move against you before the swap reverts. Presets 0.1%, 0.5% and 1%, or type your own. |
 | Transaction deadline | 20 minutes | A swap still pending after this long reverts instead of executing at an old price. |
 | Auto-refresh | 30 seconds | How often the quote reprices while you look at it. Click the timer to reprice now. |
-| Recipient | Your wallet | Send the output to another address. Not available with gasless swaps. |
+| Recipient | Your wallet | Send the output to another address. Such a swap is not gasless: you pay the gas. |
 
 **Choosing slippage.** With 0.5% on a quote of 100 EURC, the minimum received is 99.5 EURC: you get at least that, or the swap reverts and you keep your tokens. Stable pairs rarely need more than 0.5%. Volatile or thinly traded tokens may need 1% or more. Higher slippage never improves your price. It only lets the trade go through at a worse one.
 

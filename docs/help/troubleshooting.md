@@ -121,9 +121,9 @@ A reverted transaction doesn't move your tokens, but it still costs gas. Common 
 ```mermaid
 flowchart TD
   A["Gasless swap failed"] --> B{"Input is USDC, EURC or cirBTC,<br/>exact input, to your own wallet?"}
-  B -->|"No"| B2["Not supported gaslessly:<br/>turn gasless off"]
+  B -->|"No"| B2["Not gasless: it goes through<br/>as a normal swap, you pay gas"]
   B -->|"Yes"| C{"Above the gasless minimum?"}
-  C -->|"No"| C2["Increase the amount,<br/>or turn gasless off"]
+  C -->|"No"| C2["Not gasless: a normal swap,<br/>or increase the amount"]
   C -->|"Yes"| D{"Did you sign the message?"}
   D -->|"No or rejected"| D2["Sign again. A smart-contract<br/>wallet may refuse: swap normally"]
   D -->|"Yes"| E{"Already Submitted?"}
@@ -131,7 +131,7 @@ flowchart TD
   E -->|"No"| F["Price moved or relay busy:<br/>refresh and sign again,<br/>or turn gasless off"]
 ```
 
-**Likely causes:** the amount is below the token's gasless minimum; the route or token isn't supported gaslessly; the signature was rejected or expired; or the price moved while the relayer submitted it.
+**Likely causes:** the signature was rejected or expired, or the price moved while the relayer submitted it. A swap below the token's gasless minimum, on a route or token gasless doesn't support, or to another address doesn't fail: it goes through as a normal swap and you pay the gas.
 
 **Good to know:** if a gasless swap fails, nothing leaves your wallet and you pay nothing. The one-time Permit2 approval is a normal transaction you paid gas for. A signed swap can execute only once. See [gasless swaps](/achswap/gasless#if-a-gasless-swap-fails).
 

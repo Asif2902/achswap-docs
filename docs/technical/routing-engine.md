@@ -36,7 +36,11 @@ The exact factory list is under [configured factories](/technical/contract-addre
 
 ## Verification
 
-Before a quote is shown, its exact `execute()` call is simulated against the live contracts at the block the quote was computed on. The result must equal the quoted output to the unit. If it does not, the route is corrected or dropped; a quote that does not reproduce is never shown.
+Before a quote is shown, its exact `execute()` call is simulated against the live contracts at the block the quote was computed on, and the quote shown is what that simulation paid out:
+
+- **The simulation pays the router's estimate, or more:** you see what it paid.
+- **It pays slightly less, at most 0.01% (1 bp) below the estimate:** you see the lower amount at once. The router works out the difference in the background, for later quotes.
+- **It pays less than that:** the route is corrected or dropped, and the trade is routed again. A quote that does not reproduce is never shown.
 
 When you request the transaction, it is simulated again, this time from your wallet. Missing approvals or balances are supplied with state overrides, so the check also works before you approve.
 

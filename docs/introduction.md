@@ -20,8 +20,8 @@ AchSwap is a **DEX aggregator on Arc Mainnet** (chain ID 5042). For every swap i
 | [Explore](/achswap/explore) | Browse and search Arc tokens by price, volume and liquidity. | Live, data from DEX Screener (external) |
 | [Developer API](/developers/developer-api) | AchSwap quotes and ready-to-sign swap transactions for your own app. | Live, by API key |
 | [Quests and XP](/quests/overview) | Earn XP for swaps, bridges and liquidity; levels and a leaderboard. | Live |
-| [Pools](/achswap/pools) | A page per pool: price history, volume, liquidity, depth and trades. | Built, not yet live |
-| [Analytics](/achswap/analytics) | Swap and bridge volume through AchSwap, day by day. | New version built, not yet live |
+| [Pools](/achswap/pools) | A page per pool: price history, volume, liquidity, depth and trades. | Live |
+| [Analytics](/achswap/analytics) | Swap and bridge volume through AchSwap, day by day. | Live |
 
 AchSwap's own V4 liquidity contracts are not deployed on Arc Mainnet; AchSwap routes through Uniswap V4 pools instead.
 
