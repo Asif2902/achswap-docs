@@ -92,7 +92,7 @@ Refresh the quote and inspect the wallet transaction before you raise slippage.
 
 ### How do I earn XP?
 
-Swap, bridge, provide liquidity in USDC/EURC, USDC/Circle BTC, USDC/Gold or USDC/WETH pools, say GM daily, complete tasks and invite friends. Task and GM XP is added at once; swaps, bridges and liquidity every day after 00:00 UTC. There is nothing to claim. XP is counted and added daily already; the Quests page where you see it is not public yet. XP is not a token and has no monetary value. See [Quests and XP](/quests/overview) and [how to earn XP](/quests/earning-xp).
+Swap, bridge, provide liquidity in USDC/EURC, USDC/Circle BTC, USDC/Gold or USDC/WETH pools, say GM daily, complete tasks and invite friends. Task and GM XP is added at once; swaps, bridges and liquidity every day after 00:00 UTC. There is nothing to claim. XP is not a token and has no monetary value. See [Quests and XP](/quests/overview) and [how to earn XP](/quests/earning-xp).
 
 ### Is there an API for developers?
 

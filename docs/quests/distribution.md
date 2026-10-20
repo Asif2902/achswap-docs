@@ -35,7 +35,7 @@ XP replaced the earlier Points program. Task and GM points from it were carried 
 1. **Check the timing.** Swaps, bridges, liquidity and referrals are added after the UTC day ends, by the distribution that runs shortly after 00:00 UTC. Tasks and GM are added at once.
 2. **Check the activity counts.** It must be made through AchSwap, with the same wallet, and (for swaps and bridges) pay AchSwap's fee. Liquidity must be in an [eligible pool](/quests/earning-xp#liquidity), held 24 hours, and in range for V3.
 3. **Check the ladder.** XP comes per doubling step, so $1.50 of swaps earns the same as $1, and the next step comes at $2.
-4. **Check the history.** The Overview's XP history lists every award by day and source, once the Quests page is open to you.
+4. **Check the history.** The Overview's XP history lists every award by day and source.
 
 Still missing after the next distribution? Email [support@achswap.app](mailto:support@achswap.app) with your wallet address, the transaction hash, and the UTC date. Never send a seed phrase or private key, or sign a message for anyone who says they need it to "check" your XP. See [troubleshooting](/help/troubleshooting#why-hasnt-my-xp-appeared).
 

@@ -1,13 +1,13 @@
 ---
 sidebar_position: 1
 title: Quests and XP
-description: "AchSwap's XP program: levels and badges, profiles, the leaderboard and the current status of the Quests page. XP is not a token."
+description: "AchSwap's XP program: levels and badges, profiles, the leaderboard and the Quests page. XP is not a token."
 ---
 
 # Quests and XP
 
-:::info Status, 10 October 2026
-**XP is live; the Quests page is not public yet.** Swaps, bridges and liquidity on Arc Mainnet are already counted and added to wallets every day, so XP you earn now is kept. The Quests page described below, where you see your XP, level, tasks, invite link and the leaderboard, opens to everyone when AchSwap announces it. Until then, tasks, GM and referrals can't be used.
+:::info Status, 20 October 2026
+**XP and the Quests page are live.** Swaps, bridges and liquidity on Arc Mainnet are counted and added to wallets every day, and the Quests page at [trade.achswap.app/quests](https://trade.achswap.app/quests) is open to everyone: your XP, level, tasks, GM, invite link and the leaderboard.
 :::
 
 :::note XP is not a token
