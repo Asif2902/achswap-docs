@@ -12,7 +12,7 @@ AchSwap on Arc Mainnet has four groups of contracts:
 - the gasless executor;
 - a helper for paying with native USDC.
 
-Every live AchSwap contract is source-verified on [ArcScan](https://arc.etherscan.io) except the Virtuals adapter (adapter 6), which is live but not yet verified (checked 10 October 2026). Source verification is not an audit: see [security](/technical/security#audit-and-verification-status). Addresses are in the [address reference](/technical/contract-addresses).
+Every live AchSwap contract is source-verified on [ArcScan](https://arc.etherscan.io) (checked 20 October 2026). Source verification is not an audit: see [security](/technical/security#audit-and-verification-status). Addresses are in the [address reference](/technical/contract-addresses).
 
 ## AchSwap V2 and V3
 
@@ -73,6 +73,6 @@ The ERC-20 USDC at `0x3600000000000000000000000000000000000000` has 6 decimals. 
 
 ## Verification
 
-All live contracts except the Virtuals adapter (adapter 6) are verified on [ArcScan](https://arc.etherscan.io) with exact source matches and constructor arguments; adapter 6 is live but its source is not yet verified (checked 10 October 2026). The executor and its adapters were compiled with solc 0.8.24 (via-IR, optimizer 200 runs, EVM cancun). Their deployed runtime bytecode matches the verified sources.
+All live contracts are verified on [ArcScan](https://arc.etherscan.io) with exact source matches and constructor arguments (checked 20 October 2026). The executor and its adapters were compiled with solc 0.8.24 (via-IR, optimizer 200 runs, EVM cancun). Their deployed runtime bytecode matches the verified sources.
 
 See [fees](/technical/fee-structure) and [smart routing](/achswap/smart-routing).

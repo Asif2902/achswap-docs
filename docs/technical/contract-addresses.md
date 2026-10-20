@@ -9,7 +9,7 @@ description: "Every AchSwap contract address on Arc Mainnet with ArcScan links: 
 
 **Network:** Arc Mainnet, chain ID **5042**. Updated **10 October 2026**. Every address links to its page on [ArcScan](https://arc.etherscan.io), where verified source code is under the **Contract** tab.
 
-Every live AchSwap contract is source-verified on [ArcScan](https://arc.etherscan.io) except the Virtuals adapter (adapter 6), which is live but not yet verified (checked 10 October 2026). Source verification is not an audit: see [security](/technical/security#audit-and-verification-status). You can read each verified contract's code and constructor arguments there. Before building a transaction yourself, check the live state, especially `feeConfig()` and the adapter list.
+Every AchSwap contract on this page is source-verified on [ArcScan](https://arc.etherscan.io), the current executor and adapters and the previous ones alike (checked 20 October 2026). Source verification is not an audit: see [security](/technical/security#audit-and-verification-status). You can read each verified contract's code and constructor arguments there. Before building a transaction yourself, check the live state, especially `feeConfig()` and the adapter list.
 
 ## Tokens
 

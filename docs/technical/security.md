@@ -13,7 +13,7 @@ This page sets out what AchSwap's contracts enforce, what you are trusting when 
 | | Status |
 | --- | --- |
 | Independent third-party audit | **None published.** AchSwap's contracts have had internal security reviews by the AchSwap team. An internal review is not an independent audit. |
-| Source verification | Every live AchSwap contract except one is source-verified on [ArcScan](https://arc.etherscan.io): you can read the code that runs and check it matches the deployed bytecode. The exception is the Virtuals adapter (adapter 6), [`0x4166…c106`](https://arc.etherscan.io/address/0x416660F95772Eb502E1B3E18025477EAF551c106), which is live but **not yet verified** (checked 10 October 2026). |
+| Source verification | Every live AchSwap contract is source-verified on [ArcScan](https://arc.etherscan.io): you can read the code that runs and check it matches the deployed bytecode (checked 20 October 2026). |
 
 Source verification shows you what the code is. It says nothing about whether the code is safe. Decide for yourself how much to trust any smart contract.
 

@@ -69,7 +69,7 @@ Yes. With gasless mode on, swaps from USDC, EURC or cirBTC through KyberSwap, LI
 
 ### Are the contracts verified?
 
-Almost all. Every live AchSwap contract is source-verified on [ArcScan](https://arc.etherscan.io) except the Virtuals adapter (adapter 6), which is live but not yet verified (checked 10 October 2026). Source verification is not an audit: see [security](/technical/security#audit-and-verification-status). See [contract addresses](/technical/contract-addresses).
+Yes. Every live AchSwap contract is source-verified on [ArcScan](https://arc.etherscan.io) (checked 20 October 2026). Source verification is not an audit: see [security](/technical/security#audit-and-verification-status). See [contract addresses](/technical/contract-addresses).
 
 ### Does AchSwap have V4 liquidity on Arc Mainnet?
 
