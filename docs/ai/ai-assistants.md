@@ -33,11 +33,15 @@ In **Automatic**, the page also shows your agent wallet and asks for a few more 
 ## What you can ask
 
 - "What's in my wallet?" — your balances on Arc, with their value.
-- "Swap 50 USDC to EURC." — a quote from AchSwap's router, then a transaction.
+- "Swap 50 USDC to EURC." — a quote from AchSwap's router, then a transaction. The quote shows the pools' fees, AchSwap's 0.25% fee and the price impact separately, what selling straight back would cost, and on request the largest amount you can trade under a given price impact.
 - "Bridge 20 USDC from Base to Arc." — a LI.FI route to the same address on the other chain.
 - "Add 100 USDC to the USDC/EURC pool, ±5%." — V2 in the pool's ratio, or V3 in a price range; also removing a share of a position and collecting V3 fees.
 - "Show my positions." — your V2 shares and V3 positions, their range and uncollected fees.
-- "What's trending on Arc?" — market data from DEX Screener: moves, volume, liquidity and a token's pools, with risk notes. This is data, not advice, and trading still goes through the steps below.
+- "What's trending on Arc?" — every token traded on Arc in the last 24 hours, ranked, with its buy and sell volume, how many wallets bought and sold, and a safety check on each. Tokens that fail a safety check are left out unless you ask for them.
+- "Is this token safe?" — a safety check read from Arc itself: what the token's owner can still do (mint, pause, block addresses, change the code), a simulated buy and sell (honeypots and taxes), who holds it, whether its liquidity can be pulled, and whether it copies the name of a token AchSwap verified. You get a grade from A to F with the reasons, and clear warnings for honeypots, sell taxes over 10%, one holder with over 30%, liquidity under $50,000 that its owner can withdraw, and impersonators.
+- "Show me the ARGUS chart." — candles built from Arc's own swaps, with volume and common indicators (RSI, moving averages, volatility, support and resistance, a trend label).
+
+All of this is data, not advice: every part says where it comes from (Arc or DEX Screener) and how recent it is, nothing needs your wallet, and trading still goes through the steps below.
 
 In apps that show them, answers come with AchSwap's cards: the balances, the quote and its route, the transaction's steps, a chart.
 

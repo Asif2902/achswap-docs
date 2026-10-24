@@ -68,6 +68,7 @@ Automatic mode adds no fee. The trade's normal fees apply, as in the app: AchSwa
 
 ## Stop it
 
+- **Change its limits:** on the Agent wallet page, **Edit limits** next to an app: new per-trade, daily, slippage and token limits, one free signature, in force from its next transaction.
 - **One AI app, or all:** on the Agent wallet page, **Stop** next to an app (or **Stop all**). It takes one free signature and works at once: that app is back to Manual.
 - **From the chat:** ask the assistant to switch back to Manual. It can switch to Manual, never to Automatic.
 - **Everything, on chain:** **Revoke on chain** at the bottom of the Agent wallet page disables the agent wallet's permissions with transactions from your own wallet. No AchSwap server can undo it. Your funds stay in the agent wallet; withdraw them whenever you like.
@@ -92,5 +93,5 @@ The permissions in detail are in [agent wallet permissions](/technical/agent-wal
 - **"Your agent wallet is not set up yet":** sign in again with Automatic and press **Set up agent wallet**, or set it up on the Agent wallet page.
 - **"Keep at least … USDC in the agent wallet for this transaction's gas":** deposit a little USDC.
 - **"Today's gas allowance of the agent wallet is used":** automatic transactions resume within 24 hours.
-- **"Over the $… per-trade limit" or the daily limit:** ask for a smaller trade, or sign in again with higher limits.
+- **"Over the $… per-trade limit" or the daily limit:** the assistant tells you which limit stopped it and the largest amount that fits. Ask for that, raise the limit with **Edit limits** on the Agent wallet page, or switch to Manual.
 - **"Automatic mode needs a wallet with its own key":** your wallet is a smart-contract wallet; use Manual mode.
