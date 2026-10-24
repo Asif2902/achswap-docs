@@ -59,6 +59,16 @@ A gasless swap is authorized by one Permit2 signature that covers the whole swap
 
 The relayer can choose **not** to submit a signed order. Until the deadline passes, a signed order could still be submitted. To cancel one, invalidate its nonce on Permit2 (`invalidateUnorderedNonces`), or wait for it to expire.
 
+## Automatic mode
+
+In Automatic mode an AI app trades from the user's agent wallet through AchSwap's relayer, without a confirmation each time. The agent wallet is a MetaMask Delegation Framework smart account owned by the user's wallet, and the chain enforces the permissions the user signed:
+
+- **Where funds go:** only to AchSwap's contracts, back to the agent wallet, to the user's own wallet on another chain (bridges), to a LI.FI bridge's two fee wallets, and at most 1 USDC a day of gas to AchSwap's gas wallet.
+- **What can be called:** AchRouteExecutorV2, AchSwap's V2 router and V3 position manager, and three LI.FI bridges in a pinned layout; approvals only to those.
+- **Who:** only AchSwap's listed relayers, until the permissions expire or the user revokes them on chain.
+
+The user's limits (per trade, per day, slippage, verified tokens) and the price checks are AchSwap's, not the chain's: a compromised relayer key or server could trade badly inside those fences, up to what the agent wallet holds. Users should deposit only what they want the assistant to trade. See [agent wallet permissions](/technical/agent-wallet).
+
 ## What the owners can and cannot do
 
 | Contract | The owner can | The owner cannot |
@@ -88,7 +98,9 @@ AchSwap relies on services it does not control:
 | LI.FI's bridges | Bridge transfers, timing and refunds. |
 | DEX pools and Uniswap V4 hooks | Liquidity and prices. A hook can change fees during a swap; AchSwap can deny a hook from its own routes. |
 | Token contracts | A token can pause, block or tax transfers. AchSwap's router refuses tokens it can't settle exactly. |
-| DEX Screener | Market data on the Explore page. |
+| DEX Screener | Market data on the Explore page and for AI assistants. |
+| MetaMask's Delegation Framework | Agent wallets and their permissions in Automatic mode. |
+| The AI app you connect | What it asks AchSwap to do; in Automatic mode it acts without asking you first. |
 
 ## Reporting a vulnerability
 

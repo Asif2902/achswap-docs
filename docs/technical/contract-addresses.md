@@ -148,6 +148,10 @@ The retired AchExecutionRouter and first AchRouteExecutor were removed from both
 | --- | --- | --- |
 | AchArcNativeUsdcAdapter | [`0x097d6546db9fba2F908A88eE30FC870eb55fde90`](https://arc.etherscan.io/address/0x097d6546db9fba2F908A88eE30FC870eb55fde90) | Adds liquidity to, and swaps on, AchSwap's own V2/V3 contracts with USDC paid from the native balance, so no approval is needed. Its aggregator entry point is retired and not used. |
 
+## Agent wallets
+
+Automatic mode's agent wallets are MetaMask Delegation Framework v1.3.0 smart accounts. MetaMask's DelegationManager is [`0xdb9B1e94B5b69Df7e401DDbedE43491141047dB3`](https://arc.etherscan.io/address/0xdb9B1e94B5b69Df7e401DDbedE43491141047dB3). Every contract they use, and how its code was checked, is in [agent wallet permissions](/technical/agent-wallet#the-contracts).
+
 ## External protocols
 
 These belong to other protocols. AchSwap routes through their pools, but does not own or operate them.

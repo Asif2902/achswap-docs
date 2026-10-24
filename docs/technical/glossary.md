@@ -9,9 +9,13 @@ description: Definitions of the terms used across the AchSwap documentation, fro
 
 **Ask / bid:** On a pool page's depth chart and order book, asks are what the pool sells as the price rises (you buying the base token), and bids are what it buys as the price falls (you selling it). A pool has no real orders; both come from its liquidity curve. See [pools](/achswap/pools#charts).
 
+**Agent wallet:** A smart account owned by your wallet that an AI assistant trades from in Automatic mode, within the permissions you signed. See [Automatic mode](/ai/automatic-mode).
+
 **Allowance:** An ERC-20 holder's permission for a spender to transfer up to an approved amount.
 
 **AMM:** Automated market maker: a pool contract that prices swaps against the liquidity supplied to it.
+
+**Automatic mode:** A way to connect an AI assistant in which it trades from your agent wallet without asking each time, within limits you sign. The other way is Manual mode, where you approve each transaction. See [AI assistants](/ai/ai-assistants).
 
 **Branch:** One independent path from the input token to the output token within a route. A route can split its input across up to eight branches.
 
@@ -41,6 +45,8 @@ description: Definitions of the terms used across the AchSwap documentation, fro
 
 **In range / out of range:** Whether the current price is inside a V3 position's price range. Only an in-range position earns fees.
 
+**MCP:** Model Context Protocol, the standard AI apps use to connect to services like AchSwap at `https://trade.achswap.app/mcp`. See [AI assistants](/ai/ai-assistants).
+
 **Minimum received:** The least output a swap will accept under its slippage setting. The swap reverts below it.
 
 **Net output:** What you receive after every fee: the pool fees and the AchSwap or integrator fee.
@@ -53,7 +59,7 @@ description: Definitions of the terms used across the AchSwap documentation, fro
 
 **Price impact:** How much less the route pays than market reference prices, before the AchSwap fee: the trade's effect on the price plus pool and hook fees. Negative when the route pays more than the reference. It is distinct from slippage tolerance.
 
-**Relayer:** An allowlisted wallet that submits gasless swaps and pays their gas.
+**Relayer:** An allowlisted wallet that submits gasless swaps and pays their gas. In Automatic mode, AchSwap's relayer sends the agent wallet's transactions and takes their gas back from it.
 
 **Route:** The sequence of pools and tokens a swap trades through, including any splits.
 

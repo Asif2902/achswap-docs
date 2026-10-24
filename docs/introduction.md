@@ -2,12 +2,12 @@
 sidebar_position: 1
 title: "AchSwap: DEX aggregator on Arc"
 sidebar_label: AchSwap on Arc
-description: AchSwap is a DEX aggregator on Arc Mainnet. It compares its own router with KyberSwap and LI.FI, and offers V2 and V3 liquidity, a LI.FI bridge and a developer API.
+description: AchSwap is a DEX aggregator on Arc Mainnet. It compares its own router with KyberSwap and LI.FI, and offers V2 and V3 liquidity, a LI.FI bridge, AI assistant access and a developer API.
 ---
 
 # AchSwap on Arc
 
-AchSwap is a **DEX aggregator on Arc Mainnet** (chain ID 5042). For every swap it compares its own router, which reads the pools of every supported DEX on Arc, with the KyberSwap and LI.FI aggregators, and uses the route expected to leave you the most after fees and gas. It also has its own V2 and V3 liquidity pools and an XP program, and offers a bridge interface powered by LI.FI, a third-party service. You keep custody the whole time: every action is a transaction or a signature from your own wallet.
+AchSwap is a **DEX aggregator on Arc Mainnet** (chain ID 5042). For every swap it compares its own router, which reads the pools of every supported DEX on Arc, with the KyberSwap and LI.FI aggregators, and uses the route expected to leave you the most after fees and gas. It also has its own V2 and V3 liquidity pools and an XP program, and offers a bridge interface powered by LI.FI, a third-party service. You keep custody the whole time: every action is a transaction or a signature from your own wallet, or, in Automatic mode, made within the permissions your wallet signed.
 
 ## What you can do
 
@@ -18,6 +18,7 @@ AchSwap is a **DEX aggregator on Arc Mainnet** (chain ID 5042). For every swap i
 | [Liquidity](/achswap/add-liquidity) | Deposit into AchSwap V2 or V3 pools and earn a share of every swap's fee. | Live |
 | [Bridge](/achswap/bridge) | Move tokens between Arc and about two dozen chains, Solana included. | Live, through LI.FI (external) |
 | [Explore](/achswap/explore) | Browse and search Arc tokens by price, volume and liquidity. | Live, data from DEX Screener (external) |
+| [AI assistants](/ai/ai-assistants) | Use AchSwap from Claude, ChatGPT or Cursor: you approve each transaction, or let it trade from an agent wallet within your limits. | Live |
 | [Developer API](/developers/developer-api) | AchSwap quotes and ready-to-sign swap transactions for your own app. | Live, by API key |
 | [Quests and XP](/quests/overview) | Earn XP for swaps, bridges and liquidity; levels and a leaderboard. | Live |
 | [Pools](/achswap/pools) | A page per pool: price history, volume, liquidity, depth and trades. | Live |

@@ -41,6 +41,10 @@ The swap screen compares every provider by what its route is expected to deliver
 
 Gasless mode adds no fee of its own. The route's normal fees apply, and the relayer pays the gas.
 
+## Automatic mode
+
+Automatic mode adds no fee of its own. Each trade pays its route's normal fees, as in the app. The relayer pays the gas and takes back exactly what it paid from the agent wallet's USDC, at most 1 USDC a day. See [Automatic mode](/ai/automatic-mode#gas).
+
 ## Pool fees and gas
 
 Each pool charges its own trading fee, which goes to its liquidity providers (on some protocols, partly to the protocol):

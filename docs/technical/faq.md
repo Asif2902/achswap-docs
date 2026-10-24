@@ -98,6 +98,14 @@ Swap, bridge, provide liquidity in USDC/EURC, USDC/Circle BTC, USDC/Gold or USDC
 
 Yes: the [Developer API](/developers/developer-api) returns AchSwap quotes and ready-to-sign swap transactions on Arc, with an optional fee for your application. Email [support@achswap.app](mailto:support@achswap.app) for a key.
 
+### Can I use AchSwap from an AI assistant?
+
+Yes. Add `https://trade.achswap.app/mcp` as a custom connector in Claude, ChatGPT, Cursor or another AI app that supports MCP, and sign in with your wallet. In Manual mode you approve every transaction in your wallet; in Automatic mode it trades from your agent wallet within limits you sign. See [AI assistants](/ai/ai-assistants).
+
+### Can an AI assistant in Automatic mode take my funds?
+
+It can only trade from your agent wallet, which holds only what you deposit. The chain lets funds go only to AchSwap's contracts, back to the agent wallet or to your own wallet on another chain, plus at most 1 USDC a day of gas. Prices and your limits are checked by AchSwap's servers, not the chain, so deposit only what you want the assistant to trade. You can withdraw, stop it or revoke everything at any time. See [Automatic mode](/ai/automatic-mode#what-protects-your-funds).
+
 ### How do I contact AchSwap?
 
 Email [support@achswap.app](mailto:support@achswap.app), or reach us on [X](https://x.com/AchProtocol) and [Telegram](https://t.me/AchProtocol).

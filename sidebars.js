@@ -41,6 +41,15 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'AI assistants',
+      collapsed: false,
+      items: [
+        'ai/ai-assistants',
+        'ai/automatic-mode',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Quests and XP',
       collapsed: true,
       items: [
@@ -82,6 +91,7 @@ const sidebars = {
         'technical/swap-execution',
         'technical/routing-engine',
         'technical/gasless',
+        'technical/agent-wallet',
         'technical/fee-structure',
         'technical/security',
       ],
