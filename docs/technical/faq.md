@@ -20,7 +20,7 @@ Arc exposes the same balance in two forms: an 18-decimal gas currency, and a 6-d
 - Uniswap V2, V3 and V4 (including V4 pools with hooks);
 - AchSwap V2 and V3;
 - Synthra V3 and UnitFlow V3;
-- Slipstream pools: Aero CL (two factories), Archery and Topaz;
+- Slipstream pools: Aero CL (two factories, and its newer factory from 31 October 2026), Archery and Topaz;
 - Lunya;
 - DyorSwap, Architex, SushiSwap V3, Bugle and FlutchPad;
 - Virtuals launch curves.

@@ -44,6 +44,7 @@ How the contract executes a route is described in [swap execution](/technical/sw
 | AchSwap V2 and V3 | Live |
 | Synthra V3 and UnitFlow V3 | Live |
 | Slipstream pools: Aero CL (two factories), Archery, Topaz | Live |
+| Aero CL's newer factory (its main pools since 21 October 2026) | From 31 October 2026, when adapter 7 is activated |
 | Lunya concentrated and constant-product pools | Live |
 | DyorSwap, Architex, SushiSwap V3, Bugle, FlutchPad | Live |
 | Virtuals launch curves (tokens that have not yet graduated to a regular pool) | Live |
