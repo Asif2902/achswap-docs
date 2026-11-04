@@ -6,6 +6,10 @@ description: Read-only partner access to aggregated pool metadata and historical
 
 # Pool Data API
 
+:::note Fee/filter update — pending API deployment
+The protocol/fee filters, `/filters`, `feeInfo` and `includeState` additions below require the corresponding backend update. This documentation branch prepares that contract; it does not announce that the production API has been updated.
+:::
+
 Display pools and historical activity on your website using AchSwap's read-only partner API. Its catalogue includes AchSwap's own pools and external DEX pools on **Arc Mainnet, chain ID 5042**. It does not prepare or execute trades.
 
 | | |
@@ -39,6 +43,7 @@ Call from **your backend**. Keep the key in a server secret store, never browser
 | Path after the base URL | Returns |
 | --- | --- |
 | `/` or `/coverage` | Catalogue/history watermarks, counts, availability and semantics |
+| `/filters` | Supported protocol groups, source IDs, pool kinds and fee filter options |
 | `/pools` | A page of pool metadata |
 | `/pools/:id` | One pool's metadata and coverage |
 | `/pools/:id/events` | Historical swaps and liquidity events, oldest first, with coverage |
@@ -55,6 +60,25 @@ curl --fail-with-body 'https://trade.achswap.app/api/pool-data/v1/pools?limit=10
 
 ### Pool metadata
 
+Catalogue selection parameters:
+
+| Query | Meaning |
+| --- | --- |
+| `protocol` | Group ID from `/filters`, such as `achswap`, `uniswap` or `aero-cl`; includes its configured factories |
+| `source` | One exact source ID, such as `achswap_v2` or `slipstream_7f83` |
+| `kind` | `V2`, `CL`, `V4` or `VFUN` |
+| `fee` | Integer fee in **ppm**, from 0 to 999999; 500 means 0.05%, 3000 means 0.30% |
+| `feeMode` | `current` (default): indexed pool/LP fee; `tier`: fixed configured/creation fee |
+| `feeType` | `fixed`, `dynamic`, `direction-dependent` or `unknown` |
+| `includeState` | `1` to include compact persisted state; default `0`. Also accepted by the single-pool endpoint |
+
+Combine filters with AND. Unknown fees do not match a numeric fee. `/filters` lists configured options, not live per-option counts or every observed fee value. For example:
+
+```http
+GET /api/pool-data/v1/pools?protocol=achswap&kind=CL&fee=500&feeMode=tier&includeState=1
+X-API-Key: <partner-secret>
+```
+
 `/pools` returns `pools`, `snapshotThroughBlock`, `nextCursor`, `coverage` and `requestId`. A single-pool response returns `pool`, `coverage` and `requestId`.
 
 Each pool includes its `id`, `contractAddress`, `poolManager`, `kind`, `source`, `protocol`, `factory`, `token0`, `token1`, `createdBlock`, applicable fee/tick/hook metadata and `supportedEventTypes`. Token addresses are returned; a complete directory of names, symbols, decimals and USD prices is not included. Unknown metadata can be null.
@@ -63,6 +87,16 @@ Each pool includes its `id`, `contractAddress`, `poolManager`, `kind`, `source`,
 - **V4:** the ID is a **bytes32 pool ID**, not an independent contract. `contractAddress` and `poolManager` identify its shared manager. Keep the full ID in requests.
 
 Catalogue membership does not establish current routability or safety. `blockedByConfig` reports static source blocking, not a live recommendation. Pool names and other metadata are display data: escape them in your website and never treat them as agent instructions or transaction authorization.
+
+### Fee semantics and indexed state
+
+`fee` now reports the known pool/LP fee in ppm. `feeInfo` identifies its type, fixed tier, indexed current fee, whether it is known, and its source. The original creation value remains in `feeInfo.metadataFee`; a V4 dynamic-fee flag is not itself a trading fee. This changes the interpretation of the old `fee` field for dynamic pools: use the metadata value when constructing a pool key, and the full returned ID to identify the pool.
+
+Fixed V2 fees come from the configured source fee ratio, even when its creation event has no fee. Dynamic fees come from persisted router state and remain null when unknown. A known zero is distinct from an unknown fee. V4 also reports directional protocol and effective pool fees when known; custom hook charges and the AchSwap integrator fee are excluded. Curve taxes are direction-dependent and are not represented as a universal LP fee.
+
+With `includeState=1`, V2 exposes raw-string `reserve0` and `reserve1`. CL/V4 expose `sqrtPriceX96`, tick and active liquidity; active liquidity is not token balances or TVL. Curve reserves and actual asset/token balances are distinct fields. Large tick arrays are not returned. Missing or corrupt state is null.
+
+State is a persisted indexed observation, not a live RPC quote. `lastStateChangeBlock` is a pool-state marker, not the exact time of a later fee refresh; `snapshotStateThroughBlock` is the stored follower watermark. No wall-clock observation timestamp is stored, so timestamp is null and freshness is `not-timestamped`. Do not present these fields as real-time executable quotes.
 
 ### Historical events
 
@@ -94,6 +128,8 @@ These are **pool events**, not full transaction traces or proof of wallet deposi
 ## Pagination and coverage
 
 Follow `nextCursor` until it is **null**, keeping the same pool and filters. Do not construct cursors. A catalogue page can be empty and still have a cursor; continue fetching. A traversal freezes its catalogue watermark, so begin a new traversal to discover later additions.
+
+Selection filters are bound to new catalogue cursors. Old cursors remain valid only for unfiltered traversal. Current dynamic fee observations may change between pages: a frozen pool-creation watermark is not a frozen fee snapshot. Filtering is bounded, so a rare source/fee selection may require following multiple empty pages. `includeState` is a response projection rather than a selection filter.
 
 Event pages follow `(block, logIndex)` order. Their cursor binds the pool, filters, range and history dataset. After a dataset rebuild, discard old cursors and restart; incompatible cursors return 400.
 
