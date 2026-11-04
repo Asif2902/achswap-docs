@@ -38,7 +38,7 @@ V3 fee tiers (fee in hundredths of a basis point, tick spacing): 100 (0.01%, 1),
 
 ## Swap execution
 
-Every AchSwap route executes on **AchRouteExecutorV2**, which uses six execution adapters, with a seventh scheduled. How they work is described in [swap execution](/technical/swap-execution). It replaced AchRouteExecutor on 20 October 2026: the same routes and output for about 22% less gas.
+Every AchSwap route executes on **AchRouteExecutorV2**, which uses six execution adapters, IDs **2–7**. Adapter 7 was confirmed active on 4 November 2026 at block 29,464,065, with no pending activation. Native USDC needs no adapter 1. How they work is described in [swap execution](/technical/swap-execution). It replaced AchRouteExecutor on 20 October 2026: the same routes and output for about 22% less gas.
 
 | Contract | Adapter id | Address | Deployment tx (block) |
 | --- | ---: | --- | --- |
@@ -48,7 +48,7 @@ Every AchSwap route executes on **AchRouteExecutorV2**, which uses six execution
 | AchV4HookAdapterV2 | 4 | [`0x3401A0c7E6F24fA48E8F531EB2172C08e4D7B89C`](https://arc.etherscan.io/address/0x3401A0c7E6F24fA48E8F531EB2172C08e4D7B89C) | [`0x4b1e…38a5`](https://arc.etherscan.io/tx/0x4b1eef2490b383eb4f53a1d43165240c672eb90def95bce4c1bd0aaed18538a5) (26934058) |
 | AchLunyaPoolAdapterV2 | 5 | [`0xa358fcde6b34Bb3f3a35F4da3f74C9a096D171B9`](https://arc.etherscan.io/address/0xa358fcde6b34Bb3f3a35F4da3f74C9a096D171B9) | [`0xf3f8…1322`](https://arc.etherscan.io/tx/0xf3f80bd4099181ef8ca4af677c604fc342bdfcc5cffe0361be30a5dc031a1322) (26934061) |
 | AchVirtualsBondingAdapterV2 | 6 | [`0x20d8058bC76093582aAc7D0315381AEB5F6Fa3DE`](https://arc.etherscan.io/address/0x20d8058bC76093582aAc7D0315381AEB5F6Fa3DE) | [`0x50f4…0370`](https://arc.etherscan.io/tx/0x50f4291bcc5b2b72f2ed7a0240a397fef955fb85ce82f821c15b8bf9fc3b0370) (26934064) |
-| AchV3PoolAdapterV2 (scheduled) | 7 | [`0x8e8F69dd49FcA98fc11EA9fE0c49618a6c04eB34`](https://arc.etherscan.io/address/0x8e8F69dd49FcA98fc11EA9fE0c49618a6c04eB34) | [`0x7160…7442`](https://arc.etherscan.io/tx/0x7160476971846aa02fc9b8b5eccba048b5e56f8df070276384261b7ea04e7442) (28525086) |
+| AchV3PoolAdapterV2 (Aero CL extension) | 7 | [`0x8e8F69dd49FcA98fc11EA9fE0c49618a6c04eB34`](https://arc.etherscan.io/address/0x8e8F69dd49FcA98fc11EA9fE0c49618a6c04eB34) | [`0x7160…7442`](https://arc.etherscan.io/tx/0x7160476971846aa02fc9b8b5eccba048b5e56f8df070276384261b7ea04e7442) (28525086) |
 
 | Setting | Value |
 | --- | --- |
@@ -56,7 +56,7 @@ Every AchSwap route executes on **AchRouteExecutorV2**, which uses six execution
 | Fee recipient | AchSwap treasury Safe [`0x0dbd33291b0bc85e75465d0d7F261b4cF758BCf0`](https://arc.etherscan.io/address/0x0dbd33291b0bc85e75465d0d7F261b4cF758BCf0), paid directly on every swap |
 | Fee configuration version | 1 |
 | Owner | [`0x5820cdcEE868F395eB26fA9b00123f4b7530DC11`](https://arc.etherscan.io/address/0x5820cdcEE868F395eB26fA9b00123f4b7530DC11) |
-| Activation | [`0x5cdd…67f7`](https://arc.etherscan.io/tx/0x5cdd639e012b30265273c91763e010b7056ab3dbe6610245928d0151856c67f7) (block 26934087). Adapters 2 to 6 were registered before it, so all five were active from the first block. Adapter 7 was scheduled in [`0x78f3…33d9`](https://arc.etherscan.io/tx/0x78f355a7a2dfd43919623a405e79042825fe7bee4393c672ec1060842d9733d9) (block 28525091) and can be activated after the two-day delay, from 31 October 2026, 19:21 UTC. |
+| Activation | [`0x5cdd…67f7`](https://arc.etherscan.io/tx/0x5cdd639e012b30265273c91763e010b7056ab3dbe6610245928d0151856c67f7) (block 26934087). Adapters 2 to 6 were registered before it, so all five were active from the first block. Adapter 7 was scheduled in [`0x78f3…33d9`](https://arc.etherscan.io/tx/0x78f355a7a2dfd43919623a405e79042825fe7bee4393c672ec1060842d9733d9) (block 28525091) and was confirmed active after the timelock on 4 November 2026 at block 29,464,065. |
 | Compiler | solc 0.8.24, via-IR, optimizer 200 runs, EVM cancun |
 
 Each adapter is configured exactly like the AchRouteExecutor adapter with the same id, so both executors reach the same pools.

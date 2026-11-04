@@ -21,6 +21,11 @@ AchSwap has not published a formal deprecation schedule. What you can rely on to
 
 If you depend on the API in production, email [support@achswap.app](mailto:support@achswap.app) so you can be told about changes directly.
 
+## 4 November 2026 — Pool Data API
+
+A separate [read-only partner API](/developers/pool-data-api) exposes the aggregated pool catalogue and historical swaps/adds/removals where verified. It requires a pool-data scoped key, separate from trading keys. Pagination and per-pool coverage disclose partial or unavailable history; this entry does not announce a completed backfill or production enablement.
+
+
 ## API
 
 ### 2026-10-20: new route executor

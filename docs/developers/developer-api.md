@@ -20,6 +20,8 @@ The AchSwap Developer API gives your application AchSwap's best route on Arc Mai
 
 ## How a swap works
 
+For a read-only pool catalogue and historical activity, use the separate [Pool Data API](/developers/pool-data-api). It requires a **pool-data** key; the trading key described here cannot access it.
+
 Your server talks to the API. Your user's wallet signs and sends the transaction. The API only **prepares** transactions: it never submits anything to the chain, and AchSwap never holds your user's funds or keys.
 
 ```mermaid

@@ -9,6 +9,8 @@ A pool holds two tokens that traders swap against. Liquidity providers deposit t
 
 ## The pool list
 
+Building a website that displays aggregated pools and historical activity? The [Pool Data API](/developers/pool-data-api) includes external DEX pools, scoped partner keys and explicit history coverage.
+
 The **Liquidity** page lists every AchSwap pool with its all-time volume, number of swaps, version and fee tier. Search by token name, symbol or address, and filter by version.
 
 - Click a row to open that pool's page.
