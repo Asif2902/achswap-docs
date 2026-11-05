@@ -75,6 +75,7 @@ const sidebars = {
       items: [
         'developers/developer-api',
         'developers/api-reference',
+        'developers/pool-data',
         'developers/pool-data-api',
         'developers/examples',
         'developers/errors-and-limits',

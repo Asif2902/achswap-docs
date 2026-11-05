@@ -14,6 +14,8 @@ npm run build
 
 The Docusaurus build output is `build/`. The site is configured for `https://docs.achswap.app`. Cloudflare Workers uses `wrangler.jsonc` to upload that directory as static assets; Vercel uses `vercel.json`. Cloudflare's preview build runs `wrangler versions upload`, which creates a preview version rather than promoting it to production.
 
+Pool-data release documentation is prepared on **`mainnet-asif`**. The maintainer promotes a verified build manually. A branch push, a successful docs build or completed indexing does not authorize production promotion. See [release and workspace maintenance](MAINTENANCE.md) for the completion checks and deferred cleanup plan. That file is for maintainers and is not included in the public docs site.
+
 This branch documents the Arc Mainnet frontend and deployments. As checked on 14 September 2026, the public `achswap.app` URL still redirects to a site advertising Arc Testnet. The mainnet docs therefore do not link users to that live app until its host is switched to chain 5042. Branch-to-domain deployment is configured outside this repository.
 
 ## Address sources

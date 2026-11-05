@@ -50,4 +50,4 @@ Arc pays network fees in USDC, so the USDC in your wallet is both a token you ca
 2. Follow the [quick start](/getting-started/quick-start) for your first swap.
 3. Read [add liquidity](/achswap/add-liquidity) before depositing into a pool.
 
-Building on AchSwap? Start with the [Developer API](/developers/developer-api). Every contract address is in the [contract reference](/technical/contract-addresses).
+Building on AchSwap? Start with the [Developer API](/developers/developer-api) for swaps or [Pool data](/developers/pool-data) for pool directories, activity and analytics datasets. Every contract address is in the [contract reference](/technical/contract-addresses).

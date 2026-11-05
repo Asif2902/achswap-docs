@@ -10,7 +10,7 @@ Changes to the [Developer API](/developers/developer-api) and to these developer
 
 ## Versioning
 
-The API version is part of the path: every endpoint is under `/api/v1`. Version 1 is the only version.
+The version is part of each API's path: trading uses `/api/v1`, and pool data uses `/api/pool-data/v1`. Each has its own key scope and contract.
 
 AchSwap has not published a formal deprecation schedule. What you can rely on today:
 
@@ -21,9 +21,15 @@ AchSwap has not published a formal deprecation schedule. What you can rely on to
 
 If you depend on the API in production, email [support@achswap.app](mailto:support@achswap.app) so you can be told about changes directly.
 
+## 5 November 2026 — Pool datasets, filters and fee semantics
+
+The [pool data guide](/developers/pool-data) describes catalogue and activity reads, token metadata, custody observations, concentrated LP principal, nominal TVL and historical volume datasets. It distinguishes the REST response contract from custom exports and explains units, valuation methods and coverage.
+
+The [Pool Data API reference](/developers/pool-data-api) includes `/filters`, protocol/source/kind/fee selection, fixed and dynamic fee semantics, filter-bound cursors and optional compact indexed state. For dynamic pools, `fee` is the known indexed pool/LP fee; the original creation value is `feeInfo.metadataFee`.
+
 ## 4 November 2026 — Pool Data API
 
-A separate [read-only partner API](/developers/pool-data-api) exposes the aggregated pool catalogue and historical swaps/adds/removals where verified. It requires a pool-data scoped key, separate from trading keys. Pagination and per-pool coverage disclose partial or unavailable history; this entry does not announce a completed backfill or production enablement.
+A separate [read-only partner API](/developers/pool-data-api) exposes the aggregated pool catalogue and historical swaps/adds/removals with explicit per-pool coverage. It requires a pool-data scoped key, separate from trading keys.
 
 
 ## API
@@ -41,8 +47,6 @@ A separate [read-only partner API](/developers/pool-data-api) exposes the aggreg
 - API keys in `x-api-key` or `Authorization: Bearer`.
 - Optional partner fee: `feeBps` (0 to 100) paid to `feeRecipient` in the output token, in the same transaction.
 - `/swap` transactions are simulated from the sender before they are returned.
-
-No changes to the API since release.
 
 ## Documentation
 
