@@ -30,6 +30,18 @@ sudo systemctl show achswap-pool-sync.service -p MainPID -p CPUQuotaPerSecUSec -
 
 The requested budget is an upper limit, not a guarantee of using two cores or a promised speedup. Continue watching host memory, trading health, I/O waits, actual committed progress and backup results. Do not raise other services' budgets or restart trading as part of routine monitoring. Public-RPC limits and backup timeouts remain separate concerns.
 
+## Migration policy clarified — 6 November 2026
+
+Continue implementation on the existing application sync branch/worktree, without a new branch or PR. Documentation changes stay on this existing `mainnet-asif` branch. Direct updates still require the build, tests and safety review; a push is not a production promotion.
+
+The maintainer corrected the backup cadence: preserve the original verified production fallback, create a migration checkpoint near **90% of the actual historical block interval**, and another at verified completion. Hourly health checks continue. The five-minute backup timer is only an eligibility check: without a new milestone request it does no database rehash, compression, upload or R2 request. Do not restore hourly full exports/uploads.
+
+The deployed isolated worker is commit `6d1ceaa87f7862d93a0a4df5203ed170299d9bb3`. It batches durable SQLite writes with FULL synchronization retained, reuses statements and gives independent RPC phases separate backoffs. No trading restart or frozen-router overwrite was part of that update. Interpret the current `backup-policy.json`, exact `backup-request.json` and matching `backup-confirmed.json`; a pre-90 offsite age is not a failed checkpoint.
+
+The post-backfill design is **one coordinated indexing system**. The existing router remains the sole live log reader; an isolated data coordinator consumes its durable journal, fills the finite migration gap and maintains metadata, balances, LP principal observations, events and reductions. Separate resource isolation does not mean a second live log poller. The old production data and the completed historical bundle remain inactive recovery points.
+
+The application repository's `docs/indexer-consolidation.md` records the implementation and exact handoff gates. New live collection and API data activation must be verified before cleanup. Historical enrichment remains a separately specified export contract; do not invent REST routes or imply universal USD valuation. No APR or private server RPC is authorized.
+
 ## Current checkpoint, not a completion claim
 
 At approximately **20:02 Dhaka time on 5 November 2026**, the isolated server worker covered about **37.14%** of its pinned historical block interval. Its cutoff is block **29,619,812**. The latest observed metadata count was **126,680 observations**; that is not a count of universally readable token metadata or priced tokens. Trading health was HTTP 200, no worker alerts were present, and a new Cloudflare backup had completed successfully. Read the live monitor for current values rather than using this dated note as a dashboard.
@@ -45,7 +57,7 @@ sudo cat /var/lib/achswap-pool-sync/monitor/health.json
 sudo journalctl -u achswap-pool-sync-backup.service -n 10 --no-pager
 ```
 
-The health helper can flag `sync_backup_failed_or_stale` while a backup oneshot is `activating`: systemd clears its last-exit timestamp during a new run. Verify the prior successful receipt's `verifiedAt` in the workspace's `offsite/` directory and the actual backup result before treating that warning as a failed backup. Never infer backup success merely from a running process.
+Older health reports could flag `sync_backup_failed_or_stale` while a backup oneshot was `activating`, because systemd clears its last-exit timestamp during a new run. The current milestone-aware monitor uses the original fallback proof and matching checkpoint digests. Inspect the actual unit result and verified receipt before reporting a failure. Never infer backup success merely from a running process.
 
 ## Release gates
 
@@ -88,7 +100,7 @@ Keep these separate from temporary review checkouts:
 2. Preserve unmerged commits, unresolved review work, evidence, configuration and datasets. A clean Git status does not establish that ignored environment files or databases are disposable.
 3. Check server units, symlinks, automation paths and scripts for references to any candidate. The active sync release currently shares `runtime`, `runtime-deps` and `ops` with an older release; retain that older release until those dependencies are deliberately relocated and tested. An older directory name is not proof it is unused.
 4. Use Git's worktree removal for each individually verified, obsolete checkout. Do not use `--force` or recursive shell deletion. Keep branch history until it is merged or explicitly archived. Inspect `git worktree prune --dry-run` before pruning stale registrations.
-5. Do not prune Cloudflare backups, erase local recovery bundles or delete active sync data as part of folder tidying. Any future data-retention change requires a separate bounded policy.
+5. The maintainer additionally authorized R2 migration cleanup after all release gates pass. First generate a complete read-only inventory with the application's `scripts/pool-sync-cleanup-inventory.mjs`. Restrict review to `pool-sync/5042/` and `pre-sync-app/5042/`; the inventory protects every pre-sync application object, including the verified ten-database fallback manifest and all its encrypted parts. Supply the final and 90% checkpoint manifest keys/hashes as protected receipts. Unknown objects stay protected. The tool has no deletion mode; age eligibility alone is not permission to remove anything. Review exact immutable keys, complete pagination, frozen offsite writers, bounded per-run counts/bytes, live release evidence and a final restore proof before performing any later removal. Preserve normal production backups, final data, required rollback checkpoints and every separately stored recovery key. Never wipe the bucket or erase active/local datasets as folder tidying.
 6. Leave one clearly documented normal working directory per repository, update maintenance references to those paths, and verify the next build/deployment workflow. Preserve the maintainer's manual promotion step and ongoing server/backup health checks.
 
 No code pull, app build, restart, promotion, data activation or cleanup is performed by these notes.
