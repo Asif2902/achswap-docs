@@ -10,6 +10,26 @@ Maintainer instructions recorded 2026-11-05. Public documentation lives in `docs
 - Public pages document the release contract and data semantics. Keep temporary percentages, ETAs, server paths and deployment progress out of those pages.
 - The existing REST API serves catalogue, filters, compact indexed state, coverage and events. Enrichment observations and reductions live in the separate sync dataset. Sync completion does not automatically add REST fields or endpoints. Validate the delivery format for any partner export, and separately review any API integration before documenting it as an HTTP contract.
 
+## Approved sync worker resources — 6 November 2026
+
+The maintainer authorized raising the isolated worker to a two-core CPU cap and a 2 GiB memory budget. The live change was applied without restarting the worker after checking the six-core host had about 4.7 GiB available RAM and both trading health endpoints returned HTTP 200.
+
+| Setting | Approved value |
+| --- | --- |
+| `CPUQuota` | `200%`, allowing up to two cores of CPU time |
+| `MemoryHigh` | `1792M`, the 1.75 GiB soft limit |
+| `MemoryMax` | `2G`, the 2 GiB hard limit |
+
+Persistent systemd resource overrides are under `/etc/systemd/system.control/achswap-pool-sync.service.d/`. Keep them across ordinary deployments. The conservative example service file can still show the original limits; inspect effective systemd/cgroup values before replacing or reverting overrides. Memory is a total cgroup budget, including native SQLite and file cache; it is not a 2 GiB V8 heap allocation. Low CPU/I/O scheduling priority and public-only RPC remain in place. The separate backup service retains its existing resource limits.
+
+Read-only verification:
+
+```bash
+sudo systemctl show achswap-pool-sync.service -p MainPID -p CPUQuotaPerSecUSec -p MemoryHigh -p MemoryMax
+```
+
+The requested budget is an upper limit, not a guarantee of using two cores or a promised speedup. Continue watching host memory, trading health, I/O waits, actual committed progress and backup results. Do not raise other services' budgets or restart trading as part of routine monitoring. Public-RPC limits and backup timeouts remain separate concerns.
+
 ## Current checkpoint, not a completion claim
 
 At approximately **20:02 Dhaka time on 5 November 2026**, the isolated server worker covered about **37.14%** of its pinned historical block interval. Its cutoff is block **29,619,812**. The latest observed metadata count was **126,680 observations**; that is not a count of universally readable token metadata or priced tokens. Trading health was HTTP 200, no worker alerts were present, and a new Cloudflare backup had completed successfully. Read the live monitor for current values rather than using this dated note as a dashboard.
