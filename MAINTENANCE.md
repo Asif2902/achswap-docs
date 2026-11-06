@@ -36,11 +36,21 @@ Continue implementation on the existing application sync branch/worktree, withou
 
 The maintainer corrected the backup cadence: preserve the original verified production fallback, create a migration checkpoint near **90% of the actual historical block interval**, and another at verified completion. Hourly health checks continue. The five-minute backup timer is only an eligibility check: without a new milestone request it does no database rehash, compression, upload or R2 request. Do not restore hourly full exports/uploads.
 
-The deployed isolated worker is commit `6d1ceaa87f7862d93a0a4df5203ed170299d9bb3`. It batches durable SQLite writes with FULL synchronization retained, reuses statements and gives independent RPC phases separate backoffs. No trading restart or frozen-router overwrite was part of that update. Interpret the current `backup-policy.json`, exact `backup-request.json` and matching `backup-confirmed.json`; a pre-90 offsite age is not a failed checkpoint.
+The deployed isolated worker is based on commit `6d1ceaa87f7862d93a0a4df5203ed170299d9bb3`, with RPC-body recovery patch `785c43c6565da4495b058ed486365523c9c1085e` described below. It batches durable SQLite writes with FULL synchronization retained, reuses statements and gives independent RPC phases separate backoffs. No trading restart or frozen-router overwrite was part of that update. Interpret the current `backup-policy.json`, exact `backup-request.json` and matching `backup-confirmed.json`; a pre-90 offsite age is not a failed checkpoint.
 
 The post-backfill design is **one coordinated indexing system**. The existing router remains the sole live log reader; an isolated data coordinator consumes its durable journal, fills the finite migration gap and maintains metadata, balances, LP principal observations, events and reductions. Separate resource isolation does not mean a second live log poller. The old production data and the completed historical bundle remain inactive recovery points.
 
 The application repository's `docs/indexer-consolidation.md` records the implementation and exact handoff gates. New live collection and API data activation must be verified before cleanup. Historical enrichment remains a separately specified export contract; do not invent REST routes or imply universal USD valuation. No APR or private server RPC is authorized.
+
+## RPC body recovery — 7 November 2026 (Dhaka)
+
+The worker stopped after an invalid/interrupted public-RPC JSON body was treated as permanent exit 78. The reproduced fix changes only body-error classification to retryable RPC_UNAVAILABLE, reusing bounded retries and phase backoff. Partial bodies are never cached. Byte limits, structured responses, canonicality, provenance and non-read-method prohibitions remain strict.
+
+The fix is pushed on the existing app sync branch and mainnet as 785c43c6565da4495b058ed486365523c9c1085e, without a new branch or PR. Full CI passed (968 tests/typecheck/build). The exact deployed base plus this patch passed 57 Linux sync tests and five Python monitor tests. Packaged CRLF differences were verified against the canonical source before patching.
+
+The active isolated release is /opt/achswap-pool-sync.releases/6d1ceaa8-rpc-785c43c6. Its PATCH.json identifies the base and one changed runtime module; this does not activate the staged unified-live pipeline. The saved checkpoint had 2,214,684 events. After restart, three more ranges committed and 2,246,520 rows matched the coverage counter in one snapshot, with the same dataset, target and global log-identity index. Trading PIDs/health, public-only RPC, resources and the verified ten-database fallback/key were preserved.
+
+Use mainnet containing this fix for eventual live release. Older staged candidate 84309f8c lacks it and needs an updated verified stage. Keep referenced runtimes and all release gates. SQLite probes should run as achswap-pool-sync to avoid root-owned WAL sidecars; the existing throughput helper now does so. Use bounded checkpoint diagnostics for routine RPC failures, not full integrity scans. No public docs content or site promotion changed in this maintenance update.
 
 ## Current checkpoint, not a completion claim
 
