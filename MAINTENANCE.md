@@ -34,13 +34,36 @@ The requested budget is an upper limit, not a guarantee of using two cores or a 
 
 Continue implementation on the existing application sync branch/worktree, without a new branch or PR. Documentation changes stay on this existing `mainnet-asif` branch. Direct updates still require the build, tests and safety review; a push is not a production promotion.
 
-The maintainer corrected the backup cadence: preserve the original verified production fallback, create a migration checkpoint near **90% of the actual historical block interval**, and another at verified completion. Hourly health checks continue. The five-minute backup timer is only an eligibility check: without a new milestone request it does no database rehash, compression, upload or R2 request. Do not restore hourly full exports/uploads.
+The maintainer originally approved preserving the verified production fallback with migration checkpoints near **90% of the actual historical block interval** and at verified completion. The **7 November storage-budget hold below supersedes automatic R2 uploads**. Local checkpoint exports and hourly health checks continue; do not re-enable the migration-upload timer or restore hourly full exports/uploads.
 
 The deployed isolated worker is based on commit `6d1ceaa87f7862d93a0a4df5203ed170299d9bb3`, with RPC-body recovery patch `785c43c6565da4495b058ed486365523c9c1085e` described below. It batches durable SQLite writes with FULL synchronization retained, reuses statements and gives independent RPC phases separate backoffs. No trading restart or frozen-router overwrite was part of that update. Interpret the current `backup-policy.json`, exact `backup-request.json` and matching `backup-confirmed.json`; a pre-90 offsite age is not a failed checkpoint.
 
 The post-backfill design is **one coordinated indexing system**. The existing router remains the sole live log reader; an isolated data coordinator consumes its durable journal, fills the finite migration gap and maintains metadata, balances, LP principal observations, events and reductions. Separate resource isolation does not mean a second live log poller. The old production data and the completed historical bundle remain inactive recovery points.
 
 The application repository's `docs/indexer-consolidation.md` records the implementation and exact handoff gates. New live collection and API data activation must be verified before cleanup. Historical enrichment remains a separately specified export contract; do not invent REST routes or imply universal USD valuation. No APR or private server RPC is authorized.
+
+## R2 storage budget — 7 November 2026
+
+The maintainer set a **10 GB storage budget**. Automatic migration uploads are on hold; the earlier 90%-and-completion upload schedule must not restart without a capacity review. The existing app's normal backups were not changed.
+
+A complete read-only inventory of the configured bucket at **14:50:56 UTC on 7 November 2026** found:
+
+| Objects | Stored bytes |
+| --- | ---: |
+| Migration sync checkpoints | 3,905,394,870 |
+| Protected pre-sync application fallbacks | 189,276,512 |
+| Other objects, including normal application backups | 2,062,105,164 |
+| **Total: 774 objects** | **6,156,776,546** |
+
+That leaves **3,843,223,454 bytes** below a 10,000,000,000-byte budget for this bucket at that instant. This is not an account-wide measurement, a reservation, or a prediction of the final compressed dataset size. Normal backups can continue growing.
+
+Only `achswap-pool-sync-backup.timer` was disabled and stopped. Its service was inactive; no running backup was interrupted. The indexing worker stayed active with the same PID and both trading health endpoints returned HTTP 200. No R2 objects were uploaded or deleted. The original ten-database fallback manifest and all its referenced parts were verified; its separate recovery key was checked without exposing its contents.
+
+Root-owned `/var/lib/achswap-pool-sync/monitor/r2-storage-hold.json` records the budget and hold. Keep the timer disabled during routine checks and deployments. Local milestone exports, indexing and health monitoring continue. An intentionally unconfirmed milestone must be reported as a storage hold; never manufacture a matching backup confirmation or bypass the final offsite restore/handoff gate.
+
+Before any new migration upload, refresh complete bucket/account usage, measure the compressed immutable checkpoint, reserve headroom for normal app backups and temporary overlap, and verify it fits the agreed budget. The present uploader creates a full gzip copy of each exported database; it does not implement incremental backups or a 10 GB enforcement guard. Do not enable paid storage implicitly or delete the original fallback to make room.
+
+If the final backup cannot fit, agree a separate offsite destination or revised budget and review/test the required recovery integration before cutover. A second file on the same VPS is not offsite recovery. Cleanup remains deferred until all existing release gates pass.
 
 ## RPC body recovery — 7 November 2026 (Dhaka)
 
