@@ -1,3 +1,23 @@
+## Free HyperSync historical transport — 8 November 2026
+
+The maintainer explicitly authorized free HyperSync as primary historical data transport with Arc public RPC as backup, and required token secrecy. This narrowly supersedes earlier public-only worker notes. Paid/metered billing, other private RPCs, trading changes, unified-live activation and final cutover remain unauthorized by this change.
+
+Application commit `4859ae6294967aef7377c37ade138f176acd9595` was fast-forwarded to the existing sync branch and `mainnet`, without a new branch or PR. Full local Node 24 CI passed typecheck, 1,001 tests and the production build. The exact deployed base plus patch passed 89 Linux sync tests and five Python monitor tests. A real staged sample matched 7,528 logs against public RPC, with 1,250 complete linked headers and matching public header samples.
+
+The active isolated symlink is `/opt/achswap-pool-sync.releases/6d1ceaa8-hypersync-4859ae6`. It preserves the `6d1ceaa8` base and `785c43c6` RPC-body fix. `HYPERSYNC-PATCH.json` binds the three changed runtime files and source revision; the older `PATCH.json` remains. The worker resumed gracefully as PID 322478 with the same dataset, source signature, genesis, pinned cutoff/hash and global log-identity index. The first verified commit advanced 10,000 blocks and added 21,971 events, with the indexed event delta matching the coverage counter. Existing work was retained.
+
+The token is stored only in root-owned mode-600 `/etc/achswap-pool-sync/hypersync.env`, loaded by the worker-specific `30-hypersync.conf` EnvironmentFile drop-in. Do not print, publish or include its contents in receipts, Git, client/admin code, application `.env` or unit inline environment values. `ACHSWAP_SYNC_HYPERSYNC_TOKEN` comes from the Envio dashboard's free HyperSync package; it is already configured, so the maintainer does not need to paste it again. The separate HyperRPC token was not installed. Trading processes were checked not to contain the sync token, and the observed worker log tail contained no token.
+
+Historical logs and headers use the fixed HyperSync endpoint with Bearer authorization and redirects refused. Discovery, metadata, balances/calls/code, genesis/target and fresh canonical boundaries continue through fixed public Arc RPC. Complete pagination, bounded bytes/results, unique identities, every header/log association, a linked parent chain and public start/end/midpoint checks precede the existing atomic commit. Availability, rate/quota limits, rejected credentials, archive lag and interrupted bodies discard partial pages and re-read the whole range publicly. Structured conflicts stop safely; failover never conceals them.
+
+Free usage is locally bounded to 15 requests per 60 seconds, pages spaced by at least four seconds, with lower advertised remaining budgets/reset cooldowns and a per-run request cap. No billing/overage setting was activated. A short fetch benchmark is not a complete migration ETA; use committed progress across full worker cycles.
+
+Trading PIDs and HTTP 200 health were preserved. The approved worker CPU/memory limits remain 200% / 1792M / 2G. R2 migration uploads remain intentionally paused under the 10 GB budget; the backup timer stays disabled, and existing fallback objects/keys remain protected. Laptop indexing remains stopped. The existing hourly health automation now recognizes `envio-hypersync-free` plus `arc-public` usage; no additional automation was created.
+
+Evidence lives under `/root/backups/achswap-sync-migration/`: `hypersync-final-old-checkpoint-4859ae6.json`, `hypersync-readonly-smoke-4859ae6.json`, `hypersync-resume-verified-4859ae6.json` and `hypersync-linux-tests-4859ae6.log`. Local deployment notes are `C:\Users\Asif\achswap-mcp-review-2026-11-03-review\sync-hypersync-deployment-2026-11-08.md`.
+
+Preserve previous releases and their shared runtime/ops dependencies. Eventual coordinated-live handoff must stage updated `mainnet` containing both patches; the older staged `84309f8c` candidate is insufficient. All original offsite restore, matching app/data deployment, manual public-site promotion and deferred cleanup gates remain. No public-site promotion occurred.
+
 # Documentation release and deferred workspace cleanup
 
 Maintainer instructions recorded 2026-11-05. Public documentation lives in `docs/`; this operational note is outside the built site. Do not add credentials, encryption keys, API secrets or environment-file contents here.
