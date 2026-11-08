@@ -1,3 +1,19 @@
+## Lightweight automatic progress reports — 8 November 2026
+
+The maintainer authorized removing repeated full-dataset readiness audits during incomplete historical backfill while keeping useful safety checks. Below 90% of the pinned historical interval, automatic hourly worker reports now reuse committed coverage without walking all stored pools, tokens or swaps. Reports explicitly say `audit: "progress-only"`, `ready: false` and `pending: null` (not evaluated); they cannot trigger a checkpoint export or claim completion.
+
+Full readiness audits remain mandatory at 90% and above, every cycle near completion, and in explicit `status`, `check` and `prepare` commands. All per-range public canonical anchors, HyperSync pagination/header/log validation, duplicate identities, pool provenance and atomic commits remain unchanged. Incremental enrichment/analytics and native minute health checks continue. No dataset, source, cutoff, schema, keys, resource limits, backup policy or trading code changed.
+
+Commit `3e06113b4f4129be9a201f01cf7b613928b60295` passed full local Node 24 CI: typecheck, 1,004 tests and production build. The exact currently deployed base plus this one-runtime-file patch passed 92 Linux sync tests and five Python monitor tests. The three new regressions reject expensive audit SQL below 90%, require a full audit at 90%, and preserve committed coverage after a transient history failure. The commit was fast-forwarded to the existing sync branch and `mainnet`; no new branch or PR was created.
+
+The new active isolated release is `/opt/achswap-pool-sync.releases/6d1ceaa8-hypersync-audit-3e06113b`, with worker PID 324532. `AUDIT-PATCH.json` records the base HyperSync release, source revision and changed file `pool-data/local/worker.js`. Earlier `PATCH.json` and `HYPERSYNC-PATCH.json` remain as patch-chain evidence; current files must be interpreted through the latest applicable patch rather than expecting older test-file hashes to match later appended regressions. No unified-live activation or production application deployment occurred.
+
+The prior worker stopped gracefully with its lock released. Preserve `/opt/achswap-pool-sync.releases/6d1ceaa8-hypersync-4859ae6`, older referenced releases, shared runtime/ops dependencies and all existing recovery evidence. HyperSync remains free and primary for history with fixed public Arc fallback; its protected worker-only secret file and drop-in are unchanged. Trading PIDs/HTTP health and the approved 200% / 1792M / 2G limits remain unchanged. Laptop indexing remains stopped, and the intentional R2 storage hold keeps migration uploads disabled.
+
+Server evidence is under `/root/backups/achswap-sync-migration/`: `audit-final-old-checkpoint-3e06113b.json`, `audit-resume-verified-3e06113b.json`, and `audit-linux-tests-3e06113b.log`. Artifact SHA-256: `c5429845d59b51d171d7552e83dbce4fdaef148ce41f5122680b4c9bfdf273c6`. Local evidence: `C:\Users\Asif\achswap-mcp-review-2026-11-03-review\sync-lightweight-audit-2026-11-08.md`.
+
+This supersedes earlier descriptions of full automatic hourly readiness scans before 90%. All 90%/completion, offsite restore, matching app/data deployment, manual public docs promotion and deferred cleanup gates remain. Future unified-live staging must use updated `mainnet` containing this change and both RPC/HyperSync patches. Continue the existing hourly health automation without creating another.
+
 ## Free HyperSync historical transport — 8 November 2026
 
 The maintainer explicitly authorized free HyperSync as primary historical data transport with Arc public RPC as backup, and required token secrecy. This narrowly supersedes earlier public-only worker notes. Paid/metered billing, other private RPCs, trading changes, unified-live activation and final cutover remain unauthorized by this change.
