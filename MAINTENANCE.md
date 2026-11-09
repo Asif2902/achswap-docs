@@ -100,6 +100,26 @@ The post-backfill design is **one coordinated indexing system**. The existing ro
 
 The application repository's `docs/indexer-consolidation.md` records the implementation and exact handoff gates. New live collection and API data activation must be verified before cleanup. Historical enrichment remains a separately specified export contract; do not invent REST routes or imply universal USD valuation. No APR or private server RPC is authorized.
 
+## R2 recovery keep list — 9 November 2026
+
+The maintainer requires ongoing R2 recovery for campaign Points (including the XP ledger) and
+its volume ledger, with a daily recovery point, plus one verified pre-migration pool-data copy.
+The R2 namespaces for Points and volume are `sqlite/campaign/` and `sqlite/volume/`. Preserve their
+snapshots and latest pointers. The existing production backups run on change. The matching
+release should also refresh each Points recovery point once it is a day old, even if unchanged.
+
+The designated old pool recovery copy is the original ten-database pre-sync archive at
+`pre-sync-app/5042/20261105T051251307Z/manifest.json`. Protect the manifest, every encrypted part
+it names, and the separately stored recovery key. The archive contains the old router database
+and has a recorded successful restore drill. Before any cleanup, recheck the protected recovery
+receipts, confirm the original archive and separate key can restore the old pool data, and verify
+the final dataset recovery, matching deployment and manually promoted live release. Review exact
+obsolete migration keys only. Preserve regular app backups and unclassified objects.
+
+For adding a DEX or factory, use free HyperSync for older history in an isolated workspace and
+public Arc RPC within 100 blocks of the public head observed at startup. The existing router's
+journal supplies the ongoing feed. Review source provenance before adopting any new dataset.
+
 ## R2 storage budget — 7 November 2026
 
 The maintainer set a **10 GB storage budget**. Automatic migration uploads are on hold; the earlier 90%-and-completion upload schedule must not restart without a capacity review. The existing app's normal backups were not changed.
