@@ -56,6 +56,20 @@ curl --fail-with-body 'https://trade.achswap.app/api/pool-data/v1/pools?limit=10
   -H "X-API-Key: $ACHSWAP_POOL_DATA_KEY"
 ```
 
+### Partner metrics preview
+
+The separate read-only preview is available to authorized pool-data partners at `https://trade.achswap.app/api/pool-data/preview`. It uses the same scoped key and rate limits. Treat preview responses as data as of their reported block and time. The release cutoff can lag the chain.
+
+| Preview path | Returns |
+| --- | --- |
+| `/docs` | Current release notice and request examples |
+| `/summary?window=24h` | Aggregate swap counts and USDC-leg volume |
+| `/pool?id=<pool-id>&window=24h` | Per-pool metrics and available liquidity observations |
+
+Use `24h`, `7d`, `30d` or `all` for `window`. Read `release_id`, `as_of_block`, `as_of_hash`, `as_of_time` and `coverage` before displaying results. Rolling windows include the lower time boundary and exclude the cutoff block. All-time results include the cutoff block.
+
+`gross_usdc_leg_volume` sums the observed USDC amounts. `net_usdc_volume_per_pool_tx` first nets USDC flows within each pool and transaction, then sums the absolute net amounts. Swaps without a USDC leg contribute to swap counts. Balances, principal estimates and in-range liquidity are separate observations. See `coverage.pancakeswap_infinity` for the indexed Infinity CL interval. Data coverage and availability for trading are separate.
+
 ### Pool metadata
 
 Catalogue selection parameters:
