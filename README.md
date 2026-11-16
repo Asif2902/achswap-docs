@@ -1,6 +1,6 @@
 # AchSwap Documentation
 
-Documentation for AchSwap on **Arc Mainnet (chain ID 5042)**. The site covers swaps, gasless swaps, V2/V3 liquidity, routing, on-chain swap execution, and deployed contract addresses. It does not document unrelated products or the undeployed AchSwap V4 contracts.
+Documentation for AchSwap on **Arc Mainnet (chain ID 5042)**. The site covers swaps, gasless swaps, V2/V3 liquidity, routing, on-chain swap execution, and deployed contract addresses. It does not document unrelated products or the undeployed AchSwap V4 contract.
 
 ## Run locally
 
