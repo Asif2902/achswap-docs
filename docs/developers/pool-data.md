@@ -10,6 +10,8 @@ AchSwap indexes pools on **Arc Mainnet, chain ID 5042**, across its own DEX and 
 
 There are two delivery formats: the [Pool Data API](/developers/pool-data-api) for paginated website reads, and custom dataset exports with an agreed schema, block range and refresh schedule. The API reference lists the HTTP routes and fields. An indexed dataset is not automatically a new REST endpoint.
 
+The live API is `https://trade.achswap.app/api/pool-data/v1`, using a per-partner **pool-data** key on your backend. It serves `/pools`, `/tokens`, `/swaps`, `/events`, `/liquidity` and `/history`, plus `/summary` and per-pool window metrics. Every response reports its canonical as-of block/hash/time, release identity and coverage. Display that point; observation blocks for balances and principal can differ. Infinity CL is available with `protocol=pancakeswap_infinity`; this data coverage does not imply that the aggregator can execute that protocol.
+
 ## What you can build
 
 | Website or application | Data to use |
